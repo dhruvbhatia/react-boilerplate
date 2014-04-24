@@ -1,0 +1,11 @@
+{
+  "name": "react-boilerplate",
+  "private": true,
+  "dependencies": {
+    "modernizr": "~2.7.2",
+    "jquery": "~2.1.0",
+    "react": "~0.10.0",
+    "foundation": "~5.2.2"
+  },
+  "devDependencies": {}
+}
