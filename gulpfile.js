@@ -2,6 +2,9 @@
 // generated on 2014-04-24 using generator-gulp-webapp 0.0.8
 
 var gulp = require('gulp');
+var source = require('vinyl-source-stream')
+var browserify = require('browserify')
+var streamify = require('gulp-streamify')
 
 // load plugins
 var $ = require('gulp-load-plugins')();
@@ -59,6 +62,15 @@ gulp.task('fonts', function () {
         .pipe(gulp.dest('dist/fonts'))
         .pipe($.size());
 });
+
+// gulp.task('browserify', function() {
+//   var bundleStream = browserify('./app/scripts/main.js').bundle()
+
+//   bundleStream
+//     .pipe(source('main.js'))
+//     .pipe(streamify($.uglify()))
+//     .pipe(gulp.dest('./app/scripts/bundle/'))
+// });
 
 gulp.task('clean', function () {
     return gulp.src(['.tmp', 'dist'], { read: false }).pipe($.clean());

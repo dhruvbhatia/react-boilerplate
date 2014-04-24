@@ -5,7 +5,8 @@
     "modernizr": "~2.7.2",
     "jquery": "~2.1.0",
     "react": "~0.10.0",
-    "foundation": "~5.2.2"
+    "foundation": "~5.2.2",
+    "lodash": "~2.4.1"
   },
   "devDependencies": {}
 }
