@@ -15,13 +15,17 @@ body {
 
 #leftMenu {
   float: left;
-  width: 300px;
   background-color: #e6e6e6;
   height: 100vh;
 }
 
 #content {
   float: left;
+  height: 100vh;
+}
+
+.active {
+  font-weight: bold;
 }
 
 .browsehappy {

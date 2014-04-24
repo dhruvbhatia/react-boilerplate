@@ -40,13 +40,17 @@ route: function(event) {
 
     var self = this;
     
-    var links = _.map(this.props.navLinks, function(link) {
-      return <a href={link.url} onClick={self.route}><li data-nav={link.url}>{link.name}</li></a>
+    var links = _.map(this.props.navLinks, function(link, key) {
+
+      var classString = "";
+      if(self.props.navPos===link.name){classString = "active"};
+      
+      return <a href={link.url} onClick={self.route} key={key} className={classString}><li data-nav={link.url}>{link.name}</li></a>
     });
 
     return (
-      <div id="leftMenu">
-      <ul>{links}</ul>
+      <div id="leftMenu" className="small-4 large-2 columns">
+      <ul className="no-bullet">{links}</ul>
       </div>
     );
   }
@@ -56,19 +60,24 @@ route: function(event) {
 var Content = React.createClass({
 
   render: function() {
+    
+    var section = null;
     if(this.props.navPos === "Dashboard") {
-      return (
-        <div id="content">
-        <p>{this.props.navPos}</p>
-        </div>
+      section = (
+        <Dashboard navPos={this.props.navPos} setPos={this.props.setPos} />
       )
     } else {
-      return (
-        <div id="content">
+      section = (
         <p>{this.props.navPos}</p>
-        </div>
-      );
-  }
+      )
+    }
+
+    return (
+      <div id="content" className="small-8 large-10 columns">
+      {section}
+      </div>
+    )
+
   }
 
 });
