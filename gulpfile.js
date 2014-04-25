@@ -95,7 +95,23 @@ gulp.task('connect', function () {
         .use(require('connect-livereload')({ port: 35729 }))
         .use(connect.static('app'))
         .use(connect.static('.tmp'))
-        .use(connect.directory('app'));
+        .use(connect.directory('app'))
+        .use(function(req, res, next){
+          switch (req.url) {
+            case '/404':
+              var body = '404 test';
+              res.statusCode = 404;
+              res.setHeader('Content-Length', body.length);
+              res.end(body);
+              break;
+            default:
+              var body = '';
+              res.statusCode = 302;
+              res.setHeader( 'Location', ('/#' + req.url.substring(1)) );
+              res.setHeader('Content-Length', body.length);
+              res.end(body);
+          }
+  });
 
     require('http').createServer(app)
         .listen(9000)
