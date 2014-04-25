@@ -1,1 +1,5 @@
-console.log('Application loaded');
+window.onload = function() {
+
+  $(document).foundation();
+
+};
