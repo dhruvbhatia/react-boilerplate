@@ -5,6 +5,7 @@ var gulp = require('gulp');
 var source = require('vinyl-source-stream')
 var browserify = require('browserify')
 var streamify = require('gulp-streamify')
+var react = require('gulp-react');
 
 // load plugins
 var $ = require('gulp-load-plugins')();
@@ -71,6 +72,12 @@ gulp.task('fonts', function () {
 //     .pipe(streamify($.uglify()))
 //     .pipe(gulp.dest('./app/scripts/bundle/'))
 // });
+
+gulp.task('react', function () {
+    return gulp.src('./app/scripts/components/*.jsx')
+        .pipe(react())
+        .pipe(gulp.dest('dist'));
+});
 
 gulp.task('clean', function () {
     return gulp.src(['.tmp', 'dist'], { read: false }).pipe($.clean());
