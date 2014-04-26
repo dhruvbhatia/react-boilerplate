@@ -30,7 +30,7 @@ var Layout = React.createClass({
       var email = JSON.parse(cookie).email;
 
       superagent
-      .get('http://localhost:9000/api/v1/auth/validate/' + token)
+      .get('http://192.168.178.20:9000/api/v1/auth/validate/' + token)
       .set('X-API-Key', token)
       .set('Accept', 'application/json')
       .end(function(error, res){
@@ -157,7 +157,7 @@ var Login = React.createClass({
       var self = this;
 
       superagent
-      .post('http://localhost:9000/api/v1/auth/login')
+      .post('http://192.168.178.20:9000/api/v1/auth/login')
       //.send({ name: 'Manny', species: 'cat' })
       .set('X-API-Email', email)
       .set('X-API-Password', password)
