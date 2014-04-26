@@ -102,7 +102,17 @@ if(this.state.render) {
   }
 } else {
 
-  return(<div></div>)
+var loadingMsgStyle = {
+         position: "relative",
+         top: "30%"
+     };
+
+  return(
+
+      <div className="row text-center" style={loadingMsgStyle}>
+      <h1>Loading...</h1>
+    </div>
+)
 
   }
 }
@@ -120,6 +130,8 @@ var Login = React.createClass({
   login: function(e) {
 
     e.preventDefault();
+
+    this.setState({server_error: undefined});
 
     var email = $("#email").val();
     var password = $("#password").val();

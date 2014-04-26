@@ -1,5 +1,6 @@
 // bower:scss
 @import '../bower_components/foundation/scss/normalize.scss';
+@import 'settings';
 @import '../bower_components/foundation/scss/foundation.scss';
 // endbower
 
@@ -8,6 +9,8 @@ body {
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
 }
+
+$form-label-small-transform: none;
 
 #application {
   height: 100vh;
