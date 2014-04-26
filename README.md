@@ -6,14 +6,14 @@
 ## What is this?
 A starting point for a web app built with Facebook's React.
 
-The goal is to use technologies to build a solid seed project for developing web apps.
+The goal is to use [leading technologies](#tech) to build a solid seed project for developing web apps.
 
 ## Features
 - User/pass token & cookie based authentication against a backend
 - Routing between views (with URL changes)
 - Clear separation of components
 
-## Technologies
+## <a name="tech"></a>Technologies
 - React
 - Backbone.Router
 - Foundation
