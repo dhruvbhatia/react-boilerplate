@@ -270,7 +270,7 @@ route: function(event) {
 
     return (
       <div id="topBar" className="sticky">
-      <nav className="top-bar" data-topbar>
+      <nav className="top-bar" data-topbar data-options="is_hover: false">
         <ul className="title-area">
           <li className="name">
             <h1><a href="#">Web App Name</a></h1>
