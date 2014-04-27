@@ -19,6 +19,7 @@ The goal is to use [leading technologies](#tech) to build a solid seed project f
 - Foundation
 - jQuery.Cookie
 - Lo-Dash
+- MomentJS
 - Gulp
 - Bower
 

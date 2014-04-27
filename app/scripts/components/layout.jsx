@@ -354,6 +354,11 @@ var Content = React.createClass({
           <MyAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
         )
 
+    }  else if(this.props.navPos === "Edit Account") {
+        section = (
+          <EditAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
+        )
+
     } else {
       section = (
         <p>{this.props.navPos}</p>
@@ -375,6 +380,7 @@ var Router = Backbone.Router.extend({
     ""    : "index",
     "campaigns" : "campaigns",
     "account" : "account",
+    "account/edit" : "accountEdit",
     "*splat" : "index"
   },
     clearLayout : function() {
@@ -409,6 +415,10 @@ var Router = Backbone.Router.extend({
   account : function() {
     this.clearLayout();
     this.showLayout("account");
+  },
+  accountEdit : function() {
+    this.clearLayout();
+    this.showLayout("account/edit");
   }
 });
  
