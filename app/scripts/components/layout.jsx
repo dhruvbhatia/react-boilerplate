@@ -27,7 +27,7 @@ var Layout = React.createClass({
     if(!_.isUndefined(cookie)) {
 
       var token = JSON.parse(cookie).sessionId;
-      var email = JSON.parse(cookie).email;
+      var user = JSON.parse(cookie).user;
 
       superagent
       .get('http://192.168.178.20:9000/api/v1/auth/validate/' + token)
@@ -37,7 +37,7 @@ var Layout = React.createClass({
 
         if(res.ok === true) {
 
-          self.setState({loggedIn: email, render: true});
+          self.setState({loggedIn: user, render: true});
 
         } else {
 
@@ -165,16 +165,17 @@ var Login = React.createClass({
       .end(function(error, res){
 
         var sessionId = JSON.parse(res.text).sessionId
+        var user = JSON.parse(res.text).user
 
         console.log(res)
         console.log(sessionId)
         //console.log(document.cookie)
 
         if(res.ok === true) {
-          self.props.setLoggedIn(email);
+          self.props.setLoggedIn(user);
 
           // set cookie
-          $.cookie("application", JSON.stringify({ "sessionId": sessionId,  "email": email }), {path: "/", expires: 120});
+          $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
 
         } else {
 
@@ -282,7 +283,7 @@ route: function(event) {
 
           <ul className="right">
             <li className="active has-dropdown">
-            <a href="#">Logged in as {this.props.loggedIn}</a>
+            <a href="#">Logged in as {this.props.loggedIn.fullName}</a>
             <ul className="dropdown">
                 <li><a data-nav="account" onClick={this.route}>My Account</a></li>
                 <li><a onClick={this.logout}>Logout</a></li>
