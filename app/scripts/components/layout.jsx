@@ -1,9 +1,10 @@
 /** @jsx React.DOM */
 
 var navigation_data = [
-  {name: "Dashboard", url: ""},
-  {name: "Campaigns", url: "campaigns"},
-  {name: "My Account", url: "account"}
+  {name: "Dashboard", url: "", showInMenu: true},
+  {name: "Campaigns", url: "campaigns", showInMenu: true},
+  {name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true},
+  {name: "Edit Account", url: "account/edit", showInMenu: false}
 ];
 
 
@@ -322,10 +323,10 @@ route: function(event) {
 
     var self = this;
     
-    var links = _.map(this.props.navLinks, function(link, key) {
+    var links = _.map(_.filter(this.props.navLinks, "showInMenu"), function(link, key) {
 
       var classString = "";
-      if(self.props.navPos===link.name){classString = "active"};
+      if((self.props.navPos===link.name) || (_.contains(self.props.navPos,link.subroutes))){classString = "active"};
 
       return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}>{link.name}</a></li>
     });
