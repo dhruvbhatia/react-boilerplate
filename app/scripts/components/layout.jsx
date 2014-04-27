@@ -346,8 +346,13 @@ var Content = React.createClass({
     var section = null;
     if(this.props.navPos === "Dashboard") {
       section = (
-        <Dashboard navPos={this.props.navPos} setPos={this.props.setPos} />
+        <Dashboard navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
       )
+    } else if(this.props.navPos === "My Account") {
+        section = (
+          <MyAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
+        )
+
     } else {
       section = (
         <p>{this.props.navPos}</p>
