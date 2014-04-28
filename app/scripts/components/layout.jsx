@@ -2,6 +2,7 @@
 
 var navigation_data = [
   {name: "Dashboard", url: "", showInMenu: true},
+  {name: "Websites", url: "websites", showInMenu: true},
   {name: "Campaigns", url: "campaigns", showInMenu: true},
   {name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true},
   {name: "Edit Account", url: "account/edit", showInMenu: false}
@@ -28,8 +29,6 @@ var Layout = React.createClass({
     if(!_.isUndefined(cookie)) {
 
       var token = JSON.parse(cookie).sessionId;
-      var user = JSON.parse(cookie).user;
-      user.websites = JSON.parse(cookie).websites
 
       superagent
       .get('http://192.168.178.20:9000/api/v1/auth/validate/' + token)
@@ -39,10 +38,12 @@ var Layout = React.createClass({
 
         if(res.ok === true) {
 
-          var refreshed_user = JSON.parse(res.text).user
-          refreshed_user.websites = JSON.parse(res.text).websites
+          var sessionId = JSON.parse(res.text).sessionId
+        var user = JSON.parse(res.text).user
+        user.websites = JSON.parse(res.text).websites
 
-          self.setState({loggedIn: refreshed_user, render: true});
+          self.setState({loggedIn: user, render: true});
+          $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
 
         } else {
 
@@ -338,9 +339,42 @@ route: function(event) {
 
     return (
       <div id="leftMenu" className="small-4 large-2 columns">
+      <Websites />
       <ul className="side-nav">{links}</ul>
       </div>
     );
+  }
+
+});
+
+
+var Websites = React.createClass({
+
+  render: function() {
+
+    var websites = JSON.parse($.cookie("application")).user.websites
+
+     var links = _.map(websites, function(site, key) {
+
+      return <option key={key}>{site.name}</option>
+
+    });
+
+
+    console.log(websites)
+
+    return (
+
+      <div className="text-center">
+
+      <select>
+      {links}
+      <option>Add New Website</option>
+      </select>
+
+      </div>
+    )
+
   }
 
 });
@@ -383,6 +417,7 @@ var Content = React.createClass({
 var Router = Backbone.Router.extend({
   routes : {
     ""    : "index",
+    "websites" : "websites",
     "campaigns" : "campaigns",
     "account" : "account",
     "account/edit" : "accountEdit",
@@ -412,6 +447,10 @@ var Router = Backbone.Router.extend({
   index : function() {
     this.clearLayout();
     this.showLayout("dashboard");
+  },
+  websites : function() {
+    this.clearLayout();
+    this.showLayout("websites");
   },
   campaigns : function() {
     this.clearLayout();
