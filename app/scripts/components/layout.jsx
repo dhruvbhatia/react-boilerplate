@@ -352,6 +352,7 @@ var Websites = React.createClass({
 
   render: function() {
 
+if($.cookie("application")) {
     var websites = JSON.parse($.cookie("application")).user.websites
 
      var links = _.map(websites, function(site, key) {
@@ -360,7 +361,7 @@ var Websites = React.createClass({
 
     });
 
-
+}
     console.log(websites)
 
     return (
