@@ -29,6 +29,7 @@ var Layout = React.createClass({
 
       var token = JSON.parse(cookie).sessionId;
       var user = JSON.parse(cookie).user;
+      user.websites = JSON.parse(cookie).websites
 
       superagent
       .get('http://192.168.178.20:9000/api/v1/auth/validate/' + token)
@@ -38,7 +39,10 @@ var Layout = React.createClass({
 
         if(res.ok === true) {
 
-          self.setState({loggedIn: user, render: true});
+          var refreshed_user = JSON.parse(res.text).user
+          refreshed_user.websites = JSON.parse(res.text).websites
+
+          self.setState({loggedIn: refreshed_user, render: true});
 
         } else {
 
@@ -167,6 +171,7 @@ var Login = React.createClass({
 
         var sessionId = JSON.parse(res.text).sessionId
         var user = JSON.parse(res.text).user
+        user.websites = JSON.parse(res.text).websites
 
         console.log(res)
         console.log(sessionId)
