@@ -17,7 +17,7 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
-    return {navPos: this.props.navPos, loggedIn: undefined, render: false};
+    return {navPos: this.props.navPos, loggedIn: undefined, render: false, website: null};
   },
 
   componentDidMount: function() {
@@ -100,9 +100,9 @@ if(this.state.render) {
     // User is logged in
     return (
       <div>
-      <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} />
-      <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} />
-      <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} />
+      <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.website} />
+      <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.website} />
+      <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.website} />
       </div>
     );
   }
@@ -350,6 +350,14 @@ route: function(event) {
 
 var Websites = React.createClass({
 
+  websiteSelected: function(e) {
+
+    console.log(e.target.value)
+
+    self.setState({website: 1})
+
+  },
+
   render: function() {
 
 if($.cookie("application")) {
@@ -357,18 +365,17 @@ if($.cookie("application")) {
 
      var links = _.map(websites, function(site, key) {
 
-      return <option key={key}>{site.name}</option>
+      return <option key={key} value={site.name}>{site.name}</option>
 
     });
 
 }
-    console.log(websites)
 
     return (
 
       <div className="text-center">
 
-      <select>
+      <select onChange={this.websiteSelected}>
       {links}
       <option>Add New Website</option>
       </select>
