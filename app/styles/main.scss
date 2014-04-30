@@ -22,6 +22,11 @@ $form-label-small-transform: none;
   height: 100%;
   padding-left: 0px;
   padding-right: 0px;
+  padding-top: 15px;
+  p {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
 }
 
 #content {

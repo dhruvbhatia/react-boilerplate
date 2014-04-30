@@ -17,7 +17,7 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
-    return {navPos: this.props.navPos, loggedIn: undefined, render: false, website: null};
+    return {navPos: this.props.navPos, loggedIn: undefined, render: false, website: undefined};
   },
 
   componentDidMount: function() {
@@ -72,6 +72,10 @@ var Layout = React.createClass({
     router.navigate(url);
   },
 
+  setWebsite: function(website) {
+    this.setState({website: website});
+  },
+
   setLoggedIn: function(state) {
     this.setState({loggedIn: state});
 
@@ -100,9 +104,9 @@ if(this.state.render) {
     // User is logged in
     return (
       <div>
-      <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.website} />
-      <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.website} />
-      <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.website} />
+      <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+      <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+      <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
       </div>
     );
   }
@@ -339,7 +343,7 @@ route: function(event) {
 
     return (
       <div id="leftMenu" className="small-4 large-2 columns">
-      <Websites />
+      <Websites website={this.props.website} setWebsite={this.props.setWebsite} />
       <ul className="side-nav">{links}</ul>
       </div>
     );
@@ -352,9 +356,18 @@ var Websites = React.createClass({
 
   websiteSelected: function(e) {
 
-    console.log(e.target.value)
+    var websites = JSON.parse($.cookie("application")).user.websites
 
-    self.setState({website: 1})
+    if(e.target.value === 0) {
+      this.props.setWebsite(undefined)
+    } else {
+
+      var website = _.first(_.filter(websites, { 'id': parseInt(e.target.value) }))
+
+      console.log(website)
+
+      this.props.setWebsite(website)
+    }
 
   },
 
@@ -363,9 +376,11 @@ var Websites = React.createClass({
 if($.cookie("application")) {
     var websites = JSON.parse($.cookie("application")).user.websites
 
-     var links = _.map(websites, function(site, key) {
 
-      return <option key={key} value={site.name}>{site.name}</option>
+     var links = _.map(websites, function(site, key) {
+      //console.log(site)
+
+      return <option key={site.id} value={site.id}>{site.name}</option>
 
     });
 
@@ -373,11 +388,10 @@ if($.cookie("application")) {
 
     return (
 
-      <div className="text-center">
-
+      <div>
       <select onChange={this.websiteSelected}>
       {links}
-      <option>Add New Website</option>
+      <option key="0" value="0">Add New Website</option>
       </select>
 
       </div>
@@ -409,6 +423,15 @@ var Content = React.createClass({
     } else {
       section = (
         <p>{this.props.navPos}</p>
+      )
+    }
+
+
+    // Onboarding screen if no websites exist
+    if(this.props.website === undefined) {
+      console.log(this.props.website)
+      section = (
+        <p>Create a website</p>
       )
     }
 
