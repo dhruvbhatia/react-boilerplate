@@ -29,6 +29,7 @@ var Layout = React.createClass({
     if(!_.isUndefined(cookie)) {
 
       var token = JSON.parse(cookie).sessionId;
+      var active_website = JSON.parse(cookie).user.website;
 
       superagent
       .get('http://192.168.178.20:9000/api/v1/auth/validate/' + token)
@@ -40,6 +41,7 @@ var Layout = React.createClass({
 
           var sessionId = JSON.parse(res.text).sessionId
         var user = JSON.parse(res.text).user
+        user.website = active_website;
         user.websites = JSON.parse(res.text).websites
 
           self.setState({loggedIn: user, render: true});
@@ -74,6 +76,14 @@ var Layout = React.createClass({
 
   setWebsite: function(website) {
     this.setState({website: website});
+
+      var cookie = JSON.parse($.cookie("application"));
+
+      cookie.user.website = website;
+
+      $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
+
+
   },
 
   setLoggedIn: function(state) {
@@ -81,7 +91,7 @@ var Layout = React.createClass({
 
     // Kill cookie if user is logging out
     if(state === undefined) {
-      $.removeCookie("application")
+      $.removeCookie("application");
     };
 
   },
@@ -354,19 +364,47 @@ route: function(event) {
 
 var Websites = React.createClass({
 
+  componentDidMount: function() {
+
+    var websites = JSON.parse($.cookie("application")).user.websites;
+
+    if(JSON.parse($.cookie("application")).user.website === undefined) {
+
+       // set active website to the first website in the user's list if they haven't prev chosen an active website
+      var first_website = _.first(websites).id;
+
+      this.props.setWebsite(first_website);
+
+      console.log(first_website);
+
+      React.addons.TestUtils.Simulate.change($("#websiteSelector"),$("#websiteSelector").val(first_website));
+
+    } else {
+
+       React.addons.TestUtils.Simulate.change($("#websiteSelector"),$("#websiteSelector").val(JSON.parse($.cookie("application")).user.website));
+       this.props.setWebsite(JSON.parse($.cookie("application")).user.website);
+
+    
+    }
+
+  },
+
   websiteSelected: function(e) {
 
     var websites = JSON.parse($.cookie("application")).user.websites
 
-    if(e.target.value === 0) {
-      this.props.setWebsite(undefined)
+    if(parseInt(e.target.value) === 0) {
+
+      this.props.setWebsite(undefined);
+
     } else {
 
-      var website = _.first(_.filter(websites, { 'id': parseInt(e.target.value) }))
+      var website = _.first(_.filter(websites, { 'id': parseInt(e.target.value) })).id;
 
-      console.log(website)
+      console.log(website);
 
-      this.props.setWebsite(website)
+      this.props.setWebsite(website);
+
     }
 
   },
@@ -384,14 +422,15 @@ if($.cookie("application")) {
 
     });
 
-}
+};
 
     return (
 
       <div>
-      <select onChange={this.websiteSelected}>
-      {links}
+      <select id="websiteSelector" onChange={this.websiteSelected}>
+      
       <option key="0" value="0">Add New Website</option>
+      {links}
       </select>
 
       </div>
