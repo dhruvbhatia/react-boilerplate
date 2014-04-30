@@ -22,6 +22,12 @@ var Layout = React.createClass({
 
   componentDidMount: function() {
 
+    // todo: review this
+    if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
+      this.setState({navPos: "Websites"});
+    router.navigate("websites");
+    }
+
     // figure out if a cookie exists and is a valid session
     self = this;
     var cookie = $.cookie("application");
@@ -44,14 +50,14 @@ var Layout = React.createClass({
           user.websites = JSON.parse(res.text).websites
 
         // set active website to the last selected website in the cookie, else first website in the user's list
-        var active_website = JSON.parse(cookie).user.website || _.first(user.websites).id;
+        var active_website = JSON.parse(cookie).user.website || _.pick(_.first(user.websites), "id").id;
 
         if(_.isEmpty(_.first(_.filter(user.websites , { 'id': JSON.parse(cookie).user.website })))) {
           if(_.first(user.websites) === undefined) {
             active_website = undefined;
           } else {
-          active_website = _.first(user.websites).id;
-        }
+            active_website = _.first(user.websites).id;
+          }
         }
 
         $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
@@ -72,7 +78,7 @@ var Layout = React.createClass({
 
       });
 
-    } else {
+} else {
 
       // No prev cookie - render login form
       self.setLoggedIn(undefined);
@@ -83,12 +89,20 @@ var Layout = React.createClass({
   },
 
   setPos: function(url, pos) {
+
+        // Onboarding screen if no websites exist
+    if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
+      this.setState({navPos: "Websites"});
+    router.navigate("websites");
+    } else {
+
     this.setState({navPos: pos});
     router.navigate(url);
+  }
   },
 
   setWebsite: function(website) {
-    
+
 
     var cookie = JSON.parse($.cookie("application"));
 
@@ -369,7 +383,7 @@ var LeftMenu = React.createClass({
 
     return (
             <div id="leftMenu" className="small-4 large-2 columns">
-            <Websites website={this.props.website} setWebsite={this.props.setWebsite} />
+            <Websites website={this.props.website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} />
             <ul className="side-nav">{links}</ul>
             </div>
             );
@@ -387,6 +401,9 @@ var Websites = React.createClass({
     if(parseInt(e.target.value) === 0) {
 
       this.props.setWebsite(undefined);
+
+      // todo: review
+      this.props.setPos("websites", "Websites")
 
     } else {
 
@@ -408,9 +425,9 @@ var Websites = React.createClass({
 
       var links = _.map(websites, function(site, key) {
 
-      return <option key={site.id} value={site.id}>{site.name}</option>
+        return <option key={site.id} value={site.id}>{site.name}</option>
 
-    });
+      });
 
     };
 
