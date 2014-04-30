@@ -46,10 +46,19 @@ var Layout = React.createClass({
         // set active website to the last selected website in the cookie, else first website in the user's list
         var active_website = JSON.parse(cookie).user.website || _.first(user.websites).id;
 
+        if(_.isEmpty(_.first(_.filter(user.websites , { 'id': JSON.parse(cookie).user.website })))) {
+          if(_.first(user.websites) === undefined) {
+            active_website = undefined;
+          } else {
+          active_website = _.first(user.websites).id;
+        }
+        }
+
+        $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
+
         self.setWebsite(active_website);
 
         self.setState({loggedIn: user, render: true});
-        $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
 
       } else {
 
@@ -79,13 +88,15 @@ var Layout = React.createClass({
   },
 
   setWebsite: function(website) {
-    this.setState({website: website});
+    
 
     var cookie = JSON.parse($.cookie("application"));
 
     cookie.user.website = website;
 
     $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
+
+    this.setState({website: website});
 
 
   },
@@ -197,10 +208,11 @@ var Login = React.createClass({
         //console.log(document.cookie)
 
         if(res.ok === true) {
-          self.props.setLoggedIn(user);
 
           // set cookie
           $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
+
+          self.props.setLoggedIn(user);
 
         } else {
 
