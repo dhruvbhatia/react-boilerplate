@@ -2,7 +2,8 @@
 
 var navigation_data = [
 {name: "Dashboard", url: "", showInMenu: true},
-{name: "Websites", url: "websites", showInMenu: true},
+{name: "Websites", url: "websites", subroutes: "Add Website", showInMenu: true},
+{name: "Add Website", url: "websites/add", showInMenu: false},
 {name: "Campaigns", url: "campaigns", showInMenu: true},
 {name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true},
 {name: "Edit Account", url: "account/edit", showInMenu: false}
@@ -24,8 +25,8 @@ var Layout = React.createClass({
 
     // todo: review this
     if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
-      this.setState({navPos: "Websites"});
-    router.navigate("websites");
+      this.setState({navPos: "Add Website"});
+    router.navigate("websites/add");
     }
 
     // figure out if a cookie exists and is a valid session
@@ -92,8 +93,8 @@ var Layout = React.createClass({
 
         // Onboarding screen if no websites exist
     if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
-      this.setState({navPos: "Websites"});
-    router.navigate("websites");
+      this.setState({navPos: "Add Website"});
+    router.navigate("websites/add");
     } else {
 
     this.setState({navPos: pos});
@@ -496,6 +497,7 @@ var Router = Backbone.Router.extend({
   routes : {
     ""    : "index",
     "websites" : "websites",
+    "websites/add" : "websitesAdd",
     "campaigns" : "campaigns",
     "account" : "account",
     "account/edit" : "accountEdit",
@@ -529,6 +531,10 @@ var Router = Backbone.Router.extend({
   websites : function() {
     this.clearLayout();
     this.showLayout("websites");
+  },
+  websitesAdd : function() {
+    this.clearLayout();
+    this.showLayout("websites/add");
   },
   campaigns : function() {
     this.clearLayout();
