@@ -384,7 +384,7 @@ var LeftMenu = React.createClass({
 
     return (
             <div id="leftMenu" className="small-4 large-2 columns">
-            <Websites website={this.props.website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} />
+            <WebsiteSelector website={this.props.website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} />
             <ul className="side-nav">{links}</ul>
             </div>
             );
@@ -393,7 +393,7 @@ var LeftMenu = React.createClass({
 });
 
 
-var Websites = React.createClass({
+var WebsiteSelector = React.createClass({
 
   websiteSelected: function(e) {
 
@@ -404,7 +404,7 @@ var Websites = React.createClass({
       this.props.setWebsite(undefined);
 
       // todo: review
-      this.props.setPos("websites", "Websites")
+      this.props.setPos("websites/add", "Add Website");
 
     } else {
 
@@ -413,6 +413,8 @@ var Websites = React.createClass({
       console.log(website);
 
       this.props.setWebsite(website);
+
+      this.props.setPos("", "Dashboard");
 
     }
 
@@ -456,30 +458,31 @@ var Content = React.createClass({
     var section = null;
     if(this.props.navPos === "Dashboard") {
       section = (
-                 <Dashboard navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
+                 <Dashboard navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
                  )
     } else if(this.props.navPos === "My Account") {
       section = (
-                 <MyAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
+                 <MyAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
                  )
 
-    }  else if(this.props.navPos === "Edit Account") {
+    } else if(this.props.navPos === "Edit Account") {
       section = (
-                 <EditAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} />
+                 <EditAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
+                 )
+
+    } else if(this.props.navPos === "Websites") {
+      section = (
+                 <Website navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
+                 )
+
+    } else if(this.props.navPos === "Add Website") {
+      section = (
+                 <AddWebsite navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
                  )
 
     } else {
       section = (
                  <p>{this.props.navPos}</p>
-                 )
-    }
-
-
-    // Onboarding screen if no websites exist
-    if(this.props.website === undefined) {
-      console.log(this.props.website)
-      section = (
-                 <p>Create a website</p>
                  )
     }
 
