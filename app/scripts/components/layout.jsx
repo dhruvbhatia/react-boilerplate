@@ -26,7 +26,7 @@ var Layout = React.createClass({
     // todo: review this
     if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
       this.setState({navPos: "Add Website"});
-    router.navigate("websites/add");
+      router.navigate("websites/add");
     }
 
     // figure out if a cookie exists and is a valid session
@@ -92,26 +92,41 @@ var Layout = React.createClass({
   setPos: function(url, pos) {
 
         // Onboarding screen if no websites exist
-    if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
-      this.setState({navPos: "Add Website"});
-    router.navigate("websites/add");
+        if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
+          this.setState({navPos: "Add Website"});
+          router.navigate("websites/add");
+        } else {
+
+          this.setState({navPos: pos});
+
+          router.navigate(url);
+        }
+      },
+
+      setWebsite: function(website) {
+
+
+    // if this is called with "default" as an argument, then set the active website to the first one in the user's list
+    var websites = JSON.parse($.cookie("application")).user.websites;
+
+    var first_website = _.first(websites).id;
+
+    if( (!_.isEmpty(websites)) && (website === "default")) {
+
+      this.setState({website: first_website});
+
     } else {
 
-    this.setState({navPos: pos});
-    router.navigate(url);
-  }
-  },
 
-  setWebsite: function(website) {
+      var cookie = JSON.parse($.cookie("application"));
 
+      cookie.user.website = website;
 
-    var cookie = JSON.parse($.cookie("application"));
+      $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
 
-    cookie.user.website = website;
+      this.setState({website: website});
 
-    $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
-
-    this.setState({website: website});
+    };
 
 
   },
@@ -368,6 +383,10 @@ var LeftMenu = React.createClass({
     var pos = $(event.target).text();
 
     this.props.setPos(url, pos);
+
+    // TO REVIEW: set the website context back to default when a menu link is clicked
+    this.props.setWebsite("default");
+
   },
 
   render: function() {
@@ -422,6 +441,13 @@ var WebsiteSelector = React.createClass({
 
   render: function() {
     var self = this;
+
+    var value = 0;
+    // Select default option where value = 0 if website isn't defined
+    if(this.props.website !== undefined) {
+      value = this.props.website;
+    };
+
     if($.cookie("application")) {
       var websites = JSON.parse($.cookie("application")).user.websites
 
@@ -438,7 +464,7 @@ var WebsiteSelector = React.createClass({
 
             <div>
 
-            <select id="websiteSelector" onChange={this.websiteSelected} value={self.props.website}>
+            <select id="websiteSelector" onChange={this.websiteSelected} value={value}>
 
             <option key="0" value="0">Add New Website</option>
             {links}
