@@ -1,6 +1,8 @@
 var config = require("./config");
+var BackboneRouter = require("./components/router");
 
 Application = require("./components/layout").Layout;
+
 // Login = require("./components/layout").Login;
 // TopBar = require("./components/layout").TopBar;
 // LeftMenu = require("./components/layout").LeftMenu;

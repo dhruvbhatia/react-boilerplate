@@ -1,10 +1,12 @@
 /** @jsx React.DOM */
 
 
+var CONFIG = require('../config');
 var Dashboard = require('./dashboard').Dashboard;
 var MyAccount = require("./my-account").MyAccount;
 var Website = require("./website").Website;
 var AddWebsite = require("./website").AddWebsite;
+var Router = require("./router");
 
 var Layout = React.createClass({
   getInitialState: function() {
@@ -517,67 +519,6 @@ var Content = React.createClass({
   }
 
 });
-
-var Router = Backbone.Router.extend({
-  routes : {
-    ""    : "index",
-    "websites" : "websites",
-    "websites/add" : "websitesAdd",
-    "campaigns" : "campaigns",
-    "account" : "account",
-    "account/edit" : "accountEdit",
-    "*splat" : "index"
-  },
-  clearLayout : function() {
-    React.renderComponent(
-                          <div></div>,
-                          document.getElementById('application')
-                          );
-  },
-  showLayout : function(pos) {
-
-    // Look up the current route against navigation_data so that we can populate Layout with the pretty navPos name.
-    var navPos = _.find(navigation_data, { 'url': pos });
-    if(_.has(navPos, "name")) {
-      navPos = navPos.name
-    } else {
-      navPos = "Dashboard"
-    }
-
-    React.renderComponent(
-                          <Layout navLinks={navigation_data} navPos={navPos} />,
-                          document.getElementById('application')
-                          );
-  },
-  index : function() {
-    this.clearLayout();
-    this.showLayout("dashboard");
-  },
-  websites : function() {
-    this.clearLayout();
-    this.showLayout("websites");
-  },
-  websitesAdd : function() {
-    this.clearLayout();
-    this.showLayout("websites/add");
-  },
-  campaigns : function() {
-    this.clearLayout();
-    this.showLayout("campaigns");
-  },
-  account : function() {
-    this.clearLayout();
-    this.showLayout("account");
-  },
-  accountEdit : function() {
-    this.clearLayout();
-    this.showLayout("account/edit");
-  }
-});
-
-var router = new Router();
-
-Backbone.history.start({pushState: true});
 
 
 exports.Layout = Layout;
