@@ -1,6 +1,11 @@
 /** @jsx React.DOM */
 
 
+var Dashboard = require('./dashboard').Dashboard;
+var MyAccount = require("./my-account").MyAccount;
+var Website = require("./website").Website;
+var AddWebsite = require("./website").AddWebsite;
+
 var Layout = React.createClass({
   getInitialState: function() {
 
