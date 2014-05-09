@@ -58,3 +58,5 @@ var EditAccount = React.createClass({
 });
 
 
+exports.MyAccount = MyAccount;
+exports.EditAccount = EditAccount;

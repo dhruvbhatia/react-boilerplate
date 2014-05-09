@@ -43,3 +43,5 @@ Suspendisse sed semper lacus. Aenean lobortis pellentesque mattis. Fusce luctus 
   }
 
 });
+
+exports.Dashboard = Dashboard;

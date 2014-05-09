@@ -3,7 +3,7 @@
 
 var gulp = require('gulp');
 var source = require('vinyl-source-stream')
-var browserify = require('browserify')
+var browserify = require('gulp-browserify')
 var streamify = require('gulp-streamify')
 var react = require('gulp-react');
 
@@ -64,14 +64,19 @@ gulp.task('fonts', function () {
         .pipe($.size());
 });
 
-// gulp.task('browserify', function() {
-//   var bundleStream = browserify('./app/scripts/main.js').bundle()
 
-//   bundleStream
-//     .pipe(source('main.js'))
-//     .pipe(streamify($.uglify()))
-//     .pipe(gulp.dest('./app/scripts/bundle/'))
-// });
+// Basic usage
+gulp.task('browserify', function() {
+    // Single entry point to browserify
+    gulp.src('./app/scripts/main.js')
+        .pipe(browserify({
+          insertGlobals : true,
+          transform: ['reactify'],
+          extensions: ['.jsx'],
+          debug : !gulp.env.production
+        }))
+        .pipe(gulp.dest('./app/scripts/bundle/'))
+});
 
 gulp.task('react', function () {
     return gulp.src('./app/scripts/components/*.jsx')

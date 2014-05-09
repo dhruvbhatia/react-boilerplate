@@ -52,3 +52,6 @@ var AddWebsite = React.createClass({
   }
 
 });
+
+exports.Website = Website;
+exports.AddWebsite = AddWebsite;

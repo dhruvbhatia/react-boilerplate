@@ -1,14 +1,5 @@
 /** @jsx React.DOM */
 
-var navigation_data = [
-{name: "Dashboard", url: "", showInMenu: true},
-{name: "Websites", url: "websites", subroutes: "Add Website", showInMenu: true},
-{name: "Add Website", url: "websites/add", showInMenu: false},
-{name: "Campaigns", url: "campaigns", showInMenu: true},
-{name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true},
-{name: "Edit Account", url: "account/edit", showInMenu: false}
-];
-
 
 var Layout = React.createClass({
   getInitialState: function() {
@@ -582,3 +573,12 @@ var Router = Backbone.Router.extend({
 var router = new Router();
 
 Backbone.history.start({pushState: true});
+
+
+exports.Layout = Layout;
+exports.Login = Login;
+exports.TopBar = TopBar;
+exports.LeftMenu = LeftMenu;
+exports.WebsiteSelector = WebsiteSelector;
+exports.Content = Content;
+exports.Router = Router;
