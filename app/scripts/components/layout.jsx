@@ -2,11 +2,14 @@
 
 
 var CONFIG = require('../config');
+var Router = require("./router");
+
 var Dashboard = require('./dashboard').Dashboard;
 var MyAccount = require("./my-account").MyAccount;
+var EditAccount = require("./my-account").EditAccount;
 var Website = require("./website").Website;
 var AddWebsite = require("./website").AddWebsite;
-var Router = require("./router");
+
 
 var Layout = React.createClass({
   getInitialState: function() {
@@ -20,12 +23,6 @@ var Layout = React.createClass({
   },
 
   componentDidMount: function() {
-
-    // todo: review this
-    if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
-      this.setState({navPos: "Add Website"});
-      router.navigate("websites/add");
-    }
 
     // figure out if a cookie exists and is a valid session
     self = this;
@@ -65,6 +62,11 @@ var Layout = React.createClass({
 
         self.setState({loggedIn: user, render: true});
 
+        if(_.isEmpty(user.websites)) {
+          self.setState({navPos: "Add Website"});
+          router.navigate("websites/add");
+        }
+
       } else {
 
           // Cookie no longer valid - render login form
@@ -89,23 +91,29 @@ var Layout = React.createClass({
 
   setPos: function(url, pos) {
 
-        // Onboarding screen if no websites exist
-        if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
-          this.setState({navPos: "Add Website"});
-          router.navigate("websites/add");
-        } else {
+    // Onboarding screen if no websites exist
+    if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
+      this.setState({navPos: "Add Website"});
+      router.navigate("websites/add");
+    } else {
 
-          this.setState({navPos: pos});
+      this.setState({navPos: pos});
 
-          router.navigate(url);
-        }
-      },
+      router.navigate(url);
+    }
 
-      setWebsite: function(website) {
+  },
+
+  setWebsite: function(website) {
 
 
     // if this is called with "default" as an argument, then set the active website to the first one in the user's list
     var websites = JSON.parse($.cookie("application")).user.websites;
+
+    if(_.isEmpty(websites)) {
+      return this.setState({website: "default"});
+    };
+
 
     var first_website = _.first(websites).id;
 
@@ -141,44 +149,44 @@ var Layout = React.createClass({
 
   render: function() {
 
-// Defer rendering while checking if cookie is valid
-if(this.state.render) {
+    // Defer rendering while checking if cookie is valid
+    if(this.state.render) {
 
-    // Login view if not logged in
-    if(this.state.loggedIn === undefined) {
+        // Login view if not logged in
+        if(this.state.loggedIn === undefined) {
 
-      return (
-              <div>
-              <Login navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} />
-              </div>
-              )
+          return (
+                  <div>
+                  <Login navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} />
+                  </div>
+                  )
+        } else {
+
+        // User is logged in
+        return (
+                <div>
+                <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+                <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+                <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+                </div>
+                );
+      }
     } else {
 
-    // User is logged in
-    return (
-            <div>
-            <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
-            <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
-            <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+      var loadingMsgStyle = {
+       position: "relative",
+       top: "30%"
+     };
+
+     return(
+
+            <div className="row text-center" style={loadingMsgStyle}>
+            <h1>Loading...</h1>
             </div>
-            );
-  }
-} else {
+            )
 
-  var loadingMsgStyle = {
-   position: "relative",
-   top: "30%"
- };
-
- return(
-
-        <div className="row text-center" style={loadingMsgStyle}>
-        <h1>Loading...</h1>
-        </div>
-        )
-
-}
-}
+   }
+ }
 
 });
 
@@ -227,15 +235,19 @@ var Login = React.createClass({
       .set('Accept', 'application/json')
       .end(function(error, res){
 
+        console.log(res);
+
         var sessionId = JSON.parse(res.text).sessionId
         var user = JSON.parse(res.text).user
-        user.websites = JSON.parse(res.text).websites
+        
 
-        console.log(res)
+
         console.log(sessionId)
         //console.log(document.cookie)
 
         if(res.ok === true) {
+
+          user.websites = JSON.parse(res.text).websites;
 
           // set cookie
           $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});

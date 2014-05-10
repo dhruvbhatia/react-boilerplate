@@ -13,7 +13,8 @@ module.exports = {
     {name: "Add Website", url: "websites/add", showInMenu: false},
     {name: "Campaigns", url: "campaigns", showInMenu: true},
     {name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true},
-    {name: "Edit Account", url: "account/edit", showInMenu: false}
+    {name: "Edit Account", url: "account/edit", showInMenu: false},
+    {name: "Support", url: "support", showInMenu: true}
   ],
 
   MODE : "Debug"
