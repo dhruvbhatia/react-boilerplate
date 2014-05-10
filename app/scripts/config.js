@@ -17,6 +17,13 @@ module.exports = {
     {name: "Support", url: "support", showInMenu: true}
   ],
 
+  URLS : {
+
+    "validate" : "http://192.168.178.20:9000/api/v1/auth/validate/"
+
+  },
+
+
   MODE : "Debug"
 
 };
