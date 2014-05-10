@@ -8,8 +8,9 @@ var Router = require("./router");
 var Dashboard = require('./dashboard').Dashboard;
 var MyAccount = require("./my-account").MyAccount;
 var EditAccount = require("./my-account").EditAccount;
-var Website = require("./website").Website;
+var Websites = require("./website").Websites;
 var AddWebsite = require("./website").AddWebsite;
+var EditWebsite = require("./website").EditWebsite;
 
 
 var Layout = React.createClass({
@@ -31,7 +32,7 @@ var Layout = React.createClass({
 
   setPos: function(url, pos) {
 
-    _.getSession.call(this);
+   // _.getSession.call(this);
 
     // Onboarding screen if no websites exist
     if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
@@ -48,6 +49,7 @@ var Layout = React.createClass({
 
   setWebsite: function(website) {
 
+    console.log(website)
 
     // if this is called with "default" as an argument, then set the active website to the first one in the user's list
     var websites = JSON.parse($.cookie("application")).user.websites;
@@ -75,6 +77,7 @@ var Layout = React.createClass({
       this.setState({website: website});
 
     };
+
 
 
   },
@@ -337,7 +340,7 @@ var LeftMenu = React.createClass({
     this.props.setPos(url, pos);
 
     // TO REVIEW: set the website context back to default when a menu link is clicked
-    this.props.setWebsite("default");
+    //this.props.setWebsite("default");
 
   },
 
@@ -348,7 +351,7 @@ var LeftMenu = React.createClass({
     var links = _.map(_.filter(this.props.navLinks, "showInMenu"), function(link, key) {
 
       var classString = "";
-      if((self.props.navPos===link.name) || (_.contains(self.props.navPos,link.subroutes))){classString = "active"};
+      if((self.props.navPos===link.name) || (_.contains(link.subroutes,self.props.navPos))){classString = "active"};
 
       return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}>{link.name}</a></li>
     });
@@ -380,8 +383,6 @@ var WebsiteSelector = React.createClass({
     } else {
 
       var website = _.first(_.filter(websites, { 'id': parseInt(e.target.value) })).id;
-
-      console.log(website);
 
       this.props.setWebsite(website);
 
@@ -433,30 +434,16 @@ var Content = React.createClass({
 
   render: function() {
 
+
     var section = null;
-    if(this.props.navPos === "Dashboard") {
-      section = (
-                 <Dashboard navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
-                 )
-    } else if(this.props.navPos === "My Account") {
-      section = (
-                 <MyAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
-                 )
 
-    } else if(this.props.navPos === "Edit Account") {
-      section = (
-                 <EditAccount navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
-                 )
+    // The code below checks if there is a React component that matches the current navPos's name.
+    // If there is, then render it, otherwise just render the name of the current navPos.
+    if ( eval("typeof " + this.props.navPos.replace(" ","") + " === 'function'") ){ 
 
-    } else if(this.props.navPos === "Websites") {
-      section = (
-                 <Website navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
-                 )
+      var element = eval(this.props.navPos.replace(" ",""));
 
-    } else if(this.props.navPos === "Add Website") {
-      section = (
-                 <AddWebsite navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
-                 )
+      section = <element navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
 
     } else {
       section = (

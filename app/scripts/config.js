@@ -8,13 +8,14 @@
 module.exports = {
 
   ROUTES : [
-    {name: "Dashboard", url: "", showInMenu: true},
-    {name: "Websites", url: "websites", subroutes: "Add Website", showInMenu: true},
-    {name: "Add Website", url: "websites/add", showInMenu: false},
-    {name: "Campaigns", url: "campaigns", showInMenu: true},
-    {name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true},
-    {name: "Edit Account", url: "account/edit", showInMenu: false},
-    {name: "Support", url: "support", showInMenu: true}
+    {name: "Dashboard", url: "", showInMenu: true, allowParameters: false},
+    {name: "Websites", url: "websites", subroutes: "Add Website, Edit Website", showInMenu: true, allowParameters: false},
+    {name: "Add Website", url: "websites/add", showInMenu: false, allowParameters: false},
+    {name: "Edit Website", url: "websites/edit", showInMenu: false, allowParameters: true},
+    {name: "Campaigns", url: "campaigns", showInMenu: true, allowParameters: false},
+    {name: "My Account", url: "account", subroutes: "Edit Account", showInMenu: true, allowParameters: false},
+    {name: "Edit Account", url: "account/edit", showInMenu: false, allowParameters: false},
+    {name: "Support", url: "support", showInMenu: true, allowParameters: false}
   ],
 
   URLS : {

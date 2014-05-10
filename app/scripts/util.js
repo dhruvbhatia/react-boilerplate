@@ -40,17 +40,21 @@ _.mixin({
 
             user.websites = JSON.parse(res.text).websites
 
-            // set active website to the last selected website in the cookie, else first website in the user's list
-            var active_website = JSON.parse(cookie).user.website || _.pick(_.first(user.websites), "id").id;
+            var active_website = undefined;
 
-            if (_.isEmpty(_.first(_.filter(user.websites, {
-              'id': JSON.parse(cookie).user.website
-            })))) {
-              if (_.first(user.websites) === undefined) {
-                active_website = undefined;
-              } else {
+            if (!_.isEmpty(user.websites)) {
+              // set active website to the last selected website in the cookie, else first website in the user's list
+              active_website = JSON.parse(cookie).user.website;
+
+
+
+              if (_.isEmpty(_.find(user.websites, {
+                "id": parseInt(active_website)
+              }))) {
+                console.log(active_website)
                 active_website = _.first(user.websites).id;
               }
+
             }
 
             $.cookie("application", JSON.stringify({
@@ -60,6 +64,7 @@ _.mixin({
               path: "/",
               expires: 120
             });
+
 
             self.setWebsite(active_website);
 
@@ -100,6 +105,40 @@ _.mixin({
       });
 
     }
+  },
+
+  /**
+   *
+   * Gets the list of current user websites.
+   *
+   */
+  getWebsites: function() {
+
+    var cookie = $.cookie("application");
+    var self = this;
+
+    if (!_.isUndefined(cookie)) {
+      return JSON.parse(cookie).user.websites;
+    } else {
+      return undefined;
+    }
+  },
+
+
+  /**
+   *
+   * Gets the active website.
+   *
+   */
+  getActiveWebsite: function() {
+
+    var cookie = $.cookie("application");
+    var self = this;
+
+    var websites = _.getWebsites();
+
+    return _.find(websites, { "id" : parseInt(JSON.parse(cookie).user.website)});
+
   }
 
 });
