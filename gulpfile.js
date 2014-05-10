@@ -21,10 +21,17 @@ gulp.task('styles', function () {
 });
 
 gulp.task('scripts', function () {
-    return gulp.src('app/scripts/**/*.js')
-        .pipe($.jshint())
-        .pipe($.jshint.reporter($.jshintStylish))
-        .pipe($.size());
+    gulp.src('./app/scripts/main.js')
+        .pipe(browserify({
+          insertGlobals : true,
+          transform: ['reactify'],
+          extensions: ['.jsx'],
+          debug : !gulp.env.production
+        }))
+        .pipe(gulp.dest('./app/scripts/bundle/'))
+        // .pipe($.jshint())
+        // .pipe($.jshint.reporter($.jshintStylish))
+        // .pipe($.size());
 });
 
 gulp.task('html', ['styles', 'scripts'], function () {
@@ -62,26 +69,6 @@ gulp.task('fonts', function () {
         .pipe($.flatten())
         .pipe(gulp.dest('dist/fonts'))
         .pipe($.size());
-});
-
-
-// Basic usage
-gulp.task('browserify', function() {
-    // Single entry point to browserify
-    gulp.src('./app/scripts/main.js')
-        .pipe(browserify({
-          insertGlobals : true,
-          transform: ['reactify'],
-          extensions: ['.jsx'],
-          debug : !gulp.env.production
-        }))
-        .pipe(gulp.dest('./app/scripts/bundle/'))
-});
-
-gulp.task('react', function () {
-    return gulp.src('./app/scripts/components/*.jsx')
-        .pipe(react())
-        .pipe(gulp.dest('dist'));
 });
 
 gulp.task('clean', function () {
@@ -154,14 +141,14 @@ gulp.task('watch', ['connect', 'serve'], function () {
     gulp.watch([
         'app/*.html',
         '.tmp/styles/**/*.css',
-        'app/scripts/**/*.js',
+        'app/scripts/bundle/main.js',
         'app/images/**/*'
     ]).on('change', function (file) {
         server.changed(file.path);
     });
 
     gulp.watch('app/styles/**/*.scss', ['styles']);
-    gulp.watch('app/scripts/**/*.js', ['scripts']);
+    gulp.watch('app/scripts/**/{*.js,*.jsx}', ['scripts']);
     gulp.watch('app/images/**/*', ['images']);
     gulp.watch('bower.json', ['wiredep']);
 });
