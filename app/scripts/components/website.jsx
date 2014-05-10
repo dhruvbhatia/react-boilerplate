@@ -1,5 +1,7 @@
 /** @jsx React.DOM */
 
+var CONFIG = require('../config');
+
 var Websites = React.createClass({
 
   routeAddWebsite: function(e) {
@@ -110,10 +112,27 @@ var AddWebsite = React.createClass({
 
 var EditWebsite = React.createClass({
 
-  componentWillMount: function() {
+  componentDidMount: function() {
 
-    // Ensure current path references a valid website
+    // Ensure current path references a website that the user owns
+    var website_id = Backbone.history.fragment.replace("websites/edit/", "");
+    var websites = _.getWebsites();
 
+    console.log(website_id)
+
+    var match = _.find(websites, {"id" : parseInt(website_id)});
+
+    if(!_.isEmpty(match)) {
+
+      // Path id is a valid website
+      this.props.setWebsite(website_id);
+
+    } else {
+
+      // Path id is not a valid website
+      this.props.setPos("websites", "Websites");
+
+    }
 
 
   },
@@ -123,26 +142,89 @@ var EditWebsite = React.createClass({
     this.props.setPos("websites", "Websites");
   },
 
-  render: function() {
+  saveWebsite: function(e) {
+    e.preventDefault();
+    console.log("saving..");
 
-    var website = _.getActiveWebsite();
-    var self = this;
+    var active_website = _.getActiveWebsite();
 
-    return (
+    var name = $('input#name').val();
+    var url = $('input#url').val();
+    var sender_name = $('input#sender_name').val();
+    var sender_email = $('input#sender_email').val();
 
-            <div className="text-center">
+    active_website.name = name;
+    active_website.url = url;
+    active_website.sender_name = sender_name;
+    active_website.sender_email = sender_email;
 
-            <ul className="breadcrumbs">
-            <li><a onClick={this.routeWebsites}>Websites</a></li>
-            <li className="current">Edit Website</li>
-            </ul>
+    console.log(active_website);
 
-            <h2>Editing {website.name}</h2>
+    var cookie = JSON.parse($.cookie("application"));
+    var token = cookie.sessionId;
 
-            </div>
-            )
 
-  }
+    superagent
+      .post(CONFIG.URLS.updateWebsite + token)
+      .send(active_website)
+      .set('Accept', 'application/json')
+      .end(function(error, res){
+
+        console.log(res);
+
+      })
+
+    },
+
+
+    render: function() {
+
+      var active_website = _.getActiveWebsite();
+      var self = this;
+
+      return (
+
+              <div className="text-center">
+
+              <ul className="breadcrumbs">
+              <li><a onClick={this.routeWebsites}>Websites</a></li>
+              <li className="current">Edit Website</li>
+              </ul>
+
+              <h2>Editing {active_website.name}</h2>
+
+              <div className="row">
+              <form>
+              <fieldset>
+              <legend>Update Details</legend>
+
+              <label>Website Name
+              <input id="name" type="text" placeholder="Website Name" defaultValue={active_website.name} />
+              </label>
+
+              <label>URL
+              <input id="url" type="text" placeholder="Website URL" defaultValue={active_website.url} />
+              </label>
+
+              <label>Sender Name
+              <input id="sender_name" type="text" placeholder="Sender Name" defaultValue={active_website.sender_name} />
+              </label>
+
+              <label>Sender Email
+              <input id="sender_email" type="text" placeholder="Sender Name" defaultValue={active_website.sender_email} />
+              </label>
+
+              </fieldset>
+
+              <button onClick={this.saveWebsite} className="button radius expand">Update</button>
+              </form>
+              </div>
+
+
+              </div>
+              )
+
+}
 
 });
 

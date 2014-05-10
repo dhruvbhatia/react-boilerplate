@@ -32,7 +32,7 @@ var Layout = React.createClass({
 
   setPos: function(url, pos) {
 
-   // _.getSession.call(this);
+    _.getSession.call(this);
 
     // Onboarding screen if no websites exist
     if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
@@ -173,7 +173,7 @@ var Login = React.createClass({
       var self = this;
 
       superagent
-      .post('http://192.168.178.20:9000/api/v1/auth/login')
+      .post(CONFIG.URLS.login)
       //.send({ name: 'Manny', species: 'cat' })
       .set('X-API-Email', email)
       .set('X-API-Password', password)

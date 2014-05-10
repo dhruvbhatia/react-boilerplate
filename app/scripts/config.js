@@ -20,7 +20,9 @@ module.exports = {
 
   URLS : {
 
-    "validate" : "http://192.168.178.20:9000/api/v1/auth/validate/"
+    "validate" : "http://192.168.178.20:9000/api/v1/auth/validate/",
+    "updateWebsite" : "http://192.168.178.20:9000/api/v1/website/update/",
+    "login" : 'http://192.168.178.20:9000/api/v1/auth/login'
 
   },
 
