@@ -7,6 +7,8 @@
  */
 module.exports = {
 
+  WEBSITE_NAME : "React Demo",
+
   ROUTES : [
     {name: "Dashboard", url: "", showInMenu: true, allowParameters: false},
     {name: "Websites", url: "websites", subroutes: "Add Website, Edit Website", showInMenu: true, allowParameters: false},

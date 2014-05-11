@@ -69,13 +69,13 @@ _.mixin({
             self.setWebsite(active_website);
 
             self.setState({
-              loggedIn: user,
+              user: user,
               render: true
             });
 
             if (_.isEmpty(user.websites)) {
               self.setState({
-                navPos: "Add Website"
+                path: "Add Website"
               });
               router.navigate("websites/add");
             }
@@ -83,7 +83,7 @@ _.mixin({
           } else {
 
             // Cookie no longer valid - render login form
-            self.setLoggedIn(undefined);
+            self.setUser(undefined);
             self.setState({
               render: true
             });
@@ -99,7 +99,7 @@ _.mixin({
     } else {
 
       // No prev cookie - render login form
-      self.setLoggedIn(undefined);
+      self.setUser(undefined);
       self.setState({
         render: true
       });

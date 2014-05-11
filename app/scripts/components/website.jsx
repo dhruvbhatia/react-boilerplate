@@ -312,7 +312,7 @@ var EditWebsite = React.createClass({
 
     console.log(website_id)
 
-    if(this.props.website !== website_id) {
+    if(this.props.active_website !== website_id) {
       var match = _.find(websites, {"id" : parseInt(website_id)});
 
       if(!_.isEmpty(match)) {
@@ -347,7 +347,7 @@ var self = this;
   superagent
   .post(CONFIG.URLS.deleteWebsite)
   .set('X-API-Key', token)
-  .query({id: this.props.website})
+  .query({id: this.props.active_website})
   .set('Accept', 'application/json')
   .end(function(error, res){
 

@@ -17,12 +17,48 @@ var Layout = React.createClass({
   getInitialState: function() {
 
     // set the pushState to blank if the user arrives to the dashboard, either by going to the root or entering an invalid route
-    if(this.props.navPos === "Dashboard") {
+    var pos = Backbone.history.fragment;
+
+        // Look up the current route against CONFIG.ROUTES so that we can populate Layout with the pretty path name.
+    // If the current path isn't defined in CONFIG.ROUTES, send to the Dashboard
+    var path = _.find(CONFIG.ROUTES, { 'url': pos });
+
+
+    // If no path, then use the first route.
+    if(_.isEmpty(pos)) {
+      path = _.first(CONFIG.ROUTES);
+    }
+
+    // Current path isn't found. Check if it's a route with parameters
+    if(_.isEmpty(path)) {
+
+      path = _.last(_.filter(CONFIG.ROUTES, function(route) {
+        return _.contains(pos, route.url) && route.allowParameters;
+      }));
+
+    }
+
+
+    if(_.has(path, "name")) {
+      path = path.name
+    } else {
+      path = "Dashboard"
+    }
+
+
+
+    if(path === "Dashboard") {
       router.navigate("");
     };
 
-    return {navPos: this.props.navPos, loggedIn: undefined, render: false, website: undefined};
+    return {path: path, user: undefined, render: false, active_website: undefined};
   },
+
+componentDidUpdate: function() {
+
+      document.title = this.state.path + " | " + CONFIG.WEBSITE_NAME;
+
+},
 
   componentDidMount: function() {
 
@@ -36,11 +72,11 @@ var Layout = React.createClass({
 
     // Onboarding screen if no websites exist
     if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
-      this.setState({navPos: "Add Website"});
+      this.setState({path: "Add Website"});
       router.navigate("websites/add");
     } else {
 
-      this.setState({navPos: pos});
+      this.setState({path: pos});
 
       router.navigate(url);
     }
@@ -55,7 +91,7 @@ var Layout = React.createClass({
     var websites = JSON.parse($.cookie("application")).user.websites;
 
     if(_.isEmpty(websites)) {
-      return this.setState({website: "default"});
+      return this.setState({active_website: "default"});
     };
 
 
@@ -63,7 +99,7 @@ var Layout = React.createClass({
 
     if( (!_.isEmpty(websites)) && (website === "default")) {
 
-      this.setState({website: first_website});
+      this.setState({active_website: first_website});
 
     } else {
 
@@ -74,7 +110,7 @@ var Layout = React.createClass({
 
       $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
 
-      this.setState({website: website});
+      this.setState({active_website: website});
 
     };
 
@@ -82,8 +118,8 @@ var Layout = React.createClass({
 
   },
 
-  setLoggedIn: function(state) {
-    this.setState({loggedIn: state});
+  setUser: function(state) {
+    this.setState({user: state});
 
     // Kill cookie if user is logging out
     if(state === undefined) {
@@ -98,11 +134,11 @@ var Layout = React.createClass({
     if(this.state.render) {
 
         // Login view if not logged in
-        if(this.state.loggedIn === undefined) {
+        if(this.state.user === undefined) {
 
           return (
                   <div>
-                  <Login navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} setWebsite={this.setWebsite} />
+                  <Login path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} setWebsite={this.setWebsite} />
                   </div>
                   )
         } else {
@@ -110,9 +146,9 @@ var Layout = React.createClass({
         // User is logged in
         return (
                 <div>
-                <TopBar navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
-                <LeftMenu navLinks={this.props.navLinks} navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
-                <Content navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} website={this.state.website} setWebsite={this.setWebsite} />
+                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} />
+                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} />
+                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} />
                 </div>
                 );
       }
@@ -218,7 +254,7 @@ var Login = React.createClass({
           // set cookie
           $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
 
-          self.props.setLoggedIn(user);
+          self.props.setUser(user);
 
           console.log(user)
 
@@ -308,7 +344,7 @@ var TopBar = React.createClass({
   logout: function(e) {
 
     e.preventDefault();
-    this.props.setLoggedIn(undefined);
+    this.props.setUser(undefined);
 
   },
 
@@ -328,7 +364,7 @@ var TopBar = React.createClass({
 
             <ul className="right">
             <li className="active has-dropdown">
-            <a href="#">Logged in as {this.props.loggedIn.fullName}</a>
+            <a href="#">Logged in as {this.props.user.fullName}</a>
             <ul className="dropdown">
             <li><a data-nav="account" onClick={this.route}>My Account</a></li>
             <li><a onClick={this.logout}>Logout</a></li>
@@ -371,17 +407,17 @@ var LeftMenu = React.createClass({
 
     var self = this;
     
-    var links = _.map(_.filter(this.props.navLinks, "showInMenu"), function(link, key) {
+    var links = _.map(_.filter(this.props.routes, "showInMenu"), function(link, key) {
 
       var classString = "";
-      if((self.props.navPos===link.name) || (_.contains(link.subroutes,self.props.navPos))){classString = "active"};
+      if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = "active"};
 
       return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}>{link.name}</a></li>
     });
 
     return (
             <div id="leftMenu" className="small-4 large-2 columns">
-            <WebsiteSelector website={this.props.website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} />
+            <WebsiteSelector active_website={this.props.active_website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} />
             <ul className="side-nav">{links}</ul>
             </div>
             );
@@ -420,8 +456,8 @@ var WebsiteSelector = React.createClass({
 
     var value = 0;
     // Select default option where value = 0 if website isn't defined
-    if(this.props.website !== undefined) {
-      value = this.props.website;
+    if(this.props.active_website !== undefined) {
+      value = this.props.active_website;
     };
 
     if($.cookie("application")) {
@@ -460,17 +496,17 @@ var Content = React.createClass({
 
     var section = null;
 
-    // The code below checks if there is a React component that matches the current navPos's name.
-    // If there is, then render it, otherwise just render the name of the current navPos.
-    if ( eval("typeof " + this.props.navPos.replace(" ","") + " === 'function'") ){ 
+    // The code below checks if there is a React component that matches the current path's name.
+    // If there is, then render it, otherwise just render the name of the current path.
+    if ( eval("typeof " + this.props.path.replace(" ","") + " === 'function'") ){ 
 
-      var element = eval(this.props.navPos.replace(" ",""));
+      var element = eval(this.props.path.replace(" ",""));
 
-      section = <element navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} website={this.props.website} />
+      section = <element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} active_website={this.props.active_website} />
 
     } else {
       section = (
-                 <p>{this.props.navPos}</p>
+                 <p>{this.props.path}</p>
                  )
     }
 
