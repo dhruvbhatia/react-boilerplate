@@ -171,31 +171,34 @@ saveWebsite: function(e) {
     };
 
     if(_.isEmpty(url)) {
-      self.setState({url_error: true});
+      self.setState({url_error: "URL cannot be blank"});
     } else {
       self.setState({url_error: false});
     };
 
     if(_.isEmpty(sender_name)) {
-      self.setState({sender_name_error: true});
+      self.setState({sender_name_error: "Sender Name cannot be blank"});
     } else {
       self.setState({sender_name_error: false});
     };
 
     if(_.isEmpty(sender_email)) {
-      self.setState({sender_email_error: true});
+      self.setState({sender_email_error: "Sender Email cannot be blank"});
     } else {
       self.setState({sender_email_error: false});
     };
 
 // send to server if client validation passes
 if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(sender_email)])) {
-  active_website.name = name;
-  active_website.url = url;
-  active_website.sender_name = sender_name;
-  active_website.sender_email = sender_email;
 
-  console.log(active_website);
+  var updated_website = {};
+
+  updated_website.name = name;
+  updated_website.url = url;
+  updated_website.sender_name = sender_name;
+  updated_website.sender_email = sender_email;
+
+  console.log(updated_website);
 
   var cookie = JSON.parse($.cookie("application"));
   var token = cookie.sessionId;
@@ -204,7 +207,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
   superagent
   .post(CONFIG.URLS.updateWebsite)
   .set('X-API-Key', token)
-  .query(active_website)
+  .query(updated_website)
   .set('Accept', 'application/json')
   .end(function(error, res){
 
@@ -223,6 +226,18 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
 
             if(!_.isUndefined(errors.name)) {
               self.setState({name_error: errors.name.error})
+            }
+
+            if(!_.isUndefined(errors.url)) {
+              self.setState({url_error: errors.url.error})
+            }
+
+            if(!_.isUndefined(errors.sender_name)) {
+              self.setState({sender_name_error: errors.sender_name.error})
+            }
+
+            if(!_.isUndefined(errors.sender_email)) {
+              self.setState({sender_email_error: errors.sender_email.error})
             }
 
           } else {
@@ -267,6 +282,30 @@ render: function() {
     }
   };
 
+  var url_error = function() {
+    if(self.state.url_error !== false) {
+      return (
+              <small className="error">{self.state.url_error}</small>
+              )
+    }
+  };
+
+  var sender_name_error = function() {
+    if(self.state.sender_name_error !== false) {
+      return (
+              <small className="error">{self.state.sender_name_error}</small>
+              )
+    }
+  };
+
+  var sender_email_error = function() {
+    if(self.state.sender_email_error !== false) {
+      return (
+              <small className="error">{self.state.sender_email_error}</small>
+              )
+    }
+  };
+
 
   if(!_.isEmpty(active_website)) {
     if(active_website.id === parseInt(website_id)) {
@@ -294,14 +333,17 @@ render: function() {
 
               <label>URL
               <input id="url" type="text" placeholder="Website URL" defaultValue={active_website.url} />
+              {url_error()}
               </label>
 
               <label>Sender Name
               <input id="sender_name" type="text" placeholder="Sender Name" defaultValue={active_website.sender_name} />
+              {sender_name_error()}
               </label>
 
               <label>Sender Email
               <input id="sender_email" type="text" placeholder="Sender Name" defaultValue={active_website.sender_email} />
+              {sender_email_error()}
               </label>
 
               </fieldset>
