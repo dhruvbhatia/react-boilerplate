@@ -114,12 +114,14 @@ var EditWebsite = React.createClass({
 
   componentDidMount: function() {
 
+
     // Ensure current path references a website that the user owns
     var website_id = Backbone.history.fragment.replace("websites/edit/", "");
     var websites = _.getWebsites();
 
     console.log(website_id)
 
+    if(this.props.website !== website_id) {
     var match = _.find(websites, {"id" : parseInt(website_id)});
 
     if(!_.isEmpty(match)) {
@@ -134,7 +136,7 @@ var EditWebsite = React.createClass({
 
     }
 
-
+}
   },
 
   routeWebsites: function(e) {
@@ -180,7 +182,10 @@ var EditWebsite = React.createClass({
     render: function() {
 
       var active_website = _.getActiveWebsite();
+      var website_id = Backbone.history.fragment.replace("websites/edit/", "");
       var self = this;
+
+      if(active_website.id === parseInt(website_id)) {
 
       return (
 
@@ -223,7 +228,12 @@ var EditWebsite = React.createClass({
 
               </div>
               )
-
+} else {
+  return (
+          <div>
+          An unexpected error occurred
+          </div>)
+}
 }
 
 });

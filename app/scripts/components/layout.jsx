@@ -102,7 +102,7 @@ var Layout = React.createClass({
 
           return (
                   <div>
-                  <Login navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} />
+                  <Login navPos={this.state.navPos} setPos={this.setPos} loggedIn={this.state.loggedIn} setLoggedIn={this.setLoggedIn} setWebsite={this.setWebsite} />
                   </div>
                   )
         } else {
@@ -180,24 +180,40 @@ var Login = React.createClass({
       .set('Accept', 'application/json')
       .end(function(error, res){
 
-        console.log(res);
-
-        var sessionId = JSON.parse(res.text).sessionId
-        var user = JSON.parse(res.text).user
-        
-
-
-        console.log(sessionId)
-        //console.log(document.cookie)
+        console.log(res.text);
 
         if(res.ok === true) {
 
-          user.websites = JSON.parse(res.text).websites;
+          var sessionId = JSON.parse(res.text).sessionId
+          var user = JSON.parse(res.text).user
+
+
+
+          console.log(sessionId)
+          console.log(user)
+        //console.log(document.cookie)
+
+        
+
+        user.websites = JSON.parse(res.text).websites;
+
+        if(!_.isEmpty(user.websites)) {
+          user.website = _.first(user.websites).id;
+        }
+
+
+        console.log(user.websites)
+        console.log(user.website)
+
+
+        
 
           // set cookie
           $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
 
           self.props.setLoggedIn(user);
+
+          console.log(user)
 
         } else {
 
@@ -443,7 +459,7 @@ var Content = React.createClass({
 
       var element = eval(this.props.navPos.replace(" ",""));
 
-      section = <element navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} />
+      section = <element navPos={this.props.navPos} setPos={this.props.setPos} loggedIn={this.props.loggedIn} setLoggedIn={this.props.setLoggedIn} setWebsite={this.props.setWebsite} website={this.props.website} />
 
     } else {
       section = (
