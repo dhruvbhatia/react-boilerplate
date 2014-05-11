@@ -22,9 +22,10 @@ The goal is to use [leading technologies](#tech) to build a solid seed project f
 - MomentJS
 - Gulp
 - Bower
+- Browserify
 
 
 ## Caveats
 This is under **heavy development**.
 
-I'm doing a lot of hacky/non-RESTful things to tie everything up to my backend at the moment, so I would recommend against anyone cloning this in it's current state.
+I'm doing a lot of hacky/non-RESTful things to tie everything up to my backend at the moment, so I would recommend against anyone cloning this in it's current state as it probably won't work.
