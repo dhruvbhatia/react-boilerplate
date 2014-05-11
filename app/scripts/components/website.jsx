@@ -112,6 +112,12 @@ var AddWebsite = React.createClass({
 
 var EditWebsite = React.createClass({
 
+  getInitialState: function() {
+
+    return {name_error: false, url_error: false, sender_name_error: false, sender_email_error: false, server_error: undefined};
+
+  },
+
   componentDidMount: function() {
 
 
@@ -122,9 +128,9 @@ var EditWebsite = React.createClass({
     console.log(website_id)
 
     if(this.props.website !== website_id) {
-    var match = _.find(websites, {"id" : parseInt(website_id)});
+      var match = _.find(websites, {"id" : parseInt(website_id)});
 
-    if(!_.isEmpty(match)) {
+      if(!_.isEmpty(match)) {
 
       // Path id is a valid website
       this.props.setWebsite(website_id);
@@ -136,56 +142,134 @@ var EditWebsite = React.createClass({
 
     }
 
-}
-  },
+  }
+},
 
-  routeWebsites: function(e) {
-    e.preventDefault();
-    this.props.setPos("websites", "Websites");
-  },
+routeWebsites: function(e) {
+  e.preventDefault();
+  this.props.setPos("websites", "Websites");
+},
 
-  saveWebsite: function(e) {
-    e.preventDefault();
-    console.log("saving..");
+saveWebsite: function(e) {
+  e.preventDefault();
+  console.log("saving..");
 
-    var active_website = _.getActiveWebsite();
+  var active_website = _.getActiveWebsite();
+  var self = this;
 
-    var name = $('input#name').val();
-    var url = $('input#url').val();
-    var sender_name = $('input#sender_name').val();
-    var sender_email = $('input#sender_email').val();
-
-    active_website.name = name;
-    active_website.url = url;
-    active_website.sender_name = sender_name;
-    active_website.sender_email = sender_email;
-
-    console.log(active_website);
-
-    var cookie = JSON.parse($.cookie("application"));
-    var token = cookie.sessionId;
+  var name = $('input#name').val();
+  var url = $('input#url').val();
+  var sender_name = $('input#sender_name').val();
+  var sender_email = $('input#sender_email').val();
 
 
-    superagent
-      .post(CONFIG.URLS.updateWebsite + token)
-      .send(active_website)
-      .set('Accept', 'application/json')
-      .end(function(error, res){
+    // Validate - fields must not be empty
+    if(_.isEmpty(name)) {
+      self.setState({name_error: "Name cannot be blank"});
+    } else {
+      self.setState({name_error: false});
+    };
 
-        console.log(res);
+    if(_.isEmpty(url)) {
+      self.setState({url_error: true});
+    } else {
+      self.setState({url_error: false});
+    };
+
+    if(_.isEmpty(sender_name)) {
+      self.setState({sender_name_error: true});
+    } else {
+      self.setState({sender_name_error: false});
+    };
+
+    if(_.isEmpty(sender_email)) {
+      self.setState({sender_email_error: true});
+    } else {
+      self.setState({sender_email_error: false});
+    };
+
+// send to server if client validation passes
+if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(sender_email)])) {
+  active_website.name = name;
+  active_website.url = url;
+  active_website.sender_name = sender_name;
+  active_website.sender_email = sender_email;
+
+  console.log(active_website);
+
+  var cookie = JSON.parse($.cookie("application"));
+  var token = cookie.sessionId;
+
+
+  superagent
+  .post(CONFIG.URLS.updateWebsite)
+  .set('X-API-Key', token)
+  .query(active_website)
+  .set('Accept', 'application/json')
+  .end(function(error, res){
+
+    console.log(res);
+
+    if(res.ok) {
+
+
+
+    } else {
+
+          // a validation error occurred
+          if(JSON.parse(res.text).response) {
+            var errors = JSON.parse(res.text).response.error;
+
+
+            if(!_.isUndefined(errors.name)) {
+              self.setState({name_error: errors.name.error})
+            }
+
+          } else {
+            // a token error occurred
+            if(JSON.parse(res.text).error) {
+              var error = JSON.parse(res.text).error;
+              self.setState({server_error: error});
+
+              self.props.setLoggedIn(undefined);
+            }
+          }
+
+        }
+
 
       })
 
-    },
+}
+
+},
 
 
-    render: function() {
+render: function() {
 
-      var active_website = _.getActiveWebsite();
-      var website_id = Backbone.history.fragment.replace("websites/edit/", "");
-      var self = this;
+  var active_website = _.getActiveWebsite();
+  var website_id = Backbone.history.fragment.replace("websites/edit/", "");
+  var self = this;
 
-      if(active_website.id === parseInt(website_id)) {
+  var server_error = function() {
+    if(self.state.server_error !== undefined) {
+      return (
+              <small className="error">{self.state.server_error}</small>
+              )
+    }
+  };
+
+  var name_error = function() {
+    if(self.state.name_error !== false) {
+      return (
+              <small className="error">{self.state.name_error}</small>
+              )
+    }
+  };
+
+
+  if(!_.isEmpty(active_website)) {
+    if(active_website.id === parseInt(website_id)) {
 
       return (
 
@@ -202,9 +286,10 @@ var EditWebsite = React.createClass({
               <form>
               <fieldset>
               <legend>Update Details</legend>
-
+              {server_error()}
               <label>Website Name
               <input id="name" type="text" placeholder="Website Name" defaultValue={active_website.name} />
+              {name_error()}
               </label>
 
               <label>URL
@@ -228,6 +313,12 @@ var EditWebsite = React.createClass({
 
               </div>
               )
+} else {
+  return (
+          <div>
+          An unexpected error occurred
+          </div>)
+} 
 } else {
   return (
           <div>

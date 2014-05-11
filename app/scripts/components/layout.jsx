@@ -196,14 +196,21 @@ var Login = React.createClass({
         
 
         user.websites = JSON.parse(res.text).websites;
-
+        console.log(user.websites)
+        
         if(!_.isEmpty(user.websites)) {
+          if(!_.isUndefined(_.first(user.websites))) {
           user.website = _.first(user.websites).id;
+
+
+        console.log(user.website)
+
+        }
+
         }
 
 
-        console.log(user.websites)
-        console.log(user.website)
+        
 
 
         
