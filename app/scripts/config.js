@@ -22,6 +22,8 @@ module.exports = {
 
     "validate" : "http://192.168.178.20:9000/api/v1/auth/validate/",
     "updateWebsite" : "http://192.168.178.20:9000/api/v1/website/update",
+    "addWebsite" : "http://192.168.178.20:9000/api/v1/website/add",
+    "deleteWebsite" : "http://192.168.178.20:9000/api/v1/website/delete",
     "login" : 'http://192.168.178.20:9000/api/v1/auth/login'
 
   },
