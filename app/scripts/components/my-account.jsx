@@ -15,9 +15,9 @@ var MyAccount = React.createClass({
       <div className="text-center">
 
       <img className="th" src="http://gravatar.com/avatar/f00161c7b35f0084d390f785e015b9ca.jpg" />
-      <h1>{this.props.loggedIn.fullName}</h1>
-      <h3>{this.props.loggedIn.email}</h3>
-      <h4>Registered {moment(this.props.loggedIn.createdAt).fromNow()}</h4>
+      <h1>{this.props.user.fullName}</h1>
+      <h3>{this.props.user.email}</h3>
+      <h4>Registered {moment(this.props.user.createdAt).fromNow()}</h4>
 
       <button onClick={this.routeEditAccount} className="button radius">Edit Account</button>
 

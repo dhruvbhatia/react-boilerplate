@@ -157,6 +157,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
     if(res.ok) {
 
       self.props.setPos("websites", "Websites");
+      self.props.setAlert(name + " has been added!", "success");
 
     } else {
 
@@ -356,6 +357,7 @@ var self = this;
     if(res.ok) {
 
       self.props.setPos("websites", "Websites");
+      self.props.setAlert("Website has been deleted!", "success");
 
     }
 
@@ -437,6 +439,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
     if(res.ok) {
 
       self.props.setPos("websites", "Websites");
+      self.props.setAlert(name + " has been updated!", "success");
 
     } else {
 

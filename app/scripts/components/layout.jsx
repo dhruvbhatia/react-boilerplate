@@ -51,14 +51,51 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
-    return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined};
+    return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined, alert: {'message' : 'This is a test', 'type' : 'info'}};
   },
 
-componentDidUpdate: function() {
+  componentWillReceiveProps: function() {
 
-      document.title = this.state.path + " | " + CONFIG.WEBSITE_NAME;
+// set the pushState to blank if the user arrives to the dashboard, either by going to the root or entering an invalid route
+    var pos = Backbone.history.fragment;
 
-},
+        // Look up the current route against CONFIG.ROUTES so that we can populate Layout with the pretty path name.
+    // If the current path isn't defined in CONFIG.ROUTES, send to the Dashboard
+    var path = _.find(CONFIG.ROUTES, { 'url': pos });
+
+
+    // If no path, then use the first route.
+    if(_.isEmpty(pos)) {
+      path = _.first(CONFIG.ROUTES);
+    }
+
+    // Current path isn't found. Check if it's a route with parameters
+    if(_.isEmpty(path)) {
+
+      path = _.last(_.filter(CONFIG.ROUTES, function(route) {
+        return _.contains(pos, route.url) && route.allow_parameters;
+      }));
+
+    }
+
+
+    if(_.has(path, "name")) {
+      path = path.name
+    } else {
+      path = "Dashboard"
+    }
+
+
+
+    if(path === "Dashboard") {
+      router.navigate("");
+    };
+
+    this.setState({path: path})
+
+    document.title = this.state.path + " | " + CONFIG.WEBSITE_NAME;
+
+  },
 
   componentDidMount: function() {
 
@@ -80,6 +117,8 @@ componentDidUpdate: function() {
 
       router.navigate(url);
     }
+
+    this.setState({alert: {'message' : null, 'type' : null}});
 
   },
 
@@ -128,12 +167,17 @@ componentDidUpdate: function() {
 
   },
 
+  setAlert: function(message, type) {
 
-setWebsites: function(websites) {
+    this.setState({alert: {'message' : message, 'type' : type}});
 
-this.setState({websites: websites});
+  },
 
-},
+  setWebsites: function(websites) {
+
+    this.setState({websites: websites});
+
+  },
 
   render: function() {
 
@@ -145,7 +189,7 @@ this.setState({websites: websites});
 
           return (
                   <div>
-                  <Login path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
+                  <Login path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                   </div>
                   )
         } else {
@@ -153,9 +197,9 @@ this.setState({websites: websites});
         // User is logged in
         return (
                 <div>
-                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
-                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
-                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
+                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
+                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
+                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                 </div>
                 );
       }
@@ -243,12 +287,12 @@ var Login = React.createClass({
         
         if(!_.isEmpty(user_websites)) {
           if(!_.isUndefined(_.first(user_websites))) {
-          active_website = _.first(user_websites).id;
+            active_website = _.first(user_websites).id;
 
 
-        console.log(active_website)
+            console.log(active_website)
 
-        }
+          }
 
         }
 
@@ -277,60 +321,60 @@ var Login = React.createClass({
 
       });
 
+}
+
+},
+
+render: function() {
+  var self = this;
+
+  var email_blank = function() {
+    if(self.state.email_blank === true) {
+      return (
+              <small className="error">Email cannot be blank</small>
+              )
     }
+  };
 
-  },
+  var password_blank = function() {
+    if(self.state.password_blank === true) {
+      return (
+              <small className="error">Password cannot be blank</small>
+              )
+    }
+  };
 
-  render: function() {
-    var self = this;
+  var server_error = function() {
+    if(self.state.server_error !== undefined) {
+      return (
+              <small className="error">{self.state.server_error}</small>
+              )
+    }
+  };
 
-    var email_blank = function() {
-      if(self.state.email_blank === true) {
-        return (
-                <small className="error">Email cannot be blank</small>
-                )
-      }
-    };
+  return (
+          <div id="login" className="row">
+          <div className="panel">
+          <h1>Login to Web App</h1>
+          Please login to access Web App.
+          <hr />
+          {server_error()}
+          <form>
+          <label>Email
+          <input id="email" type="text" placeholder="Email" />
+          {email_blank()}
 
-    var password_blank = function() {
-      if(self.state.password_blank === true) {
-        return (
-                <small className="error">Password cannot be blank</small>
-                )
-      }
-    };
-
-    var server_error = function() {
-      if(self.state.server_error !== undefined) {
-        return (
-                <small className="error">{self.state.server_error}</small>
-                )
-      }
-    };
-
-    return (
-            <div id="login" className="row">
-            <div className="panel">
-            <h1>Login to Web App</h1>
-            Please login to access Web App.
-            <hr />
-            {server_error()}
-            <form>
-            <label>Email
-            <input id="email" type="text" placeholder="Email" />
-            {email_blank()}
-
-            </label>
-            <label>Password
-            <input id="password" type="password" placeholder="Password" />
-            {password_blank()}
-            </label>
-            <button onClick={this.login} className="button radius expand">Login</button>
-            </form>
-            </div>
-            </div>
-            );
-  }
+          </label>
+          <label>Password
+          <input id="password" type="password" placeholder="Password" />
+          {password_blank()}
+          </label>
+          <button onClick={this.login} className="button radius expand">Login</button>
+          </form>
+          </div>
+          </div>
+          );
+}
 });
 
 
@@ -426,7 +470,7 @@ var LeftMenu = React.createClass({
 
     return (
             <div id="leftMenu" className="small-4 large-2 columns">
-            <WebsiteSelector active_website={this.props.active_website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} />
+            <WebsiteSelector active_website={this.props.active_website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
             <ul className="side-nav">{links}</ul>
             </div>
             );
@@ -504,6 +548,7 @@ var Content = React.createClass({
 
 
     var section = null;
+    var self = this;
 
     // The code below checks if there is a React component that matches the current path's name.
     // If there is, then render it, otherwise just render the name of the current path.
@@ -511,7 +556,7 @@ var Content = React.createClass({
 
       var element = eval(this.props.path.replace(" ",""));
 
-      section = <element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} active_website={this.props.active_website} websites={this.props.websites} setWebsites={this.props.setWebsites} />
+      section = <element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} active_website={this.props.active_website} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
 
     } else {
       section = (
@@ -519,8 +564,26 @@ var Content = React.createClass({
                  )
     }
 
+
+    var alerts = function() {
+
+      if(!_.isEmpty(self.props.alert.message)) {
+        var classString = "alert-box " + self.props.alert.type
+        return (
+
+                <div data-alert className={classString}>
+                {self.props.alert.message}
+                </div>
+                )
+      }
+
+    };
+
     return (
             <div id="content" className="small-8 large-10 columns">
+
+            {alerts()}
+
             {section}
             </div>
             )
