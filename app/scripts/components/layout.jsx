@@ -33,7 +33,7 @@ var Layout = React.createClass({
     if(_.isEmpty(path)) {
 
       path = _.last(_.filter(CONFIG.ROUTES, function(route) {
-        return _.contains(pos, route.url) && route.allowParameters;
+        return _.contains(pos, route.url) && route.allow_parameters;
       }));
 
     }
@@ -51,7 +51,7 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
-    return {path: path, user: undefined, render: false, active_website: undefined};
+    return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined};
   },
 
 componentDidUpdate: function() {
@@ -71,7 +71,7 @@ componentDidUpdate: function() {
     _.getSession.call(this);
 
     // Onboarding screen if no websites exist
-    if(_.isEmpty(JSON.parse($.cookie("application")).user.websites)) {
+    if(_.isEmpty(this.state.websites)) {
       this.setState({path: "Add Website"});
       router.navigate("websites/add");
     } else {
@@ -88,7 +88,7 @@ componentDidUpdate: function() {
     console.log(website)
 
     // if this is called with "default" as an argument, then set the active website to the first one in the user's list
-    var websites = JSON.parse($.cookie("application")).user.websites;
+    var websites = this.state.websites;
 
     if(_.isEmpty(websites)) {
       return this.setState({active_website: "default"});
@@ -106,7 +106,7 @@ componentDidUpdate: function() {
 
       var cookie = JSON.parse($.cookie("application"));
 
-      cookie.user.website = website;
+      cookie.active_website = website;
 
       $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
 
@@ -128,6 +128,13 @@ componentDidUpdate: function() {
 
   },
 
+
+setWebsites: function(websites) {
+
+this.setState({websites: websites});
+
+},
+
   render: function() {
 
     // Defer rendering while checking if cookie is valid
@@ -138,7 +145,7 @@ componentDidUpdate: function() {
 
           return (
                   <div>
-                  <Login path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} setWebsite={this.setWebsite} />
+                  <Login path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
                   </div>
                   )
         } else {
@@ -146,9 +153,9 @@ componentDidUpdate: function() {
         // User is logged in
         return (
                 <div>
-                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} />
-                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} />
-                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} />
+                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
+                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
+                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} />
                 </div>
                 );
       }
@@ -231,15 +238,15 @@ var Login = React.createClass({
 
         
 
-        user.websites = JSON.parse(res.text).websites;
-        console.log(user.websites)
+        var user_websites = JSON.parse(res.text).websites;
+        console.log(user_websites)
         
-        if(!_.isEmpty(user.websites)) {
-          if(!_.isUndefined(_.first(user.websites))) {
-          user.website = _.first(user.websites).id;
+        if(!_.isEmpty(user_websites)) {
+          if(!_.isUndefined(_.first(user_websites))) {
+          active_website = _.first(user_websites).id;
 
 
-        console.log(user.website)
+        console.log(active_website)
 
         }
 
@@ -255,6 +262,8 @@ var Login = React.createClass({
           $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
 
           self.props.setUser(user);
+
+          self.props.setWebsites(user_websites);
 
           console.log(user)
 
@@ -407,7 +416,7 @@ var LeftMenu = React.createClass({
 
     var self = this;
     
-    var links = _.map(_.filter(this.props.routes, "showInMenu"), function(link, key) {
+    var links = _.map(_.filter(this.props.routes, "show_in_menu"), function(link, key) {
 
       var classString = "";
       if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = "active"};
@@ -417,7 +426,7 @@ var LeftMenu = React.createClass({
 
     return (
             <div id="leftMenu" className="small-4 large-2 columns">
-            <WebsiteSelector active_website={this.props.active_website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} />
+            <WebsiteSelector active_website={this.props.active_website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} />
             <ul className="side-nav">{links}</ul>
             </div>
             );
@@ -430,7 +439,7 @@ var WebsiteSelector = React.createClass({
 
   websiteSelected: function(e) {
 
-    var websites = JSON.parse($.cookie("application")).user.websites;
+    var websites = this.props.websites;
 
     if(parseInt(e.target.value) === 0) {
 
@@ -461,7 +470,7 @@ var WebsiteSelector = React.createClass({
     };
 
     if($.cookie("application")) {
-      var websites = JSON.parse($.cookie("application")).user.websites
+      var websites = this.props.websites;
 
 
       var links = _.map(websites, function(site, key) {
@@ -502,7 +511,7 @@ var Content = React.createClass({
 
       var element = eval(this.props.path.replace(" ",""));
 
-      section = <element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} active_website={this.props.active_website} />
+      section = <element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} active_website={this.props.active_website} websites={this.props.websites} setWebsites={this.props.setWebsites} />
 
     } else {
       section = (

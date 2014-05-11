@@ -38,28 +38,28 @@ _.mixin({
             var sessionId = JSON.parse(res.text).sessionId
             var user = JSON.parse(res.text).user
 
-            user.websites = JSON.parse(res.text).websites
+            var user_websites = JSON.parse(res.text).websites
 
             var active_website = undefined;
 
-            if (!_.isEmpty(user.websites)) {
+            if (!_.isEmpty(user_websites)) {
               // set active website to the last selected website in the cookie, else first website in the user's list
-              active_website = JSON.parse(cookie).user.website;
+              active_website = JSON.parse(cookie).active_website;
 
 
 
-              if (_.isEmpty(_.find(user.websites, {
+              if (_.isEmpty(_.find(user_websites, {
                 "id": parseInt(active_website)
               }))) {
                 console.log(active_website)
-                active_website = _.first(user.websites).id;
+                active_website = _.first(user_websites).id;
               }
 
             }
 
             $.cookie("application", JSON.stringify({
               "sessionId": sessionId,
-              "user": user
+              "active_website": active_website
             }), {
               path: "/",
               expires: 120
@@ -70,10 +70,12 @@ _.mixin({
 
             self.setState({
               user: user,
+              active_website: active_website,
+              websites: user_websites,
               render: true
             });
 
-            if (_.isEmpty(user.websites)) {
+            if (_.isEmpty(user_websites)) {
               self.setState({
                 path: "Add Website"
               });
@@ -105,40 +107,6 @@ _.mixin({
       });
 
     }
-  },
-
-  /**
-   *
-   * Gets the list of current user websites.
-   *
-   */
-  getWebsites: function() {
-
-    var cookie = $.cookie("application");
-    var self = this;
-
-    if (!_.isUndefined(cookie)) {
-      return JSON.parse(cookie).user.websites;
-    } else {
-      return undefined;
-    }
-  },
-
-
-  /**
-   *
-   * Gets the active website.
-   *
-   */
-  getActiveWebsite: function() {
-
-    var cookie = $.cookie("application");
-    var self = this;
-
-    var websites = _.getWebsites();
-
-    return _.find(websites, { "id" : parseInt(JSON.parse(cookie).user.website)});
-
   }
 
 });

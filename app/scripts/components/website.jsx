@@ -21,7 +21,7 @@ var Websites = React.createClass({
 
   render: function() {
 
-    var websites = _.getWebsites();
+    var websites = this.props.websites;
     var self = this;
 
 
@@ -308,7 +308,7 @@ var EditWebsite = React.createClass({
 
     // Ensure current path references a website that the user owns
     var website_id = Backbone.history.fragment.replace("websites/edit/", "");
-    var websites = _.getWebsites();
+    var websites = this.props.websites;
 
     console.log(website_id)
 
@@ -369,7 +369,12 @@ saveWebsite: function(e) {
   e.preventDefault();
   console.log("saving..");
 
-  var active_website = _.getActiveWebsite();
+
+var cookie = $.cookie("application");
+var websites = this.props.websites;
+
+
+  var active_website = _.find(websites, { "id" : parseInt(JSON.parse(cookie).active_website)});
   var self = this;
 
   var name = $('input#name').val();
@@ -480,7 +485,11 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
 
 render: function() {
 
-  var active_website = _.getActiveWebsite();
+var cookie = $.cookie("application");
+var websites = this.props.websites;
+
+
+  var active_website = _.find(websites, { "id" : parseInt(JSON.parse(cookie).active_website)});
   var website_id = Backbone.history.fragment.replace("websites/edit/", "");
   var self = this;
 
