@@ -51,7 +51,7 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
-    return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined, alert: {'message' : 'This is a test', 'type' : 'info'}};
+    return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined, alert: {'message' : null, 'type' : null}};
   },
 
   componentWillReceiveProps: function() {

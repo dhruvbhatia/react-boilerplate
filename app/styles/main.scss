@@ -5,7 +5,7 @@
 // endbower
 
 body {
-  background: #fafafa;
+  //background-color: #f1f1f1;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   color: #333;
 }
@@ -18,7 +18,7 @@ $form-label-small-transform: none;
 
 #leftMenu {
   position: fixed;
-  background-color: #e6e6e6;
+  background-color: #f1f1f1;
   height: 100%;
   padding-left: 0px;
   padding-right: 0px;
@@ -46,12 +46,12 @@ $form-label-small-transform: none;
     padding-right: 15px;
   }
   li:hover a {
-    background-color: #f3f3f3;
+    background-color: #fff;
   }
 }
 
 .active {
-  background-color: #f3f3f3;
+  background-color: #fff;
 }
 
 .browsehappy {
