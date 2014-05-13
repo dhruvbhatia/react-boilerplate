@@ -75,12 +75,7 @@ _.mixin({
               render: true
             });
 
-            if (_.isEmpty(user_websites)) {
-              self.setState({
-                path: "Add Website"
-              });
-              router.navigate("websites/add");
-            }
+
 
           } else {
 

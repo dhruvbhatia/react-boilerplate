@@ -108,15 +108,12 @@ var Layout = React.createClass({
     _.getSession.call(this);
 
     // Onboarding screen if no websites exist
-    if(_.isEmpty(this.state.websites)) {
-      this.setState({path: "Add Website"});
-      router.navigate("websites/add");
-    } else {
+
 
       this.setState({path: pos});
 
       router.navigate(url);
-    }
+    
 
     this.setState({alert: {'message' : null, 'type' : null}});
 

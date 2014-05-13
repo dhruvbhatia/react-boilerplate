@@ -279,7 +279,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
               </label>
 
               <label>Sender Email
-              <input id="sender_email" type="text" placeholder="Sender Name" />
+              <input id="sender_email" type="text" placeholder="Sender Email" />
               {sender_email_error()}
               </label>
 
@@ -573,7 +573,7 @@ var websites = this.props.websites;
               </label>
 
               <label>Sender Email
-              <input id="sender_email" type="text" placeholder="Sender Name" defaultValue={active_website.sender_email} />
+              <input id="sender_email" type="text" placeholder="Sender Email" defaultValue={active_website.sender_email} />
               {sender_email_error()}
               </label>
 
