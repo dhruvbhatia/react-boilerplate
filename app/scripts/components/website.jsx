@@ -77,7 +77,7 @@ var AddWebsite = React.createClass({
 
   getInitialState: function() {
 
-    return {name_error: false, url_error: false, sender_name_error: false, sender_email_error: false, server_error: undefined};
+    return {name_error: undefined, url_error: undefined, sender_name_error: undefined, sender_email_error: undefined, server_error: undefined};
 
   },
 
@@ -108,29 +108,31 @@ saveWebsite: function(e) {
     if(_.isEmpty(name)) {
       self.setState({name_error: "Name cannot be blank"});
     } else {
-      self.setState({name_error: false});
+      self.setState({name_error: undefined});
     };
 
     if(_.isEmpty(url)) {
       self.setState({url_error: "URL cannot be blank"});
     } else {
-      self.setState({url_error: false});
+      self.setState({url_error: undefined});
     };
 
     if(_.isEmpty(sender_name)) {
       self.setState({sender_name_error: "Sender Name cannot be blank"});
     } else {
-      self.setState({sender_name_error: false});
+      self.setState({sender_name_error: undefined});
     };
 
     if(_.isEmpty(sender_email)) {
       self.setState({sender_email_error: "Sender Email cannot be blank"});
+    } else if(sender_email.indexOf("@") === -1) {
+      this.setState({sender_email_error: "Please input a valid email address"});
     } else {
-      self.setState({sender_email_error: false});
+      self.setState({sender_email_error: undefined});
     };
 
 // send to server if client validation passes
-if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(sender_email)])) {
+if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._pendingState.sender_name_error, this._pendingState.sender_email_error])) {
 
   var new_website = {};
 
@@ -216,7 +218,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
   };
 
   var name_error = function() {
-    if(self.state.name_error !== false) {
+    if(self.state.name_error !== undefined) {
       return (
               <small className="error">{self.state.name_error}</small>
               )
@@ -224,7 +226,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
   };
 
   var url_error = function() {
-    if(self.state.url_error !== false) {
+    if(self.state.url_error !== undefined) {
       return (
               <small className="error">{self.state.url_error}</small>
               )
@@ -232,7 +234,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
   };
 
   var sender_name_error = function() {
-    if(self.state.sender_name_error !== false) {
+    if(self.state.sender_name_error !== undefined) {
       return (
               <small className="error">{self.state.sender_name_error}</small>
               )
@@ -240,7 +242,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
   };
 
   var sender_email_error = function() {
-    if(self.state.sender_email_error !== false) {
+    if(self.state.sender_email_error !== undefined) {
       return (
               <small className="error">{self.state.sender_email_error}</small>
               )
@@ -300,7 +302,7 @@ var EditWebsite = React.createClass({
 
   getInitialState: function() {
 
-    return {name_error: false, url_error: false, sender_name_error: false, sender_email_error: false, server_error: undefined};
+    return {name_error: undefined, url_error: undefined, sender_name_error: undefined, sender_email_error: undefined, server_error: undefined};
 
   },
 
@@ -389,29 +391,31 @@ var websites = this.props.websites;
     if(_.isEmpty(name)) {
       self.setState({name_error: "Name cannot be blank"});
     } else {
-      self.setState({name_error: false});
+      self.setState({name_error: undefined});
     };
 
     if(_.isEmpty(url)) {
       self.setState({url_error: "URL cannot be blank"});
     } else {
-      self.setState({url_error: false});
+      self.setState({url_error: undefined});
     };
 
     if(_.isEmpty(sender_name)) {
       self.setState({sender_name_error: "Sender Name cannot be blank"});
     } else {
-      self.setState({sender_name_error: false});
+      self.setState({sender_name_error: undefined});
     };
 
     if(_.isEmpty(sender_email)) {
       self.setState({sender_email_error: "Sender Email cannot be blank"});
+    } else if(sender_email.indexOf("@") === -1) {
+      this.setState({sender_email_error: "Please input a valid email address"});
     } else {
-      self.setState({sender_email_error: false});
+      self.setState({sender_email_error: undefined});
     };
 
 // send to server if client validation passes
-if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(sender_email)])) {
+if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._pendingState.sender_name_error, this._pendingState.sender_email_error])) {
 
   var updated_website = {};
 
@@ -505,7 +509,7 @@ var websites = this.props.websites;
   };
 
   var name_error = function() {
-    if(self.state.name_error !== false) {
+    if(self.state.name_error !== undefined) {
       return (
               <small className="error">{self.state.name_error}</small>
               )
@@ -513,7 +517,7 @@ var websites = this.props.websites;
   };
 
   var url_error = function() {
-    if(self.state.url_error !== false) {
+    if(self.state.url_error !== undefined) {
       return (
               <small className="error">{self.state.url_error}</small>
               )
@@ -521,7 +525,7 @@ var websites = this.props.websites;
   };
 
   var sender_name_error = function() {
-    if(self.state.sender_name_error !== false) {
+    if(self.state.sender_name_error !== undefined) {
       return (
               <small className="error">{self.state.sender_name_error}</small>
               )
@@ -529,7 +533,7 @@ var websites = this.props.websites;
   };
 
   var sender_email_error = function() {
-    if(self.state.sender_email_error !== false) {
+    if(self.state.sender_email_error !== undefined) {
       return (
               <small className="error">{self.state.sender_email_error}</small>
               )

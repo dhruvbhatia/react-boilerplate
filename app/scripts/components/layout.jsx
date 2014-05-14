@@ -6,11 +6,13 @@ var UTIL = require("../util");
 var Router = require("./router");
 
 var Dashboard = require('./dashboard').Dashboard;
+var Login = require("./login").Login;
 var MyAccount = require("./my-account").MyAccount;
 var EditAccount = require("./my-account").EditAccount;
 var Websites = require("./website").Websites;
 var AddWebsite = require("./website").AddWebsite;
 var EditWebsite = require("./website").EditWebsite;
+
 
 
 var Layout = React.createClass({
@@ -222,161 +224,6 @@ var Layout = React.createClass({
 
 });
 
-var Login = React.createClass({
-
-  getInitialState: function() {
-
-    return {email_blank: false, password_blank: false, server_error: undefined};
-
-  },
-
-  login: function(e) {
-
-    e.preventDefault();
-
-    this.setState({server_error: undefined});
-
-    var email = $("#email").val();
-    var password = $("#password").val();
-
-
-    // Validate - fields must not be empty
-    if(_.isEmpty(email)) {
-      this.setState({email_blank: true});
-    } else {
-      this.setState({email_blank: false});
-    };
-    
-    if(_.isEmpty(password)) {
-      this.setState({password_blank: true});
-    } else {
-      this.setState({password_blank: false});
-    };
-
-    // fields are populated
-    if(!_.isEmpty(email) && !_.isEmpty(password)) {
-      // TODO: check if credentials are valid
-
-      var self = this;
-
-      superagent
-      .post(CONFIG.URLS.login)
-      //.send({ name: 'Manny', species: 'cat' })
-      .set('X-API-Email', email)
-      .set('X-API-Password', password)
-      .set('Accept', 'application/json')
-      .end(function(error, res){
-
-        console.log(res.text);
-
-        if(res.ok === true) {
-
-          var sessionId = JSON.parse(res.text).sessionId
-          var user = JSON.parse(res.text).user
-
-
-
-          console.log(sessionId)
-          console.log(user)
-        //console.log(document.cookie)
-
-        
-
-        var user_websites = JSON.parse(res.text).websites;
-        console.log(user_websites)
-        
-        if(!_.isEmpty(user_websites)) {
-          if(!_.isUndefined(_.first(user_websites))) {
-            active_website = _.first(user_websites).id;
-
-
-            console.log(active_website)
-
-          }
-
-        }
-
-
-        
-
-
-        
-
-          // set cookie
-          $.cookie("application", JSON.stringify({ "sessionId": sessionId, "user": user }), {path: "/", expires: 120});
-
-          self.props.setUser(user);
-
-          self.props.setWebsites(user_websites);
-
-          console.log(user)
-
-        } else {
-
-          // Return error from server
-          self.setState({server_error: JSON.parse(res.text).error});
-
-
-        }
-
-      });
-
-}
-
-},
-
-render: function() {
-  var self = this;
-
-  var email_blank = function() {
-    if(self.state.email_blank === true) {
-      return (
-              <small className="error">Email cannot be blank</small>
-              )
-    }
-  };
-
-  var password_blank = function() {
-    if(self.state.password_blank === true) {
-      return (
-              <small className="error">Password cannot be blank</small>
-              )
-    }
-  };
-
-  var server_error = function() {
-    if(self.state.server_error !== undefined) {
-      return (
-              <small className="error">{self.state.server_error}</small>
-              )
-    }
-  };
-
-  return (
-          <div id="login" className="row">
-          <div className="panel">
-          <h1>Login to Web App</h1>
-          Please login to access Web App.
-          <hr />
-          {server_error()}
-          <form>
-          <label>Email
-          <input id="email" type="text" placeholder="Email" />
-          {email_blank()}
-
-          </label>
-          <label>Password
-          <input id="password" type="password" placeholder="Password" />
-          {password_blank()}
-          </label>
-          <button onClick={this.login} className="button radius expand">Login</button>
-          </form>
-          </div>
-          </div>
-          );
-}
-});
-
 
 var TopBar = React.createClass({
 
@@ -397,7 +244,10 @@ var TopBar = React.createClass({
   logout: function(e) {
 
     e.preventDefault();
+    router.navigate('', {trigger: false, replace: true});
     this.props.setUser(undefined);
+    this.props.setWebsites(undefined);
+    this.props.setPos("", "Dashboard");
 
   },
 

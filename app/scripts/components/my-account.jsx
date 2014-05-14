@@ -71,6 +71,8 @@ saveUser: function(e) {
 
     if(_.isEmpty(email)) {
       self.setState({email_error: "Email cannot be blank"});
+    } else if(email.indexOf("@") === -1) {
+      this.setState({email_error: "Please input a valid email address"});
     } else {
       self.setState({email_error: undefined});
     };
@@ -82,7 +84,7 @@ saveUser: function(e) {
     };
 
 // send to server if client validation passes
-if(!_.some([_.isEmpty(first_name), _.isEmpty(last_name), _.isEmpty(email), _.isEmpty(password)])) {
+if(!_.some([this._pendingState.first_name_error, this._pendingState.last_name_error, this._pendingState.email_error, this._pendingState.password_error])) {
 
   var updated_user = {};
 
