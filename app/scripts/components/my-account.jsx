@@ -86,6 +86,7 @@ if(!_.some([_.isEmpty(first_name), _.isEmpty(last_name), _.isEmpty(email), _.isE
 
   var updated_user = {};
 
+  updated_user.uid = this.props.user.uid;
   updated_user.first_name = first_name;
   updated_user.last_name = last_name;
   updated_user.email = email;
@@ -98,7 +99,7 @@ if(!_.some([_.isEmpty(first_name), _.isEmpty(last_name), _.isEmpty(email), _.isE
 
 
   superagent
-  .post(CONFIG.URLS.updateUser)
+  .post(CONFIG.URLS.updateAccount)
   .set('X-API-Key', token)
   .query(updated_user)
   .set('Accept', 'application/json')
@@ -108,8 +109,8 @@ if(!_.some([_.isEmpty(first_name), _.isEmpty(last_name), _.isEmpty(email), _.isE
 
     if(res.ok) {
 
-      self.props.setPos("websites", "Websites");
-      self.props.setAlert(name + " has been added!", "success");
+      self.props.setPos("account", "My Account");
+      self.props.setAlert("Your account has been updated!", "success");
 
     } else {
 
@@ -141,7 +142,7 @@ if(!_.some([_.isEmpty(first_name), _.isEmpty(last_name), _.isEmpty(email), _.isE
               self.setState({server_error: error});
 
               if(JSON.parse(res.text).session_invalid) {
-              self.props.setLoggedIn(undefined);
+              self.props.setUser(undefined);
             }
             }
           }

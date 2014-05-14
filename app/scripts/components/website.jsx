@@ -28,7 +28,7 @@ var Websites = React.createClass({
     var website_rows = _.map(websites, function(website) {
 
       return(
-             <tr id={website.id}>
+             <tr id={website.id} key={website.id}>
              <td>{website.name}</td>
              <td>{website.sender_name} ({website.sender_email})</td>
              <td>{moment(website.created_at).fromNow()}</td>
@@ -189,7 +189,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
               self.setState({server_error: error});
 
               if(JSON.parse(res.text).session_invalid) {
-              self.props.setLoggedIn(undefined);
+              self.props.setUser(undefined);
             }
             }
           }
@@ -471,7 +471,7 @@ if(!_.some([_.isEmpty(name), _.isEmpty(url), _.isEmpty(sender_name), _.isEmpty(s
               self.setState({server_error: error});
 
               if(JSON.parse(res.text).session_invalid) {
-              self.props.setLoggedIn(undefined);
+              self.props.setUser(undefined);
             }
             }
           }

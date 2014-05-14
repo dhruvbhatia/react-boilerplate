@@ -51,6 +51,8 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
+    document.title = path + " | " + CONFIG.WEBSITE_NAME;
+
     return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined, alert: {'message' : null, 'type' : null}};
   },
 
@@ -91,9 +93,10 @@ var Layout = React.createClass({
       router.navigate("");
     };
 
-    this.setState({path: path})
+    this.setPos(pos, path)
+    //this.setState({path: path})
 
-    document.title = this.state.path + " | " + CONFIG.WEBSITE_NAME;
+    
 
   },
 
@@ -109,7 +112,7 @@ var Layout = React.createClass({
 
     // Onboarding screen if no websites exist
 
-
+      document.title = pos + " | " + CONFIG.WEBSITE_NAME;
       this.setState({path: pos});
 
       router.navigate(url);
@@ -546,6 +549,9 @@ var Content = React.createClass({
 
     var section = null;
     var self = this;
+
+    // scroll to top
+    $(window).scrollTop(0);
 
     // The code below checks if there is a React component that matches the current path's name.
     // If there is, then render it, otherwise just render the name of the current path.
