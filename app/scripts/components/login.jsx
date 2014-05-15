@@ -66,9 +66,21 @@ var Login = React.createClass({
 
         if(res.ok === true) {
 
+          // login
+          $("#login_email").val(email);
+          $("#login_password").val(password);
+          $("#login_button").trigger("click");
 
         } else {
 
+          if(JSON.parse(res.text).hasOwnProperty("error")) {
+
+            var error = JSON.parse(res.text).error;
+
+            self.setState({register_server_error: error});
+
+
+          }
 
         }
 
@@ -210,7 +222,7 @@ render: function() {
           <input id="login_password" type="password" placeholder="Password" />
           {validation_error(this.state.login_password_error)}
           </label>
-          <button onClick={this.login} className="button radius expand">Login</button>
+          <button id="login_button" onClick={this.login} className="button radius expand">Login</button>
           </form>
 
           <hr />
