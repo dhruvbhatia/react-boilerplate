@@ -8,14 +8,75 @@ var Login = React.createClass({
 
     document.title = "Login | " + CONFIG.WEBSITE_NAME;
 
-    return {email_error: undefined, password_error: undefined, server_error: undefined};
+    return {login_email_error: undefined, login_password_error: undefined, login_server_error: undefined, register_first_name_error: undefined, register_last_name_error: undefined, register_email_error: undefined, register_password_error: undefined, register_server_error: undefined};
 
   },
 
   register: function(e) {
     e.preventDefault();
 
-    console.log("register");
+    this.setState({register_server_error: undefined});
+
+    var first_name = $("#register_first_name").val();
+    var last_name = $("#register_last_name").val();
+    var email = $("#register_email").val();
+    var password = $("#register_password").val();
+
+    // Validate fields
+    if(_.isEmpty(first_name)) {
+      this.setState({register_first_name_error: "First Name cannot be blank"});
+    } 
+
+    if(_.isEmpty(last_name)) {
+      this.setState({register_last_name_error: "Last Name cannot be blank"});
+    } 
+
+    if(_.isEmpty(email)) {
+      this.setState({register_email_error: "Email cannot be blank"});
+    } else if(email.indexOf("@") === -1) {
+      this.setState({register_email_error: "Please input a valid email address"});
+    } else {
+      this.setState({register_email_error: undefined});
+    }
+    
+    if(_.isEmpty(password)) {
+      this.setState({register_password_error: "Password cannot be blank"});
+    } else {
+      this.setState({register_password_error: undefined});
+    }
+
+    // fields are populated
+    if(!_.some([this._pendingState.login_first_name_error, this._pendingState.login_last_name_error, this._pendingState.login_email_error, this._pendingState.login_password_error])) {
+
+      var self = this;
+      var register = {};
+
+      register.first_name = first_name;
+      register.last_name = last_name;
+      register.email = email;
+      register.password = password;
+
+      superagent
+      .post(CONFIG.URLS.register)
+      .query(register)
+      .set('Accept', 'application/json')
+      .end(function(error, res){
+
+        console.log(res.text);
+
+        if(res.ok === true) {
+
+
+        } else {
+
+
+        }
+
+      });
+
+
+    }
+
 
 
   },
@@ -25,32 +86,32 @@ var Login = React.createClass({
 
     e.preventDefault();
 
-    this.setState({server_error: undefined});
+    this.setState({login_server_error: undefined});
 
-    var email = $("#email").val();
-    var password = $("#password").val();
+    var email = $("#login_email").val();
+    var password = $("#login_password").val();
 
 
     // Validate - fields must not be empty
     if(_.isEmpty(email)) {
-      this.setState({email_error: "Email cannot be blank"});
+      this.setState({login_email_error: "Email cannot be blank"});
     } else if(email.indexOf("@") === -1) {
-      this.setState({email_error: "Please input a valid email address"});
+      this.setState({login_email_error: "Please input a valid email address"});
     } else {
-      this.setState({email_error: undefined});
+      this.setState({login_email_error: undefined});
     }
-    // alert(this._pendingState.email_error)
-    // alert(this.state.email_error)
+    // alert(this._pendingState.login_email_error)
+    // alert(this.state.login_email_error)
     
     if(_.isEmpty(password)) {
-      this.setState({password_error: "Password cannot be blank"});
+      this.setState({login_password_error: "Password cannot be blank"});
     } else {
-      this.setState({password_error: undefined});
+      this.setState({login_password_error: undefined});
     }
 
 
     // fields are populated
-    if(!_.some([this._pendingState.email_error, this._pendingState.password_error])) {
+    if(!_.some([this._pendingState.login_email_error, this._pendingState.login_password_error])) {
 
       var self = this;
 
@@ -107,7 +168,7 @@ var Login = React.createClass({
         } else {
 
           // Return error from server
-          self.setState({server_error: JSON.parse(res.text).error});
+          self.setState({login_server_error: JSON.parse(res.text).error});
 
 
         }
@@ -121,50 +182,69 @@ var Login = React.createClass({
 render: function() {
   var self = this;
 
-  var email_error = function() {
-    if(self.state.email_error !== undefined) {
-      return (
-              <small className="error">{self.state.email_error}</small>
-              )
-    }
-  };
+  var validation_error = function(field) {
 
-  var password_error = function() {
-    if(self.state.password_error !== undefined) {
+    if(field !== undefined) {
       return (
-              <small className="error">{self.state.password_error}</small>
+              <small className="error">{field}</small>
               )
     }
-  };
 
-  var server_error = function() {
-    if(self.state.server_error !== undefined) {
-      return (
-              <small className="error">{self.state.server_error}</small>
-              )
-    }
   };
 
   return (
           <div id="login" className="row">
+
           <div className="panel">
           <h1>Login to {CONFIG.WEBSITE_NAME}</h1>
           Please login to access {CONFIG.WEBSITE_NAME}.
           <hr />
-          {server_error()}
+          {validation_error(this.state.login_server_error)}
           <form>
           <label>Email
-          <input id="email" type="text" placeholder="Email" />
-          {email_error()}
+          <input id="login_email" type="email" placeholder="Email" />
+          {validation_error(this.state.login_email_error)}
 
           </label>
           <label>Password
-          <input id="password" type="password" placeholder="Password" />
-          {password_error()}
+          <input id="login_password" type="password" placeholder="Password" />
+          {validation_error(this.state.login_password_error)}
           </label>
           <button onClick={this.login} className="button radius expand">Login</button>
-          <a onClick={this.register}>Don't have an account?</a>
           </form>
+
+          <hr />
+          <h1>Don't have an account?</h1>
+          Register a new account at {CONFIG.WEBSITE_NAME}.
+          <hr />
+          {validation_error(this.state.register_server_error)}
+          <form>
+
+          <label>First Name
+          <input id="register_first_name" type="text" placeholder="First Name" />
+          {validation_error(this.state.register_first_name_error)}
+          </label>
+
+          <label>Last Name
+          <input id="register_last_name" type="text" placeholder="Last Name" />
+          {validation_error(this.state.register_last_name_error)}
+          </label>
+
+          <label>Email
+          <input id="register_email" type="email" placeholder="Email" />
+          {validation_error(this.state.register_email_error)}
+          </label>
+
+          <label>Password
+          <input id="register_password" type="password" placeholder="Password" />
+          {validation_error(this.state.register_password_error)}
+          </label>
+
+          <button onClick={this.register} className="button radius expand">Register</button>
+          </form>
+
+
+
           </div>
           </div>
           );
