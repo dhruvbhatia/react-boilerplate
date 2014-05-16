@@ -11,6 +11,7 @@ module.exports = {
 
   ROUTES : [
     {name: "Dashboard", url: "", show_in_menu: true, allow_parameters: false},
+    {name: "Users", url: "users", show_in_menu: true, allow_parameters: false},
     {name: "Websites", url: "websites", subroutes: "Add Website, Edit Website", show_in_menu: true, allow_parameters: false},
     {name: "Add Website", url: "websites/add", show_in_menu: false, allow_parameters: false},
     {name: "Edit Website", url: "websites/edit", show_in_menu: false, allow_parameters: true},

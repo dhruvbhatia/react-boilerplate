@@ -225,6 +225,8 @@ render: function() {
           <button id="login_button" onClick={this.login} className="button radius expand">Login</button>
           </form>
 
+          Forgot Password
+
           <hr />
           <h1>Don't have an account?</h1>
           Register a new account at {CONFIG.WEBSITE_NAME}.

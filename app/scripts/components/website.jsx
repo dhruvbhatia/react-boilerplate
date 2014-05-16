@@ -30,6 +30,7 @@ var Websites = React.createClass({
       return(
              <tr id={website.id} key={website.id}>
              <td>{website.name}</td>
+             <td>{website.contact_count}</td>
              <td>{website.sender_name} ({website.sender_email})</td>
              <td>{moment(website.created_at).fromNow()}</td>
              <td><button onClick={self.routeEditWebsite} className="button radius">Edit</button></td>
@@ -41,6 +42,7 @@ var Websites = React.createClass({
 
     return (
 
+
             <div>
             <h2>Websites</h2>
 
@@ -48,6 +50,7 @@ var Websites = React.createClass({
             <thead>
             <tr>
             <th>Website Name</th>
+            <th>Users</th>
             <th>Sender Details</th>
             <th>Created</th>
             <th>Actions</th>
