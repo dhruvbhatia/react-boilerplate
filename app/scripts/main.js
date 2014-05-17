@@ -1,21 +1,13 @@
-var config = require("./config");
-var BackboneRouter = require("./components/router");
-
-Application = require("./components/layout").Layout;
-
-// Login = require("./components/layout").Login;
-// TopBar = require("./components/layout").TopBar;
-// LeftMenu = require("./components/layout").LeftMenu;
-// WebsiteSelector = require("./components/layout").WebsiteSelector;
-// Content = require("./components/layout").Content;
-// Router = require("./components/layout").Router;
+'use strict';
 
 
 
 
+$( document ).ready(function() {
 
-window.onload = function() {
+  require("./components/router");
+  require("./components/layout").Layout;
 
   $(document).foundation();
 
-}();
+});

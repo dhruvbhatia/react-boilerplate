@@ -1,4 +1,5 @@
 /** @jsx React.DOM */
+'use strict';
 
 var CONFIG = require('../config');
 
@@ -318,7 +319,7 @@ var EditWebsite = React.createClass({
 
     console.log(website_id)
 
-    if(this.props.active_website !== website_id) {
+    if(this.props.activeWebsite !== website_id) {
       var match = _.find(websites, {"id" : parseInt(website_id)});
 
       if(!_.isEmpty(match)) {
@@ -353,7 +354,7 @@ var self = this;
   superagent
   .post(CONFIG.URLS.deleteWebsite)
   .set('X-API-Key', token)
-  .query({id: this.props.active_website})
+  .query({id: this.props.activeWebsite})
   .set('Accept', 'application/json')
   .end(function(error, res){
 
@@ -381,7 +382,7 @@ var cookie = $.cookie("application");
 var websites = this.props.websites;
 
 
-  var active_website = _.find(websites, { "id" : parseInt(JSON.parse(cookie).active_website)});
+  var activeWebsite = _.find(websites, { "id" : parseInt(JSON.parse(cookie).activeWebsite)});
   var self = this;
 
   var name = $('input#name').val();
@@ -422,7 +423,7 @@ if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._p
 
   var updated_website = {};
 
-  updated_website.id = active_website.id;
+  updated_website.id = activeWebsite.id;
   updated_website.name = name;
   updated_website.url = url;
   updated_website.sender_name = sender_name;
@@ -499,7 +500,7 @@ var cookie = $.cookie("application");
 var websites = this.props.websites;
 
 
-  var active_website = _.find(websites, { "id" : parseInt(JSON.parse(cookie).active_website)});
+  var activeWebsite = _.find(websites, { "id" : parseInt(JSON.parse(cookie).activeWebsite)});
   var website_id = Backbone.history.fragment.replace("websites/edit/", "");
   var self = this;
 
@@ -544,8 +545,8 @@ var websites = this.props.websites;
   };
 
 
-  if(!_.isEmpty(active_website)) {
-    if(active_website.id === parseInt(website_id)) {
+  if(!_.isEmpty(activeWebsite)) {
+    if(activeWebsite.id === parseInt(website_id)) {
 
       return (
 
@@ -554,10 +555,10 @@ var websites = this.props.websites;
               <ul className="breadcrumbs">
               <li><a onClick={this.routeWebsites}>Websites</a></li>
               <li className="current">Edit Website</li>
-              <li className="current">{active_website.name}</li>
+              <li className="current">{activeWebsite.name}</li>
               </ul>
 
-              <h2>Editing {active_website.name}</h2>
+              <h2>Editing {activeWebsite.name}</h2>
 
               <div className="row">
               <form>
@@ -565,22 +566,22 @@ var websites = this.props.websites;
               <legend>Update Details</legend>
               {server_error()}
               <label>Website Name
-              <input id="name" type="text" placeholder="Website Name" defaultValue={active_website.name} />
+              <input id="name" type="text" placeholder="Website Name" defaultValue={activeWebsite.name} />
               {name_error()}
               </label>
 
               <label>URL
-              <input id="url" type="text" placeholder="Website URL" defaultValue={active_website.url} />
+              <input id="url" type="text" placeholder="Website URL" defaultValue={activeWebsite.url} />
               {url_error()}
               </label>
 
               <label>Sender Name
-              <input id="sender_name" type="text" placeholder="Sender Name" defaultValue={active_website.sender_name} />
+              <input id="sender_name" type="text" placeholder="Sender Name" defaultValue={activeWebsite.sender_name} />
               {sender_name_error()}
               </label>
 
               <label>Sender Email
-              <input id="sender_email" type="text" placeholder="Sender Email" defaultValue={active_website.sender_email} />
+              <input id="sender_email" type="text" placeholder="Sender Email" defaultValue={activeWebsite.sender_email} />
               {sender_email_error()}
               </label>
 
@@ -592,7 +593,7 @@ var websites = this.props.websites;
               <hr />
               <h3>Permenantly Delete Website</h3>
               
-              <p>Click the button below to <strong>permenantly remove the {active_website.name} website and all of its data</strong> from the system.</p>
+              <p>Click the button below to <strong>permenantly remove the {activeWebsite.name} website and all of its data</strong> from the system.</p>
               <button onClick={this.deleteWebsite} className="button radius alert expand">Delete</button>
               </div>
 

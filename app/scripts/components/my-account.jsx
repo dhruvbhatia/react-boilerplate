@@ -1,4 +1,5 @@
 /** @jsx React.DOM */
+'use strict';
 
 var CONFIG = require('../config');
 
@@ -11,7 +12,7 @@ var MyAccount = React.createClass({
   },
 
   render: function() {
-
+    /*jshint ignore:start */
     return (
 
             <div className="text-center">
@@ -24,8 +25,8 @@ var MyAccount = React.createClass({
             <button onClick={this.routeEditAccount} className="button radius">Edit Account</button>
 
             </div>
-            )
-
+            );
+    /*jshint ignore:end */
   }
 
 });
@@ -35,7 +36,7 @@ var EditAccount = React.createClass({
 
   getInitialState: function() {
 
-    return {first_name_error: undefined, last_name_error: undefined, email_error: undefined, password_error: undefined, server_error: undefined};
+    return {firstNameError: undefined, lastNameError: undefined, emailError: undefined, passwordError: undefined, serverError: undefined};
 
   },
 
@@ -44,57 +45,59 @@ var EditAccount = React.createClass({
     this.props.setPos("account", "My Account");
   },
 
-saveUser: function(e) {
-  e.preventDefault();
-  console.log("saving..");
+  saveUser: function(e) {
+    e.preventDefault();
+    console.log("saving..");
 
-  var self = this;
+    var self = this;
 
-  var first_name = $('input#first_name').val();
-  var last_name = $('input#last_name').val();
-  var email = $('input#email').val();
-  var password = $('input#password').val();
+    var firstName = $('input#firstName').val();
+    var lastName = $('input#lastName').val();
+    var email = $('input#email').val();
+    var password = $('input#password').val();
 
 
     // Validate - fields must not be empty
-    if(_.isEmpty(first_name)) {
-      self.setState({first_name_error: "First Name cannot be blank"});
+    if(_.isEmpty(firstName)) {
+      self.setState({firstNameError: "First Name cannot be blank"});
     } else {
-      self.setState({first_name_error: undefined});
-    };
+      self.setState({firstNameError: undefined});
+    }
 
-    if(_.isEmpty(last_name)) {
-      self.setState({last_name_error: "Last Name cannot be blank"});
+    if(_.isEmpty(lastName)) {
+      self.setState({lastNameError: "Last Name cannot be blank"});
     } else {
-      self.setState({last_name_error: undefined});
-    };
+      self.setState({lastNameError: undefined});
+    }
 
     if(_.isEmpty(email)) {
-      self.setState({email_error: "Email cannot be blank"});
+      self.setState({emailError: "Email cannot be blank"});
     } else if(email.indexOf("@") === -1) {
-      this.setState({email_error: "Please input a valid email address"});
+      this.setState({emailError: "Please input a valid email address"});
     } else {
-      self.setState({email_error: undefined});
-    };
+      self.setState({emailError: undefined});
+    }
 
     if(_.isEmpty(password)) {
-      self.setState({password_error: "Password cannot be blank"});
+      self.setState({passwordError: "Password cannot be blank"});
     } else {
-      self.setState({password_error: undefined});
-    };
+      self.setState({passwordError: undefined});
+    }
 
 // send to server if client validation passes
-if(!_.some([this._pendingState.first_name_error, this._pendingState.last_name_error, this._pendingState.email_error, this._pendingState.password_error])) {
+if(!_.some([this._pendingState.firstNameError, this._pendingState.lastNameError, this._pendingState.emailError, this._pendingState.passwordError])) {
 
-  var updated_user = {};
+  var updatedUser = {};
 
-  updated_user.uid = this.props.user.uid;
-  updated_user.first_name = first_name;
-  updated_user.last_name = last_name;
-  updated_user.email = email;
-  updated_user.password = password;
+  /*jshint ignore:start */
+  updatedUser.uid = this.props.user.uid;
+  updatedUser.first_name = firstName;
+  updatedUser.last_name = lastName;
+  updatedUser.email = email;
+  updatedUser.password = password;
+  /*jshint ignore:end */
 
-  console.log(updated_user);
+  console.log(updatedUser);
 
   var cookie = JSON.parse($.cookie("application"));
   var token = cookie.sessionId;
@@ -103,7 +106,7 @@ if(!_.some([this._pendingState.first_name_error, this._pendingState.last_name_er
   superagent
   .post(CONFIG.URLS.updateAccount)
   .set('X-API-Key', token)
-  .query(updated_user)
+  .query(updatedUser)
   .set('Accept', 'application/json')
   .end(function(error, res){
 
@@ -115,89 +118,93 @@ if(!_.some([this._pendingState.first_name_error, this._pendingState.last_name_er
       self.props.setAlert("Your account has been updated!", "success");
 
     } else {
-
+      /*jshint ignore:start */
           // a validation error occurred
           if(JSON.parse(res.text).response) {
             var errors = JSON.parse(res.text).response.error;
 
 
             if(!_.isUndefined(errors.first_name)) {
-              self.setState({first_name_error: errors.first_name.error})
+              self.setState({firstNameError: errors.first_name.error});
             }
 
             if(!_.isUndefined(errors.last_name)) {
-              self.setState({last_name_error: errors.last_name.error})
+              self.setState({lastNameError: errors.last_name.error});
             }
 
             if(!_.isUndefined(errors.email)) {
-              self.setState({email_error: errors.email.error})
+              self.setState({emailError: errors.email.error});
             }
 
             if(!_.isUndefined(errors.password)) {
-              self.setState({password_error: errors.password_error.error})
+              self.setState({passwordError: errors.password.error});
             }
 
           } else {
             // a token error occurred
             if(JSON.parse(res.text).error) {
-              var error = JSON.parse(res.text).error;
-              self.setState({server_error: error});
+              var serverError = JSON.parse(res.text).error;
+              self.setState({serverError: serverError});
 
+              
               if(JSON.parse(res.text).session_invalid) {
-              self.props.setUser(undefined);
-            }
+                self.props.setUser(undefined);
+              }
+              
             }
           }
-
+          /*jshint ignore:end */
         }
 
 
-      })
+      });
 
 }
 
 },
 
-  render: function() {
+render: function() {
 
-   var self = this;
+  /*jshint ignore:start */
 
-   var server_error = function() {
-    if(self.state.server_error !== undefined) {
+  var self = this;
+
+  var serverError = function() {
+    if(self.state.serverError !== undefined) {
       return (
-              <small className="error">{self.state.server_error}</small>
+              <small className="error">{self.state.serverError}</small>
               )
     }
   };
 
-  var first_name_error = function() {
-    if(self.state.first_name_error !== undefined) {
+  var firstNameError = function() {
+    if(self.state.firstNameError !== undefined) {
       return (
-              <small className="error">{self.state.first_name_error}</small>
+              <small className="error">{self.state.firstNameError}</small>
               )
     }
   };
 
-  var last_name_error = function() {
-    if(self.state.last_name_error !== undefined) {
+  var lastNameError = function() {
+    if(self.state.lastNameError !== undefined) {
       return (
-              <small className="error">{self.state.last_name_error}</small>
+              <small className="error">{self.state.lastNameError}</small>
               )
     }
   };
 
-  var email_error = function() {
-    if(self.state.email_error !== undefined) {
+  var emailError = function() {
+    if(self.state.emailError !== undefined) {
       return (
-              <small className="error">{self.state.email_error}</small>
+              <small className="error">{self.state.emailError}</small>
               )
     }
   };
 
-  var password_error = function() {
-    if(self.state.password_error !== undefined) {
+  var passwordError = function() {
+    if(self.state.passwordError !== undefined) {
       return (
-              <small className="error">{self.state.password_error}</small>
+              <small className="error">{self.state.passwordError}</small>
               )
     }
   };
@@ -218,25 +225,25 @@ if(!_.some([this._pendingState.first_name_error, this._pendingState.last_name_er
           <form>
           <fieldset>
           <legend>Update User Details</legend>
-          {server_error()}
+          {serverError()}
           <label>First Name
-          <input id="first_name" type="text" placeholder="First Name" defaultValue={this.props.user.firstName} />
-          {first_name_error()}
+          <input id="firstName" type="text" placeholder="First Name" defaultValue={this.props.user.firstName} />
+          {firstNameError()}
           </label>
 
           <label>Last Name
-          <input id="last_name" type="text" placeholder="Last Name" defaultValue={this.props.user.lastName} />
-          {last_name_error()}
+          <input id="lastName" type="text" placeholder="Last Name" defaultValue={this.props.user.lastName} />
+          {lastNameError()}
           </label>
 
           <label>Email Address
           <input id="email" type="text" placeholder="Email Address" defaultValue={this.props.user.email} />
-          {email_error()}
+          {emailError()}
           </label>
 
           <label>Password
           <input id="password" type="password" placeholder="Password" />
-          {password_error()}
+          {passwordError()}
           </label>
 
           </fieldset>
@@ -250,6 +257,7 @@ if(!_.some([this._pendingState.first_name_error, this._pendingState.last_name_er
           </div>
           )
 
+/*jshint ignore:end */
 }
 
 });

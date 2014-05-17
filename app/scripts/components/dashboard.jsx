@@ -1,4 +1,5 @@
 /** @jsx React.DOM */
+'use strict';
 
 var Dashboard = React.createClass({
 

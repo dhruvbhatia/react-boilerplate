@@ -1,17 +1,19 @@
 /** @jsx React.DOM */
-
+'use strict';
 
 var CONFIG = require('../config');
-var UTIL = require("../util");
-var Router = require("./router");
+require('../util');
 
+/*jshint ignore:start */
 var Dashboard = require('./dashboard').Dashboard;
-var Login = require("./login").Login;
-var MyAccount = require("./my-account").MyAccount;
-var EditAccount = require("./my-account").EditAccount;
-var Websites = require("./website").Websites;
-var AddWebsite = require("./website").AddWebsite;
-var EditWebsite = require("./website").EditWebsite;
+var Login = require('./login').Login;
+var MyAccount = require('./my-account').MyAccount;
+var EditAccount = require('./my-account').EditAccount;
+var Websites = require('./website').Websites;
+var AddWebsite = require('./website').AddWebsite;
+var EditWebsite = require('./website').EditWebsite;
+var Users = require('./users').Users;
+/*jshint ignore:end */
 
 
 
@@ -35,27 +37,27 @@ var Layout = React.createClass({
     if(_.isEmpty(path)) {
 
       path = _.last(_.filter(CONFIG.ROUTES, function(route) {
-        return _.contains(pos, route.url) && route.allow_parameters;
+        return _.contains(pos, route.url) && route.allowParameters;
       }));
 
     }
 
 
-    if(_.has(path, "name")) {
-      path = path.name
+    if(_.has(path, 'name')) {
+      path = path.name;
     } else {
-      path = "Dashboard"
+      path = 'Dashboard';
     }
 
 
 
-    if(path === "Dashboard") {
-      router.navigate("");
-    };
+    if(path === 'Dashboard') {
+      router.navigate('');
+    }
 
-    document.title = path + " | " + CONFIG.WEBSITE_NAME;
+    document.title = path + ' | ' + CONFIG.WEBSITE_NAME;
 
-    return {path: path, user: undefined, render: false, active_website: undefined, websites: undefined, alert: {'message' : null, 'type' : null}};
+    return {path: path, user: undefined, render: false, activeWebsite: undefined, websites: undefined, alert: {'message' : null, 'type' : null}};
   },
 
   componentWillReceiveProps: function() {
@@ -77,25 +79,25 @@ var Layout = React.createClass({
     if(_.isEmpty(path)) {
 
       path = _.last(_.filter(CONFIG.ROUTES, function(route) {
-        return _.contains(pos, route.url) && route.allow_parameters;
+        return _.contains(pos, route.url) && route.allowParameters;
       }));
 
     }
 
 
-    if(_.has(path, "name")) {
-      path = path.name
+    if(_.has(path, 'name')) {
+      path = path.name;
     } else {
-      path = "Dashboard"
+      path = 'Dashboard';
     }
 
 
 
-    if(path === "Dashboard") {
-      router.navigate("");
-    };
+    if(path === 'Dashboard') {
+      router.navigate('');
+    }
 
-    this.setPos(pos, path)
+    this.setPos(pos, path);
     //this.setState({path: path})
 
     
@@ -114,7 +116,7 @@ var Layout = React.createClass({
 
     // Onboarding screen if no websites exist
 
-      document.title = pos + " | " + CONFIG.WEBSITE_NAME;
+      document.title = pos + ' | ' + CONFIG.WEBSITE_NAME;
       this.setState({path: pos});
 
       router.navigate(url);
@@ -126,34 +128,34 @@ var Layout = React.createClass({
 
   setWebsite: function(website) {
 
-    console.log(website)
+    console.log(website);
 
-    // if this is called with "default" as an argument, then set the active website to the first one in the user's list
+    // if this is called with 'default' as an argument, then set the active website to the first one in the user's list
     var websites = this.state.websites;
 
     if(_.isEmpty(websites)) {
-      return this.setState({active_website: "default"});
-    };
+      return this.setState({activeWebsite: 'default'});
+    }
 
 
-    var first_website = _.first(websites).id;
+    var firstWebsite = _.first(websites).id;
 
-    if( (!_.isEmpty(websites)) && (website === "default")) {
+    if( (!_.isEmpty(websites)) && (website === 'default')) {
 
-      this.setState({active_website: first_website});
+      this.setState({activeWebsite: firstWebsite});
 
     } else {
 
 
-      var cookie = JSON.parse($.cookie("application"));
+      var cookie = JSON.parse($.cookie('application'));
 
-      cookie.active_website = website;
+      cookie.activeWebsite = website;
 
-      $.cookie("application", JSON.stringify(cookie), {path: "/", expires: 120});
+      $.cookie('application', JSON.stringify(cookie), {path: '/', expires: 120});
 
-      this.setState({active_website: website});
+      this.setState({activeWebsite: website});
 
-    };
+    }
 
 
 
@@ -164,8 +166,8 @@ var Layout = React.createClass({
 
     // Kill cookie if user is logging out
     if(state === undefined) {
-      $.removeCookie("application");
-    };
+      $.removeCookie('application');
+    }
 
   },
 
@@ -182,7 +184,7 @@ var Layout = React.createClass({
   },
 
   render: function() {
-
+    /*jshint ignore:start */
     // Defer rendering while checking if cookie is valid
     if(this.state.render) {
 
@@ -193,33 +195,35 @@ var Layout = React.createClass({
                   <div>
                   <Login path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                   </div>
-                  )
+                  );
         } else {
 
         // User is logged in
         return (
                 <div>
-                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
-                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
-                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} active_website={this.state.active_website} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
+                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
+                <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
+                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                 </div>
                 );
       }
     } else {
 
       var loadingMsgStyle = {
-       position: "relative",
-       top: "30%"
+       position: 'relative',
+       top: '30%'
      };
 
      return(
 
-            <div className="row text-center" style={loadingMsgStyle}>
+            <div className='row text-center' style={loadingMsgStyle}>
             <h1>Loading...</h1>
             </div>
-            )
+            );
 
    }
+
+   /*jshint ignore:end */
  }
 
 });
@@ -247,38 +251,38 @@ var TopBar = React.createClass({
     router.navigate('', {trigger: false, replace: true});
     this.props.setUser(undefined);
     this.props.setWebsites(undefined);
-    this.props.setPos("", "Dashboard");
+    this.props.setPos('', 'Dashboard');
 
   },
 
   render: function() {
 
     return (
-            <div id="topBar" className="sticky">
-            <nav className="top-bar" data-topbar data-options="is_hover: false">
-            <ul className="title-area">
-            <li className="name">
-            <h1><a href="#">Web App Name</a></h1>
+            <div id='topBar' className='sticky'>
+            <nav className='top-bar' data-topbar data-options='is_hover: false'>
+            <ul className='title-area'>
+            <li className='name'>
+            <h1><a href='#'>Web App Name</a></h1>
             </li>
-            <li className="toggle-topbar menu-icon"><a href="#">Menu</a></li>
+            <li className='toggle-topbar menu-icon'><a href='#'>Menu</a></li>
             </ul>
 
-            <section className="top-bar-section">
+            <section className='top-bar-section'>
 
-            <ul className="right">
-            <li className="active has-dropdown">
-            <a href="#">Logged in as {this.props.user.fullName}</a>
-            <ul className="dropdown">
-            <li><a data-nav="account" onClick={this.route}>My Account</a></li>
+            <ul className='right'>
+            <li className='active has-dropdown'>
+            <a href='#'>Logged in as {this.props.user.fullName}</a>
+            <ul className='dropdown'>
+            <li><a data-nav='account' onClick={this.route}>My Account</a></li>
             <li><a onClick={this.logout}>Logout</a></li>
             </ul>
             </li>
-            <li className="has-dropdown">
-            <a href="#">Help</a>
-            <ul className="dropdown">
-            <li><a href="#">Getting Started Guide</a></li>
-            <li><a href="#">API Documentation</a></li>
-            <li><a href="#">Contact Us</a></li>
+            <li className='has-dropdown'>
+            <a href='#'>Help</a>
+            <ul className='dropdown'>
+            <li><a href='#'>Getting Started Guide</a></li>
+            <li><a href='#'>API Documentation</a></li>
+            <li><a href='#'>Contact Us</a></li>
             </ul>
             </li>
             </ul>
@@ -302,28 +306,30 @@ var LeftMenu = React.createClass({
     this.props.setPos(url, pos);
 
     // TO REVIEW: set the website context back to default when a menu link is clicked
-    //this.props.setWebsite("default");
+    //this.props.setWebsite('default');
 
   },
 
   render: function() {
-
+    /*jshint ignore:start */
     var self = this;
     
-    var links = _.map(_.filter(this.props.routes, "show_in_menu"), function(link, key) {
+    var links = _.map(_.filter(this.props.routes, 'showInMenu'), function(link, key) {
 
-      var classString = "";
-      if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = "active"};
+      var classString = '';
+      if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = 'active';}
 
-      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}>{link.name}</a></li>
+      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}>{link.name}</a></li>;
     });
 
     return (
-            <div id="leftMenu" className="small-4 large-2 columns">
-            <WebsiteSelector active_website={this.props.active_website} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
-            <ul className="side-nav">{links}</ul>
+            <div id='leftMenu' className='small-4 large-2 columns'>
+            <WebsiteSelector activeWebsite={this.props.activeWebsite} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
+            <ul className='side-nav'>{links}</ul>
             </div>
             );
+
+    /*jshint ignore:end */
   }
 
 });
@@ -340,7 +346,7 @@ var WebsiteSelector = React.createClass({
       this.props.setWebsite(undefined);
 
       // todo: review
-      this.props.setPos("websites/add", "Add Website");
+      this.props.setPos('websites/add', 'Add Website');
 
     } else {
 
@@ -348,46 +354,49 @@ var WebsiteSelector = React.createClass({
 
       this.props.setWebsite(website);
 
-      this.props.setPos("", "Dashboard");
+      this.props.setPos('', 'Dashboard');
 
     }
 
   },
 
   render: function() {
-    var self = this;
+
+    /*jshint ignore:start */
 
     var value = 0;
     // Select default option where value = 0 if website isn't defined
-    if(this.props.active_website !== undefined) {
-      value = this.props.active_website;
-    };
+    if(this.props.activeWebsite !== undefined) {
+      value = this.props.activeWebsite;
+    }
 
-    if($.cookie("application")) {
+    if($.cookie('application')) {
       var websites = this.props.websites;
 
 
       var links = _.map(websites, function(site, key) {
 
-        return <option key={site.id} value={site.id}>{site.name}</option>
+        return (<option key={site.id} value={site.id}>{site.name}</option>);
 
       });
 
-    };
+    }
 
     return (
 
             <div>
 
-            <select id="websiteSelector" onChange={this.websiteSelected} value={value}>
+            <select id='websiteSelector' onChange={this.websiteSelected} value={value}>
 
-            <option key="0" value="0">Add New Website</option>
+            <option key='0' value='0'>Add New Website</option>
             {links}
             </select>
 
             </div>
-            )
+            );
 
+
+    /*jshint ignore:end */
   }
 
 });
@@ -405,41 +414,41 @@ var Content = React.createClass({
 
     // The code below checks if there is a React component that matches the current path's name.
     // If there is, then render it, otherwise just render the name of the current path.
-    if ( eval("typeof " + this.props.path.replace(" ","") + " === 'function'") ){ 
+    if ( eval("typeof " + this.props.path.replace(" ","") + " === 'function'") ){
 
-      var element = eval(this.props.path.replace(" ",""));
+      var element = eval(this.props.path.replace(' ',''));
 
-      section = <element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} active_website={this.props.active_website} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
+      section = (<element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} activeWebsite={this.props.activeWebsite} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />);
 
     } else {
       section = (
                  <p>{this.props.path}</p>
-                 )
+                 );
     }
 
 
     var alerts = function() {
 
       if(!_.isEmpty(self.props.alert.message)) {
-        var classString = "alert-box " + self.props.alert.type
+        var classString = 'alert-box ' + self.props.alert.type;
         return (
 
                 <div data-alert className={classString}>
                 {self.props.alert.message}
                 </div>
-                )
+                );
       }
 
     };
 
     return (
-            <div id="content" className="small-8 large-10 columns">
+            <div id='content' className='small-8 large-10 columns'>
 
             {alerts()}
 
             {section}
             </div>
-            )
+            );
 
   }
 
@@ -447,9 +456,3 @@ var Content = React.createClass({
 
 
 exports.Layout = Layout;
-exports.Login = Login;
-exports.TopBar = TopBar;
-exports.LeftMenu = LeftMenu;
-exports.WebsiteSelector = WebsiteSelector;
-exports.Content = Content;
-exports.Router = Router;

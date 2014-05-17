@@ -40,37 +40,37 @@ _.mixin({
 
             var user_websites = JSON.parse(res.text).websites
 
-            var active_website = undefined;
+            var activeWebsite = undefined;
 
             if (!_.isEmpty(user_websites)) {
               // set active website to the last selected website in the cookie, else first website in the user's list
-              active_website = JSON.parse(cookie).active_website;
+              activeWebsite = JSON.parse(cookie).activeWebsite;
 
 
 
               if (_.isEmpty(_.find(user_websites, {
-                "id": parseInt(active_website)
+                "id": parseInt(activeWebsite)
               }))) {
-                console.log(active_website)
-                active_website = _.first(user_websites).id;
+                console.log(activeWebsite)
+                activeWebsite = _.first(user_websites).id;
               }
 
             }
 
             $.cookie("application", JSON.stringify({
               "sessionId": sessionId,
-              "active_website": active_website
+              "activeWebsite": activeWebsite
             }), {
               path: "/",
               expires: 120
             });
 
 
-            self.setWebsite(active_website);
+            self.setWebsite(activeWebsite);
 
             self.setState({
               user: user,
-              active_website: active_website,
+              activeWebsite: activeWebsite,
               websites: user_websites,
               render: true
             });

@@ -144,6 +144,7 @@ gulp.task('watch', ['connect', 'serve'], function () {
         'app/scripts/bundle/main.js',
         'app/images/**/*'
     ]).on('change', function (file) {
+        console.log(file.path + ' changed');
         server.changed(file.path);
     });
 
