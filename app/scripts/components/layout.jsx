@@ -57,7 +57,7 @@ var Layout = React.createClass({
 
     document.title = path + ' | ' + CONFIG.WEBSITE_NAME;
 
-    return {path: path, user: undefined, render: false, activeWebsite: undefined, websites: undefined, alert: {'message' : null, 'type' : null}};
+    return {path: path, user: undefined, render: false, activeWebsite: undefined, websites: undefined, alert: {'message' : null, 'type' : null}, websiteContacts: undefined};
   },
 
   componentWillReceiveProps: function() {
@@ -123,6 +123,13 @@ var Layout = React.createClass({
     
 
     this.setState({alert: {'message' : null, 'type' : null}});
+
+  },
+
+
+  setWebsiteContacts: function(contacts) {
+
+    this.setState({websiteContacts: contacts});
 
   },
 
@@ -203,7 +210,7 @@ var Layout = React.createClass({
                 <div>
                 <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                 <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
-                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
+                <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} websiteContacts={this.state.websiteContacts} setWebsiteContacts={this.setWebsiteContacts} />
                 </div>
                 );
       }
@@ -418,7 +425,7 @@ var Content = React.createClass({
 
       var element = eval(this.props.path.replace(' ',''));
 
-      section = (<element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} activeWebsite={this.props.activeWebsite} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />);
+      section = (<element path={this.props.path} setPos={this.props.setPos} user={this.props.user} setUser={this.props.setUser} setWebsite={this.props.setWebsite} activeWebsite={this.props.activeWebsite} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} websiteContacts={this.props.websiteContacts} setWebsiteContacts={this.props.setWebsiteContacts} />);
 
     } else {
       section = (

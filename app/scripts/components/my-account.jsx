@@ -12,7 +12,7 @@ var MyAccount = React.createClass({
   },
 
   render: function() {
-    /*jshint ignore:start */
+
     return (
 
             <div className="text-center">
@@ -26,7 +26,7 @@ var MyAccount = React.createClass({
 
             </div>
             );
-    /*jshint ignore:end */
+
   }
 
 });
@@ -89,13 +89,13 @@ if(!_.some([this._pendingState.firstNameError, this._pendingState.lastNameError,
 
   var updatedUser = {};
 
-  /*jshint ignore:start */
+
   updatedUser.uid = this.props.user.uid;
-  updatedUser.first_name = firstName;
-  updatedUser.last_name = lastName;
+  updatedUser.firstName = firstName;
+  updatedUser.lastName = lastName;
   updatedUser.email = email;
   updatedUser.password = password;
-  /*jshint ignore:end */
+
 
   console.log(updatedUser);
 
@@ -118,18 +118,18 @@ if(!_.some([this._pendingState.firstNameError, this._pendingState.lastNameError,
       self.props.setAlert("Your account has been updated!", "success");
 
     } else {
-      /*jshint ignore:start */
+
           // a validation error occurred
           if(JSON.parse(res.text).response) {
             var errors = JSON.parse(res.text).response.error;
 
 
-            if(!_.isUndefined(errors.first_name)) {
-              self.setState({firstNameError: errors.first_name.error});
+            if(!_.isUndefined(errors.firstName)) {
+              self.setState({firstNameError: errors.firstName.error});
             }
 
-            if(!_.isUndefined(errors.last_name)) {
-              self.setState({lastNameError: errors.last_name.error});
+            if(!_.isUndefined(errors.lastName)) {
+              self.setState({lastNameError: errors.lastName.error});
             }
 
             if(!_.isUndefined(errors.email)) {
@@ -153,7 +153,6 @@ if(!_.some([this._pendingState.firstNameError, this._pendingState.lastNameError,
               
             }
           }
-          /*jshint ignore:end */
         }
 
 
@@ -164,8 +163,6 @@ if(!_.some([this._pendingState.firstNameError, this._pendingState.lastNameError,
 },
 
 render: function() {
-
-  /*jshint ignore:start */
 
   var self = this;
 
@@ -257,7 +254,6 @@ render: function() {
           </div>
           )
 
-/*jshint ignore:end */
 }
 
 });

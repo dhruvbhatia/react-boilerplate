@@ -9,6 +9,7 @@ var Users = React.createClass({
             <div>
             <p>{this.props.path}</p>
             <p>Blah</p>
+            {_.pluck(this.props.websites, 'contacts')}
             </div>
             );
 

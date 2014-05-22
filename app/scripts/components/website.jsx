@@ -14,10 +14,10 @@ var Websites = React.createClass({
 
   routeEditWebsite: function(e) {
     e.preventDefault();
-    var website_id = $(e.target).closest("tr").attr("id");
-    console.log(website_id);
-    this.props.setWebsite(website_id);
-    this.props.setPos("websites/edit/" + website_id, "Edit Website");
+    var id = $(e.target).closest("tr").attr("id");
+    console.log(id);
+    this.props.setWebsite(id);
+    this.props.setPos("websites/edit/" + id, "Edit Website");
   },
 
   render: function() {
@@ -26,18 +26,18 @@ var Websites = React.createClass({
     var self = this;
 
 
-    var website_rows = _.map(websites, function(website) {
+    var rows = _.map(websites, function(website) {
 
       return(
              <tr id={website.id} key={website.id}>
              <td>{website.name}</td>
-             <td>{website.contact_count}</td>
-             <td>{website.sender_name} ({website.sender_email})</td>
-             <td>{moment(website.created_at).fromNow()}</td>
+             <td>{website.contacts.length}</td>
+             <td>{website.senderName} ({website.senderEmail})</td>
+             <td>{moment(website.createdAt).fromNow()}</td>
              <td><button onClick={self.routeEditWebsite} className="button radius">Edit</button></td>
              </tr>
 
-             )
+             );
 
     });
 
@@ -58,7 +58,7 @@ var Websites = React.createClass({
             </tr>
             </thead>
             <tbody>
-            {website_rows}
+            {rows}
             </tbody>
             </table>
 
@@ -70,7 +70,7 @@ var Websites = React.createClass({
 
             </div>
             </div>
-            )
+            );
 
   }
 
@@ -81,7 +81,7 @@ var AddWebsite = React.createClass({
 
   getInitialState: function() {
 
-    return {name_error: undefined, url_error: undefined, sender_name_error: undefined, sender_email_error: undefined, server_error: undefined};
+    return {nameError: undefined, urlError: undefined, senderNameError: undefined, senderEmailError: undefined, serverError: undefined};
 
   },
 
@@ -96,56 +96,56 @@ var AddWebsite = React.createClass({
     this.props.setPos("websites", "Websites");
   },
 
-saveWebsite: function(e) {
-  e.preventDefault();
-  console.log("saving..");
+  saveWebsite: function(e) {
+    e.preventDefault();
+    console.log("saving..");
 
-  var self = this;
+    var self = this;
 
-  var name = $('input#name').val();
-  var url = $('input#url').val();
-  var sender_name = $('input#sender_name').val();
-  var sender_email = $('input#sender_email').val();
+    var name = $('input#name').val();
+    var url = $('input#url').val();
+    var senderName = $('input#senderName').val();
+    var senderEmail = $('input#senderEmail').val();
 
 
     // Validate - fields must not be empty
     if(_.isEmpty(name)) {
-      self.setState({name_error: "Name cannot be blank"});
+      self.setState({nameError: "Name cannot be blank"});
     } else {
-      self.setState({name_error: undefined});
-    };
+      self.setState({nameError: undefined});
+    }
 
     if(_.isEmpty(url)) {
-      self.setState({url_error: "URL cannot be blank"});
+      self.setState({urlError: "URL cannot be blank"});
     } else {
-      self.setState({url_error: undefined});
-    };
+      self.setState({urlError: undefined});
+    }
 
-    if(_.isEmpty(sender_name)) {
-      self.setState({sender_name_error: "Sender Name cannot be blank"});
+    if(_.isEmpty(senderName)) {
+      self.setState({senderNameError: "Sender Name cannot be blank"});
     } else {
-      self.setState({sender_name_error: undefined});
-    };
+      self.setState({senderNameError: undefined});
+    }
 
-    if(_.isEmpty(sender_email)) {
-      self.setState({sender_email_error: "Sender Email cannot be blank"});
-    } else if(sender_email.indexOf("@") === -1) {
-      this.setState({sender_email_error: "Please input a valid email address"});
+    if(_.isEmpty(senderEmail)) {
+      self.setState({senderEmailError: "Sender Email cannot be blank"});
+    } else if(senderEmail.indexOf("@") === -1) {
+      this.setState({senderEmailError: "Please input a valid email address"});
     } else {
-      self.setState({sender_email_error: undefined});
-    };
+      self.setState({senderEmailError: undefined});
+    }
 
 // send to server if client validation passes
-if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._pendingState.sender_name_error, this._pendingState.sender_email_error])) {
+if(!_.some([this._pendingState.nameError, this._pendingState.urlError, this._pendingState.senderNameError, this._pendingState.senderEmailError])) {
 
-  var new_website = {};
+  var newWebsite = {};
 
-  new_website.name = name;
-  new_website.url = url;
-  new_website.sender_name = sender_name;
-  new_website.sender_email = sender_email;
+  newWebsite.name = name;
+  newWebsite.url = url;
+  newWebsite.senderName = senderName;
+  newWebsite.senderEmail = senderEmail;
 
-  console.log(new_website);
+  console.log(newWebsite);
 
   var cookie = JSON.parse($.cookie("application"));
   var token = cookie.sessionId;
@@ -154,7 +154,7 @@ if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._p
   superagent
   .post(CONFIG.URLS.addWebsite)
   .set('X-API-Key', token)
-  .query(new_website)
+  .query(newWebsite)
   .set('Accept', 'application/json')
   .end(function(error, res){
 
@@ -173,132 +173,134 @@ if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._p
 
 
             if(!_.isUndefined(errors.name)) {
-              self.setState({name_error: errors.name.error})
+              self.setState({nameError: errors.name.error});
             }
 
             if(!_.isUndefined(errors.url)) {
-              self.setState({url_error: errors.url.error})
+              self.setState({urlError: errors.url.error});
             }
 
-            if(!_.isUndefined(errors.sender_name)) {
-              self.setState({sender_name_error: errors.sender_name.error})
+            if(!_.isUndefined(errors.senderName)) {
+              self.setState({senderNameError: errors.senderName.error});
             }
 
-            if(!_.isUndefined(errors.sender_email)) {
-              self.setState({sender_email_error: errors.sender_email.error})
+            if(!_.isUndefined(errors.senderEmail)) {
+              self.setState({senderEmailError: errors.senderEmail.error});
             }
 
           } else {
             // a token error occurred
             if(JSON.parse(res.text).error) {
-              var error = JSON.parse(res.text).error;
-              self.setState({server_error: error});
+              var serverError = JSON.parse(res.text).error;
+              self.setState({serverError: serverError});
 
-              if(JSON.parse(res.text).session_invalid) {
-              self.props.setUser(undefined);
-            }
+              if(JSON.parse(res.text).sessionInvalid) {
+                self.props.setUser(undefined);
+              }
             }
           }
 
         }
 
 
-      })
+      });
 
 }
 
 },
 
-  render: function() {
+render: function() {
 
- var self = this;
+  var self = this;
 
-  var server_error = function() {
-    if(self.state.server_error !== undefined) {
+  var serverError = function() {
+    if(self.state.serverError !== undefined) {
       return (
-              <small className="error">{self.state.server_error}</small>
-              )
+              <small className="error">{self.state.serverError}</small>
+              );
     }
   };
 
-  var name_error = function() {
-    if(self.state.name_error !== undefined) {
+  var nameError = function() {
+    if(self.state.nameError !== undefined) {
       return (
-              <small className="error">{self.state.name_error}</small>
-              )
+              <small className="error">{self.state.nameError}</small>
+              );
     }
   };
 
-  var url_error = function() {
-    if(self.state.url_error !== undefined) {
+  var urlError = function() {
+    if(self.state.urlError !== undefined) {
       return (
-              <small className="error">{self.state.url_error}</small>
-              )
+              <small className="error">{self.state.urlError}</small>
+              );
     }
   };
 
-  var sender_name_error = function() {
-    if(self.state.sender_name_error !== undefined) {
+  var senderNameError = function() {
+    if(self.state.senderNameError !== undefined) {
       return (
-              <small className="error">{self.state.sender_name_error}</small>
-              )
+              <small className="error">{self.state.senderNameError}</small>
+              );
     }
   };
 
-  var sender_email_error = function() {
-    if(self.state.sender_email_error !== undefined) {
+  var senderEmailError = function() {
+    if(self.state.senderEmailError !== undefined) {
       return (
-              <small className="error">{self.state.sender_email_error}</small>
-              )
+              <small className="error">{self.state.senderEmailError}</small>
+              );
     }
   };
 
-    return (
+  return (
 
-            <div className="text-center">
+          <div className="text-center">
 
-            <ul className="breadcrumbs">
-            <li><a onClick={this.routeWebsites}>Websites</a></li>
-            <li className="current">Add Website</li>
-            </ul>
+          <ul className="breadcrumbs">
+          <li><a onClick={this.routeWebsites}>Websites</a></li>
+          <li className="current">Add Website</li>
+          </ul>
 
-            <h2>Add Website</h2>
+          <h2>Add Website</h2>
 
-              <div className="row">
-              <form>
-              <fieldset>
-              <legend>Website Details</legend>
-              {server_error()}
-              <label>Website Name
-              <input id="name" type="text" placeholder="Website Name" />
-              {name_error()}
-              </label>
+          <div className="row">
+          <form>
+          <fieldset>
+          <legend>Website Details</legend>
+          {serverError()}
+          <label>Website Name
+          <input id="name" type="text" placeholder="Website Name" />
+          {nameError()}
+          </label>
 
-              <label>URL
-              <input id="url" type="text" placeholder="Website URL" />
-              {url_error()}
-              </label>
+          <label>URL
+          <input id="url" type="text" placeholder="Website URL" />
+          {urlError()}
+          </label>
 
-              <label>Sender Name
-              <input id="sender_name" type="text" placeholder="Sender Name" />
-              {sender_name_error()}
-              </label>
+          <label>Sender Name
+          <input id="senderName" type="text" placeholder="Sender Name" />
+          {senderNameError()}
+          </label>
 
-              <label>Sender Email
-              <input id="sender_email" type="text" placeholder="Sender Email" />
-              {sender_email_error()}
-              </label>
+          <label>Sender Email
+          <input id="senderEmail" type="text" placeholder="Sender Email" />
+          {senderEmailError()}
+          </label>
 
-              </fieldset>
+          </fieldset>
 
-              <button onClick={this.saveWebsite} className="button radius expand">Add</button>
-              </form>
-              </div>
+          <button onClick={this.saveWebsite} className="button radius expand">Add</button>
+          </form>
+          </div>
 
-            </div>
-            )
+          </div>
+          );
 
-  }
+
+
+}
 
 });
 
@@ -306,7 +308,7 @@ var EditWebsite = React.createClass({
 
   getInitialState: function() {
 
-    return {name_error: undefined, url_error: undefined, sender_name_error: undefined, sender_email_error: undefined, server_error: undefined};
+    return {nameError: undefined, urlError: undefined, senderNameError: undefined, senderEmailError: undefined, serverError: undefined};
 
   },
 
@@ -314,18 +316,18 @@ var EditWebsite = React.createClass({
 
 
     // Ensure current path references a website that the user owns
-    var website_id = Backbone.history.fragment.replace("websites/edit/", "");
+    var id = Backbone.history.fragment.replace("websites/edit/", "");
     var websites = this.props.websites;
 
-    console.log(website_id)
+    console.log(id);
 
-    if(this.props.activeWebsite !== website_id) {
-      var match = _.find(websites, {"id" : parseInt(website_id)});
+    if(this.props.activeWebsite !== id) {
+      var match = _.find(websites, {"id" : parseInt(id)});
 
       if(!_.isEmpty(match)) {
 
       // Path id is a valid website
-      this.props.setWebsite(website_id);
+      this.props.setWebsite(id);
 
     } else {
 
@@ -346,8 +348,8 @@ deleteWebsite: function(e) {
   e.preventDefault();
   console.log("deleting..");
 
-var cookie = JSON.parse($.cookie("application"));
-var self = this;
+  var cookie = JSON.parse($.cookie("application"));
+  var self = this;
   var token = cookie.sessionId;
 
 
@@ -378,8 +380,8 @@ saveWebsite: function(e) {
   console.log("saving..");
 
 
-var cookie = $.cookie("application");
-var websites = this.props.websites;
+  var cookie = $.cookie("application");
+  var websites = this.props.websites;
 
 
   var activeWebsite = _.find(websites, { "id" : parseInt(JSON.parse(cookie).activeWebsite)});
@@ -387,58 +389,57 @@ var websites = this.props.websites;
 
   var name = $('input#name').val();
   var url = $('input#url').val();
-  var sender_name = $('input#sender_name').val();
-  var sender_email = $('input#sender_email').val();
+  var senderName = $('input#senderName').val();
+  var senderEmail = $('input#senderEmail').val();
 
 
     // Validate - fields must not be empty
     if(_.isEmpty(name)) {
-      self.setState({name_error: "Name cannot be blank"});
+      self.setState({nameError: "Name cannot be blank"});
     } else {
-      self.setState({name_error: undefined});
-    };
+      self.setState({nameError: undefined});
+    }
 
     if(_.isEmpty(url)) {
-      self.setState({url_error: "URL cannot be blank"});
+      self.setState({urlError: "URL cannot be blank"});
     } else {
-      self.setState({url_error: undefined});
-    };
+      self.setState({urlError: undefined});
+    }
 
-    if(_.isEmpty(sender_name)) {
-      self.setState({sender_name_error: "Sender Name cannot be blank"});
+    if(_.isEmpty(senderName)) {
+      self.setState({senderNameError: "Sender Name cannot be blank"});
     } else {
-      self.setState({sender_name_error: undefined});
-    };
+      self.setState({senderNameError: undefined});
+    }
 
-    if(_.isEmpty(sender_email)) {
-      self.setState({sender_email_error: "Sender Email cannot be blank"});
-    } else if(sender_email.indexOf("@") === -1) {
-      this.setState({sender_email_error: "Please input a valid email address"});
+    if(_.isEmpty(senderEmail)) {
+      self.setState({senderEmailError: "Sender Email cannot be blank"});
+    } else if(senderEmail.indexOf("@") === -1) {
+      this.setState({senderEmailError: "Please input a valid email address"});
     } else {
-      self.setState({sender_email_error: undefined});
-    };
+      self.setState({senderEmailError: undefined});
+    }
 
 // send to server if client validation passes
-if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._pendingState.sender_name_error, this._pendingState.sender_email_error])) {
+if(!_.some([this._pendingState.nameError, this._pendingState.urlError, this._pendingState.senderNameError, this._pendingState.senderEmailError])) {
 
-  var updated_website = {};
+  var updatedWebsite = {};
 
-  updated_website.id = activeWebsite.id;
-  updated_website.name = name;
-  updated_website.url = url;
-  updated_website.sender_name = sender_name;
-  updated_website.sender_email = sender_email;
+  updatedWebsite.id = activeWebsite.id;
+  updatedWebsite.name = name;
+  updatedWebsite.url = url;
+  updatedWebsite.senderName = senderName;
+  updatedWebsite.senderEmail = senderEmail;
 
-  console.log(updated_website);
+  console.log(updatedWebsite);
 
-  var cookie = JSON.parse($.cookie("application"));
   var token = cookie.sessionId;
 
 
   superagent
   .post(CONFIG.URLS.updateWebsite)
   .set('X-API-Key', token)
-  .query(updated_website)
+  .query(updatedWebsite)
   .set('Accept', 'application/json')
   .end(function(error, res){
 
@@ -457,37 +458,37 @@ if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._p
 
 
             if(!_.isUndefined(errors.name)) {
-              self.setState({name_error: errors.name.error})
+              self.setState({nameError: errors.name.error});
             }
 
             if(!_.isUndefined(errors.url)) {
-              self.setState({url_error: errors.url.error})
+              self.setState({urlError: errors.url.error});
             }
 
-            if(!_.isUndefined(errors.sender_name)) {
-              self.setState({sender_name_error: errors.sender_name.error})
+            if(!_.isUndefined(errors.senderName)) {
+              self.setState({senderNameError: errors.senderName.error});
             }
 
-            if(!_.isUndefined(errors.sender_email)) {
-              self.setState({sender_email_error: errors.sender_email.error})
+            if(!_.isUndefined(errors.senderEmail)) {
+              self.setState({senderEmailError: errors.senderEmail.error});
             }
 
           } else {
             // a token error occurred
             if(JSON.parse(res.text).error) {
-              var error = JSON.parse(res.text).error;
-              self.setState({server_error: error});
+              var serverError = JSON.parse(res.text).error;
+              self.setState({serverError: serverError});
 
-              if(JSON.parse(res.text).session_invalid) {
-              self.props.setUser(undefined);
-            }
+              if(JSON.parse(res.text).sessionInvalid) {
+                self.props.setUser(undefined);
+              }
             }
           }
 
         }
 
 
-      })
+      });
 
 }
 
@@ -495,58 +496,58 @@ if(!_.some([this._pendingState.name_error, this._pendingState.url_error, this._p
 
 
 render: function() {
-
-var cookie = $.cookie("application");
-var websites = this.props.websites;
+  
+  var cookie = $.cookie("application");
+  var websites = this.props.websites;
 
 
   var activeWebsite = _.find(websites, { "id" : parseInt(JSON.parse(cookie).activeWebsite)});
-  var website_id = Backbone.history.fragment.replace("websites/edit/", "");
+  var id = Backbone.history.fragment.replace("websites/edit/", "");
   var self = this;
 
-  var server_error = function() {
-    if(self.state.server_error !== undefined) {
+  var serverError = function() {
+    if(self.state.serverError !== undefined) {
       return (
-              <small className="error">{self.state.server_error}</small>
-              )
+              <small className="error">{self.state.serverError}</small>
+              );
     }
   };
 
-  var name_error = function() {
-    if(self.state.name_error !== undefined) {
+  var nameError = function() {
+    if(self.state.nameError !== undefined) {
       return (
-              <small className="error">{self.state.name_error}</small>
-              )
+              <small className="error">{self.state.nameError}</small>
+              );
     }
   };
 
-  var url_error = function() {
-    if(self.state.url_error !== undefined) {
+  var urlError = function() {
+    if(self.state.urlError !== undefined) {
       return (
-              <small className="error">{self.state.url_error}</small>
-              )
+              <small className="error">{self.state.urlError}</small>
+              );
     }
   };
 
-  var sender_name_error = function() {
-    if(self.state.sender_name_error !== undefined) {
+  var senderNameError = function() {
+    if(self.state.senderNameError !== undefined) {
       return (
-              <small className="error">{self.state.sender_name_error}</small>
-              )
+              <small className="error">{self.state.senderNameError}</small>
+              );
     }
   };
 
-  var sender_email_error = function() {
-    if(self.state.sender_email_error !== undefined) {
+  var senderEmailError = function() {
+    if(self.state.senderEmailError !== undefined) {
       return (
-              <small className="error">{self.state.sender_email_error}</small>
-              )
+              <small className="error">{self.state.senderEmailError}</small>
+              );
     }
   };
 
 
   if(!_.isEmpty(activeWebsite)) {
-    if(activeWebsite.id === parseInt(website_id)) {
+    if(activeWebsite.id === parseInt(id)) {
 
       return (
 
@@ -564,25 +565,25 @@ var websites = this.props.websites;
               <form>
               <fieldset>
               <legend>Update Details</legend>
-              {server_error()}
+              {serverError()}
               <label>Website Name
               <input id="name" type="text" placeholder="Website Name" defaultValue={activeWebsite.name} />
-              {name_error()}
+              {nameError()}
               </label>
 
               <label>URL
               <input id="url" type="text" placeholder="Website URL" defaultValue={activeWebsite.url} />
-              {url_error()}
+              {urlError()}
               </label>
 
               <label>Sender Name
-              <input id="sender_name" type="text" placeholder="Sender Name" defaultValue={activeWebsite.sender_name} />
-              {sender_name_error()}
+              <input id="senderName" type="text" placeholder="Sender Name" defaultValue={activeWebsite.senderName} />
+              {senderNameError()}
               </label>
 
               <label>Sender Email
-              <input id="sender_email" type="text" placeholder="Sender Email" defaultValue={activeWebsite.sender_email} />
-              {sender_email_error()}
+              <input id="senderEmail" type="text" placeholder="Sender Email" defaultValue={activeWebsite.senderEmail} />
+              {senderEmailError()}
               </label>
 
               </fieldset>
@@ -599,18 +600,18 @@ var websites = this.props.websites;
 
 
               </div>
-              )
+              );
 } else {
   return (
           <div>
           An unexpected error occurred
-          </div>)
+          </div>);
 } 
 } else {
   return (
           <div>
           An unexpected error occurred
-          </div>)
+          </div>);
 }
 }
 

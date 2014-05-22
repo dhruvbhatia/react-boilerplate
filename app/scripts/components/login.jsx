@@ -52,12 +52,10 @@ var Login = React.createClass({
       var self = this;
       var register = {};
 
-      /*jshint ignore:start */
-      register.first_name = firstName;
-      register.last_name = lastName;
+      register.firstName = firstName;
+      register.lastName = lastName;
       register.email = email;
       register.password = password;
-      /*jshint ignore:end */
 
       superagent
       .post(CONFIG.URLS.register)
@@ -83,13 +81,13 @@ var Login = React.createClass({
 
               var errors = JSON.parse(res.text).response.error;
 
-              /*jshint ignore:start */
-              if(!_.isUndefined(errors.first_name)) {
-                self.setState({registerFirstNameError: errors.first_name.error});
+
+              if(!_.isUndefined(errors.firstName)) {
+                self.setState({registerFirstNameError: errors.firstName.error});
               }
 
-              if(!_.isUndefined(errors.last_name)) {
-                self.setState({registerLastNameError: errors.last_name.error});
+              if(!_.isUndefined(errors.lastName)) {
+                self.setState({registerLastNameError: errors.lastName.error});
               }
 
               if(!_.isUndefined(errors.email)) {
@@ -99,7 +97,6 @@ var Login = React.createClass({
               if(!_.isUndefined(errors.password)) {
                 self.setState({registerPasswordError: errors.password.error});
               }
-              /*jshint ignore:end */
 
             }
 

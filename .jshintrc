@@ -23,6 +23,7 @@
     "Backbone": false,
     "_": false,
     "superagent": false,
+    "moment": false,
     "router": false
   },
   "expr": true,
