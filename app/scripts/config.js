@@ -13,6 +13,7 @@ module.exports = {
     {name: 'Dashboard', url: '', showInMenu: true, allowParameters: false},
     {name: 'Users', url: 'users', subroutes: 'Edit User', showInMenu: true, allowParameters: false},
     {name: 'Edit User', url: 'users/edit', showInMenu: false, allowParameters: true},
+    {name: 'User Profile', url: 'users/profile', showInMenu: false, allowParameters: true},
     {name: 'Websites', url: 'websites', subroutes: 'Add Website, Edit Website', showInMenu: true, allowParameters: false},
     {name: 'Add Website', url: 'websites/add', showInMenu: false, allowParameters: false},
     {name: 'Edit Website', url: 'websites/edit', showInMenu: false, allowParameters: true},

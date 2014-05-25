@@ -16,13 +16,23 @@ var Users = React.createClass({
 
   },
 
+  routeUserProfile: function(e) {
+
+    e.preventDefault();
+    var id = $(e.target).closest("tr").attr("id");
+    console.log(id);
+    //this.props.setWebsite(id);
+    this.props.setPos("users/profile/" + id, "User Profile");
+
+  },
+
   render: function() {
 
     var self = this;
 
     var moreCustomAttributes = function(user) {
 
-      if(_.chain(user.custom_attributes).keys().size() == 0) {
+      if(_.chain(user.custom_attributes).keys().size() === 0) {
         return(<span>-</span>);
       }
 
@@ -32,7 +42,7 @@ var Users = React.createClass({
 
     };
 
-    var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().map(function(user) {
+    var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().sortBy(function(user) { return -user.user_last_seen;}).map(function(user) {
 
       return(
              <tr id={user.user_id} key={user.user_id}>
@@ -48,7 +58,11 @@ var Users = React.createClass({
              {moreCustomAttributes(user)}
 
              </td>
-             <td><button onClick={self.routeEditUser} className="button radius">Edit</button></td>
+             <td>
+             <button onClick={self.routeUserProfile} className="button radius">Profile</button>
+             <br />
+             <button onClick={self.routeEditUser} className="button radius">Edit</button>
+             </td>
              </tr>
 
              );
@@ -90,6 +104,163 @@ var Users = React.createClass({
   }
 
 });
+
+var UserProfile = React.createClass({
+
+  getInitialState: function() {
+
+    return {user: undefined};
+
+  },
+
+  componentDidMount: function() {
+
+
+    // Ensure current path references a website that the user owns
+    var id = Backbone.history.fragment.replace("users/profile/", "");
+
+    var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().value();
+
+    var match = _.find(users, {"user_id" : parseInt(id)});
+
+
+    // Redirect if id is non numeric
+    if (!/^\d+$/.test(id)) {
+
+      match = undefined;
+
+    }
+
+
+    if(_.isUndefined(match)) {
+
+      // Path id is an invalid user
+      this.props.setPos("users", "Users");
+
+    } else {
+      this.setState({user: match});
+    }
+
+  },
+
+  routeUsers: function(e) {
+
+    e.preventDefault();
+    this.props.setPos("users", "Users");
+
+  },
+
+  render: function() {
+
+
+    var self = this;
+
+    var events = function() {
+      if(!_.isEmpty(self.state.user.events)) {
+
+
+
+
+        var rows = _.chain(self.state.user.events).sortBy(function(event) { return -event.created_at;}).map(function(event) {
+
+          var customAttrs = _.chain(event.custom_attributes).keys().first(2).map(function(key) {
+
+            return (<span>{key} = {event.custom_attributes[key].value}<br /></span>);
+          });
+
+          var moreCustomAttributes = function() {
+
+            if(_.chain(event.custom_attributes).keys().size() == 0) {
+              return(<span>-</span>);
+            }
+
+            if(_.chain(event.custom_attributes).keys().size() > 2) {
+              return(<span>...</span>);
+            }
+
+          };
+
+          return(
+                 <tr id={event.id} key={event.id}>
+                 <td>{event.event_name}</td>
+                 <td>
+                 {customAttrs}
+                 {moreCustomAttributes()}
+                 </td>
+
+                 <td>{moment(event.created_at).fromNow()}</td>
+                 </tr>
+
+                 );
+
+        });
+
+
+        return (
+                <div>
+                
+                <table width="100%">
+                <thead>
+                <tr>
+                <th>Event Name</th>
+                <th>Event Data</th>
+                <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                {rows}
+                </tbody>
+                </table>
+
+
+                </div>
+
+                );
+
+      } else {
+
+        return (
+                <div>
+                User has no events
+                </div>
+
+                );
+
+
+      }
+    };
+
+    if(!_.isUndefined(this.state.user)) {
+
+      return (
+              <div>
+              <strong>User ID: </strong>{this.state.user.user_id}
+              <br />
+              <strong>User Name: </strong>{this.state.user.user_name}
+              <br />
+              <strong>User Email: </strong>{this.state.user.user_email}
+              <br />
+              <strong>Signed Up: </strong>{moment(this.state.user.user_signup_date).fromNow()}
+              <br />
+              <strong>Last Seen: </strong>{moment(this.state.user.user_last_seen).fromNow()}
+
+              <hr />
+              {events()}
+
+              </div>
+
+              );
+
+    } else {
+
+      return (<div>No User</div>);
+
+
+    }
+  }
+
+});
+
 
 var EditUser = React.createClass({
 
@@ -216,32 +387,32 @@ var EditUser = React.createClass({
 
   deleteUser: function(e) {
 
-  e.preventDefault();
-  console.log("deleting..");
+    e.preventDefault();
+    console.log("deleting..");
 
-  var cookie = JSON.parse($.cookie("application"));
-  var self = this;
-  var token = cookie.sessionId;
+    var cookie = JSON.parse($.cookie("application"));
+    var self = this;
+    var token = cookie.sessionId;
 
 
-  superagent
-  .post(CONFIG.URLS.deleteUser)
-  .set('X-API-Key', token)
-  .query({user_id: this.state.user.user_id})
-  .query({website_id: this.state.user.website_id})
-  .set('Accept', 'application/json')
-  .end(function(error, res){
+    superagent
+    .post(CONFIG.URLS.deleteUser)
+    .set('X-API-Key', token)
+    .query({user_id: this.state.user.user_id})
+    .query({website_id: this.state.user.website_id})
+    .set('Accept', 'application/json')
+    .end(function(error, res){
 
-    console.log(res);
+      console.log(res);
 
-    if(res.ok) {
+      if(res.ok) {
 
-      self.props.setPos("users", "Users");
-      self.props.setAlert("User has been deleted!", "success");
+        self.props.setPos("users", "Users");
+        self.props.setAlert("User has been deleted!", "success");
 
-    }
+      }
 
-  });
+    });
 
   },
 
@@ -385,3 +556,4 @@ return(
 
 exports.Users = Users;
 exports.EditUser = EditUser;
+exports.UserProfile = UserProfile;

@@ -14,6 +14,8 @@ var AddWebsite = require('./website').AddWebsite;
 var EditWebsite = require('./website').EditWebsite;
 var Users = require('./users').Users;
 var EditUser = require('./users').EditUser;
+var UserProfile = require('./users').UserProfile;
+var Campaigns = require('./campaigns').Campaigns;
 /*jshint ignore:end */
 
 
