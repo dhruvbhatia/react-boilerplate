@@ -13,6 +13,7 @@ var Websites = require('./website').Websites;
 var AddWebsite = require('./website').AddWebsite;
 var EditWebsite = require('./website').EditWebsite;
 var Users = require('./users').Users;
+var EditUser = require('./users').EditUser;
 /*jshint ignore:end */
 
 
@@ -135,8 +136,6 @@ var Layout = React.createClass({
 
   setWebsite: function(website) {
 
-    console.log(website);
-
     // if this is called with 'default' as an argument, then set the active website to the first one in the user's list
     var websites = this.state.websites;
 
@@ -155,6 +154,8 @@ var Layout = React.createClass({
 
 
       var cookie = JSON.parse($.cookie('application'));
+
+      website = parseInt(website);
 
       cookie.activeWebsite = website;
 

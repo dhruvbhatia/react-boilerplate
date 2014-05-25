@@ -11,7 +11,8 @@ module.exports = {
 
   ROUTES : [
     {name: 'Dashboard', url: '', showInMenu: true, allowParameters: false},
-    {name: 'Users', url: 'users', showInMenu: true, allowParameters: false},
+    {name: 'Users', url: 'users', subroutes: 'Edit User', showInMenu: true, allowParameters: false},
+    {name: 'Edit User', url: 'users/edit', showInMenu: false, allowParameters: true},
     {name: 'Websites', url: 'websites', subroutes: 'Add Website, Edit Website', showInMenu: true, allowParameters: false},
     {name: 'Add Website', url: 'websites/add', showInMenu: false, allowParameters: false},
     {name: 'Edit Website', url: 'websites/edit', showInMenu: false, allowParameters: true},
@@ -29,7 +30,9 @@ module.exports = {
     'deleteWebsite' : 'http://192.168.178.20:9000/api/v1/website/delete',
     'login' : 'http://192.168.178.20:9000/api/v1/auth/login',
     'register' : 'http://192.168.178.20:9000/api/v1/account/add',
-    'updateAccount' : 'http://192.168.178.20:9000/api/v1/account/update'
+    'updateAccount' : 'http://192.168.178.20:9000/api/v1/account/update',
+    'saveUser' : 'http://192.168.178.20:9000/api/v1/user',
+    'deleteUser' : 'http://192.168.178.20:9000/api/v1/user/delete'
 
   },
 

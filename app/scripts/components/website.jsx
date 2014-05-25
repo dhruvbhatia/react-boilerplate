@@ -324,7 +324,16 @@ var EditWebsite = React.createClass({
     if(this.props.activeWebsite !== id) {
       var match = _.find(websites, {"id" : parseInt(id)});
 
-      if(!_.isEmpty(match)) {
+    // Redirect if id is non numeric
+    if (!/^\d+$/.test(id)) {
+
+      match = undefined;
+
+    }
+
+
+
+    if(!_.isUndefined(match)) {
 
       // Path id is a valid website
       this.props.setWebsite(id);
