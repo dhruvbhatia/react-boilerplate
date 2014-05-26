@@ -85,7 +85,7 @@ var Users = React.createClass({
             <th>Name</th>
             <th>Email</th>
             <th>Signup Date</th>
-            <th>Last Seen</th>
+            <th>Last Seen ▾</th>
             <th>Custom Attributes</th>
             <th>Actions</th>
             </tr>
@@ -204,7 +204,7 @@ var UserProfile = React.createClass({
                 <tr>
                 <th>Event Name</th>
                 <th>Event Data</th>
-                <th>Date</th>
+                <th>Event Timestamp ▾</th>
                 </tr>
                 </thead>
                 <tbody>
