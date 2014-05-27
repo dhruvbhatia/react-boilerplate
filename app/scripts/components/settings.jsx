@@ -3,12 +3,12 @@
 
 var CONFIG = require('../config');
 
-var MyAccount = React.createClass({
+var Settings = React.createClass({
 
   routeEditAccount: function(e) {
     e.preventDefault();
     console.log("button clicked");
-    this.props.setPos("account/edit", "Edit Account");
+    this.props.setPos("settings/edit", "Edit Account");
   },
 
   render: function() {
@@ -40,9 +40,9 @@ var EditAccount = React.createClass({
 
   },
 
-  routeMyAccount: function(e) {
+  routeSettings: function(e) {
     e.preventDefault();
-    this.props.setPos("account", "My Account");
+    this.props.setPos("settings", "Settings");
   },
 
   saveUser: function(e) {
@@ -114,7 +114,7 @@ if(!_.some([this._pendingState.firstNameError, this._pendingState.lastNameError,
 
     if(res.ok) {
 
-      self.props.setPos("account", "My Account");
+      self.props.setPos("settings", "Settings");
       self.props.setAlert("Your account has been updated!", "success");
 
     } else {
@@ -211,7 +211,7 @@ render: function() {
           <div className="text-center">
 
           <ul className="breadcrumbs">
-          <li><a onClick={this.routeMyAccount}>My Account</a></li>
+          <li><a onClick={this.routeSettings}>Settings</a></li>
           <li className="current">Edit Account</li>
           <li className="current">{this.props.user.fullName}</li>
           </ul>
@@ -259,5 +259,5 @@ render: function() {
 });
 
 
-exports.MyAccount = MyAccount;
+exports.Settings = Settings;
 exports.EditAccount = EditAccount;

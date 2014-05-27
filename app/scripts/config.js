@@ -11,15 +11,15 @@ module.exports = {
 
   ROUTES : [
     {name: 'Dashboard', url: '', showInMenu: true, allowParameters: false},
-    {name: 'Users', url: 'users', subroutes: 'Edit User', showInMenu: true, allowParameters: false},
+    {name: 'Users', url: 'users', subroutes: 'Edit User, User Profile', showInMenu: true, allowParameters: false},
     {name: 'Edit User', url: 'users/edit', showInMenu: false, allowParameters: true},
     {name: 'User Profile', url: 'users/profile', showInMenu: false, allowParameters: true},
     {name: 'Websites', url: 'websites', subroutes: 'Add Website, Edit Website', showInMenu: true, allowParameters: false},
     {name: 'Add Website', url: 'websites/add', showInMenu: false, allowParameters: false},
     {name: 'Edit Website', url: 'websites/edit', showInMenu: false, allowParameters: true},
     {name: 'Campaigns', url: 'campaigns', showInMenu: true, allowParameters: false},
-    {name: 'My Account', url: 'account', subroutes: 'Edit Account', showInMenu: true, allowParameters: false},
-    {name: 'Edit Account', url: 'account/edit', showInMenu: false, allowParameters: false},
+    {name: 'Settings', url: 'settings', subroutes: 'Edit Account', showInMenu: true, allowParameters: false},
+    {name: 'Edit Account', url: 'settings/edit', showInMenu: false, allowParameters: false},
     {name: 'Support', url: 'support', showInMenu: true, allowParameters: false}
   ],
 

@@ -7,8 +7,8 @@ require('../util');
 /*jshint ignore:start */
 var Dashboard = require('./dashboard').Dashboard;
 var Login = require('./login').Login;
-var MyAccount = require('./my-account').MyAccount;
-var EditAccount = require('./my-account').EditAccount;
+var Settings = require('./settings').Settings;
+var EditAccount = require('./settings').EditAccount;
 var Websites = require('./website').Websites;
 var AddWebsite = require('./website').AddWebsite;
 var EditWebsite = require('./website').EditWebsite;
@@ -211,7 +211,6 @@ var Layout = React.createClass({
         // User is logged in
         return (
                 <div>
-                <TopBar path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                 <LeftMenu routes={this.props.routes} path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} />
                 <Content path={this.state.path} setPos={this.setPos} user={this.state.user} setUser={this.setUser} activeWebsite={this.state.activeWebsite} setWebsite={this.setWebsite} websites={this.state.websites} setWebsites={this.setWebsites} alert={this.state.alert} setAlert={this.setAlert} websiteContacts={this.state.websiteContacts} setWebsiteContacts={this.setWebsiteContacts} />
                 </div>
@@ -283,7 +282,7 @@ var TopBar = React.createClass({
             <li className='active has-dropdown'>
             <a href='#'>Logged in as {this.props.user.fullName}</a>
             <ul className='dropdown'>
-            <li><a data-nav='account' onClick={this.route}>My Account</a></li>
+            <li><a data-nav='settings' onClick={this.route}>Settings</a></li>
             <li><a onClick={this.logout}>Logout</a></li>
             </ul>
             </li>
@@ -327,13 +326,14 @@ var LeftMenu = React.createClass({
     var links = _.map(_.filter(this.props.routes, 'showInMenu'), function(link, key) {
 
       var classString = '';
+      var icon = 'images/icon-' + link.name.toLowerCase() + '.png';
       if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = 'active';}
 
-      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}>{link.name}</a></li>;
+      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}><img src={icon} />{link.name}</a></li>;
     });
 
     return (
-            <div id='leftMenu' className='small-4 large-2 columns'>
+            <div id='leftMenu'>
             <WebsiteSelector activeWebsite={this.props.activeWebsite} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
             <ul className='side-nav'>{links}</ul>
             </div>
@@ -452,7 +452,7 @@ var Content = React.createClass({
     };
 
     return (
-            <div id='content' className='small-8 large-10 columns'>
+            <div id='content'>
 
             {alerts()}
 

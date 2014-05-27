@@ -5,20 +5,21 @@
 // endbower
 
 body {
-  //background-color: #f1f1f1;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #333;
+  background-color: #F3F9FF;
+  //font-family: "Gotham Book", Helvetica, Arial, sans-serif;
+  font-size: 18px;
 }
 
 $form-label-small-transform: none;
 
 #application {
-  height: 100vh;
+  //height: 100vh;
 }
 
 #leftMenu {
   position: fixed;
   background-color: #404E64;
+  width: 200px;
   height: 100%;
   padding-left: 0px;
   padding-right: 0px;
@@ -31,7 +32,8 @@ $form-label-small-transform: none;
 
 #content {
   height: 100%;
-  padding-top: 15px;
+  padding: 15px;
+  padding-left: 215px;
 }
 
 .side-nav {
@@ -41,17 +43,22 @@ $form-label-small-transform: none;
   }
 
   li a {
-    font-size: 125%;
-    padding-left: 15px;
-    padding-right: 15px;
+    font-size: 20px;
+    padding: 15px;
+    img {
+      vertical-align: bottom;
+    }
+    span {
+      padding-left: 10px;
+    }
   }
   li:hover a {
-    background-color: #fff;
+    background-color: #2A3648;
   }
 }
 
 .active {
-  background-color: #fff;
+  background-color: #2A3648;
 }
 
 .browsehappy {
