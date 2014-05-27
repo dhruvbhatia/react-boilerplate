@@ -40,7 +40,9 @@ $rem-base: 18px;
 // We use these to control various global styles
 // $body-bg: #fff;
 $body-font-color: #5A5A5A;
-$body-font-family: "Gotham Book", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+$body-font-family: "Gotham Light", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+$gotham-book-font-family: "Gotham Book", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+$gotham-font-family: "Gotham", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
 // $body-font-weight: normal;
 // $body-font-style: normal;
 
@@ -57,12 +59,12 @@ $primary-color: #6AA5FE;
 $sidebar-link-color: #FFF;
 // $secondary-color: #e7e7e7;
 // $alert-color: #f04124;
-// $success-color: #43AC6A;
+$success-color: #7ECD28;
 // $warning-color: #f08a24;
 // $info-color: #a0d3e8;
 
 // We use these to make sure border radius matches unless we want it different.
-// $global-radius: 3px;
+$global-radius: 10px;
 // $global-rounded: 1000px;
 
 // We use these to control inset shadow shiny edges and depressions.
@@ -121,15 +123,15 @@ $sidebar-link-color: #FFF;
 // $header-font-family: $body-font-family;
 // $header-font-weight: normal;
 // $header-font-style: normal;
-// $header-font-color: #222;
+$header-font-color: #5A5A5A;
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;
 // $header-text-rendering: optimizeLegibility;
 
 // We use these to control header font sizes
-// $h1-font-size: rem-calc(44);
-// $h2-font-size: rem-calc(37);
+$h1-font-size: 3rem;
+$h2-font-size: 2rem;
 // $h3-font-size: rem-calc(27);
 // $h4-font-size: rem-calc(23);
 // $h5-font-size: rem-calc(18);
@@ -244,7 +246,7 @@ $paragraph-font-size: inherit;
 
 // We use these to control text style.
 // $alert-font-weight: normal;
-// $alert-font-size: rem-calc(13);
+$alert-font-size: 20px;
 // $alert-font-color: #fff;
 // $alert-font-color-alt: scale-color($secondary-color, $lightness: -66%);
 
@@ -253,7 +255,7 @@ $paragraph-font-size: inherit;
 
 // We use these to control border styles.
 // $alert-border-style: solid;
-// $alert-border-width: 1px;
+$alert-border-width: 0px;
 // $alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
 // $alert-bottom-margin: rem-calc(20);
 
@@ -272,6 +274,11 @@ $paragraph-font-size: inherit;
 // We use this to control transition effects
 // $alert-transition-speed: 300ms;
 // $alert-transition-ease: ease-out;
+
+
+.alert-box {
+  font-family: $gotham-font-family;
+}
 
 // Block Grid
 
@@ -325,7 +332,7 @@ $paragraph-font-size: inherit;
 
 // We use these to build padding for buttons.
 // $button-tny: rem-calc(10);
-// $button-sml: rem-calc(14);
+$button-sml: 0.50rem;
 // $button-med: rem-calc(16);
 // $button-lrg: rem-calc(18);
 
@@ -334,12 +341,12 @@ $paragraph-font-size: inherit;
 // $button-margin-bottom: rem-calc(20);
 
 // We use these to control button text styles.
-// $button-font-family: $body-font-family;
+$button-font-family: $gotham-font-family;
 // $button-font-color: #fff;
-// $button-font-color-alt: #333;
+$button-font-color-alt: #fff;
 // $button-font-tny: rem-calc(11);
-// $button-font-sml: rem-calc(13);
-// $button-font-med: rem-calc(16);
+$button-font-sml: 16px;
+$button-font-med: 20px;
 // $button-font-lrg: rem-calc(20);
 // $button-font-weight: normal;
 // $button-font-align: center;
@@ -950,7 +957,7 @@ $side-nav-link-color: $sidebar-link-color;
 // $side-nav-font-size: rem-calc(14);
 // $side-nav-font-weight: normal;
 // $side-nav-font-weight-active: $side-nav-font-weight;
-// $side-nav-font-family: $body-font-family;
+$side-nav-font-family: $gotham-book-font-family;
 // $side-nav-active-font-family: $side-nav-font-family;
 
 
@@ -1074,25 +1081,33 @@ $side-nav-link-color: $sidebar-link-color;
 
 // These control the background color for the table and even rows
 // $table-bg: #fff;
-// $table-even-row-bg: #f9f9f9  ;
+$table-even-row-bg: #F7FBFF  ;
 
 // These control the table cell border style
 // $table-border-style: solid;
-// $table-border-size: 1px;
-// $table-border-color: #ddd;
+$table-border-size: 1px;
+$table-border-color: #E4E4E4;
 
 // These control the table head styles
-// $table-head-bg: #f5f5f5  ;
-// $table-head-font-size: rem-calc(14);
-// $table-head-font-color: #222;
+$table-head-bg: #647DA3  ;
+$table-head-font-size: 20px;
+$table-head-font-color: #ECF5FF;
 // $table-head-font-weight: bold;
-// $table-head-padding: rem-calc(8 10 10);
+$table-head-padding: 20px;
 
 // These control the row padding and font styles
-// $table-row-padding: rem-calc(9 10);
-// $table-row-font-size: rem-calc(14);
-// $table-row-font-color: #222;
-// $table-line-height: rem-calc(18);
+$table-row-padding: 20px;
+$table-row-font-size: 20px;
+$table-row-font-color: #848484;
+$table-line-height: 25px;
+
+tr, td, th {
+  border: 1px solid #E4E4E4;
+}
+
+th {
+  font-family: $gotham-book-font-family;
+}
 
 // These are for controlling the display and margin of tables
 // $table-display: table-cell;

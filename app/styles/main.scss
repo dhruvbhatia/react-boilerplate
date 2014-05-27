@@ -57,6 +57,24 @@ $form-label-small-transform: none;
   }
 }
 
+#userInfo {
+  text-align: right;
+  span {
+    vertical-align: text-top;
+  }
+  button {
+    margin-left: 20px;
+  }
+}
+
+.gotham-book {
+  font-family: $gotham-book-font-family;
+}
+
+.gotham {
+  font-family: $gotham-font-family;
+}
+
 .active {
   background-color: #2A3648;
 }

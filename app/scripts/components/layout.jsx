@@ -60,7 +60,7 @@ var Layout = React.createClass({
 
     document.title = path + ' | ' + CONFIG.WEBSITE_NAME;
 
-    return {path: path, user: undefined, render: false, activeWebsite: undefined, websites: undefined, alert: {'message' : null, 'type' : null}, websiteContacts: undefined};
+    return {path: path, user: undefined, render: false, activeWebsite: undefined, websites: undefined, alert: {'message' : 'Test message', 'type' : 'success'}, websiteContacts: undefined};
   },
 
   componentWillReceiveProps: function() {
@@ -326,7 +326,7 @@ var LeftMenu = React.createClass({
     var links = _.map(_.filter(this.props.routes, 'showInMenu'), function(link, key) {
 
       var classString = '';
-      var icon = 'images/icon-' + link.name.toLowerCase() + '.png';
+      var icon = '/images/icon-' + link.name.toLowerCase() + '.png';
       if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = 'active';}
 
       return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}><img src={icon} />{link.name}</a></li>;
@@ -413,6 +413,16 @@ var WebsiteSelector = React.createClass({
 
 var Content = React.createClass({
 
+  logout: function(e) {
+
+    e.preventDefault();
+    router.navigate('', {trigger: false, replace: true});
+    this.props.setUser(undefined);
+    this.props.setWebsites(undefined);
+    this.props.setPos('', 'Dashboard');
+
+  },
+
   render: function() {
 
 
@@ -440,7 +450,7 @@ var Content = React.createClass({
     var alerts = function() {
 
       if(!_.isEmpty(self.props.alert.message)) {
-        var classString = 'alert-box ' + self.props.alert.type;
+        var classString = 'alert-box radius ' + self.props.alert.type;
         return (
 
                 <div data-alert className={classString}>
@@ -454,6 +464,10 @@ var Content = React.createClass({
     return (
             <div id='content'>
 
+            <div id='userInfo'>
+            Logged in as <span className='gotham'>{this.props.user.fullName}</span>
+            <button onClick={this.logout} className="button radius small">Logout</button>
+            </div>
             {alerts()}
 
             {section}
