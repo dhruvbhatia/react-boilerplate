@@ -463,6 +463,7 @@ var Content = React.createClass({
 
     return (
             <div id='content'>
+            <div className='small-11 columns'>
 
             <div id='userInfo'>
             Logged in as <span className='gotham'>{this.props.user.fullName}</span>
@@ -471,6 +472,7 @@ var Content = React.createClass({
             {alerts()}
 
             {section}
+            </div>
             </div>
             );
 
