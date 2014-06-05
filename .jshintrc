@@ -24,6 +24,8 @@
     "_": false,
     "superagent": false,
     "moment": false,
+    "nv": false,
+    "d3": false,
     "router": false
   },
   "expr": true,

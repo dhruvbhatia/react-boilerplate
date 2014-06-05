@@ -9,7 +9,9 @@
     "lodash": "~2.4.1",
     "backbone": "~1.1.2",
     "superagent": "~0.17.0",
-    "momentjs": "~2.6.0"
+    "momentjs": "~2.6.0",
+    "d3": "~3.4.8",
+    "nvd3": "~1.1.15-beta"
   },
   "devDependencies": {}
 }

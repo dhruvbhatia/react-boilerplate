@@ -67,6 +67,27 @@ $form-label-small-transform: none;
   }
 }
 
+.fullWidth {
+   width: 100%;
+   margin-left: auto;
+   margin-right: auto;
+   max-width: initial;
+}
+
+.chart {
+  text-align: center;
+}
+
+.nvtooltip {
+  // position: static !important;
+  left: 0px !important;
+  top: 0px !important;
+}
+
+.tick line {
+  display: none;
+}
+
 .gotham-book {
   font-family: $gotham-book-font-family;
 }
