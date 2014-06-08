@@ -23,6 +23,7 @@ The goal is to use [leading technologies](#tech) to build a solid seed project f
 - Gulp
 - Bower
 - Browserify
+- NVD3
 
 
 ## Caveats
