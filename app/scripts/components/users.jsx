@@ -32,26 +32,26 @@ var Users = React.createClass({
 
     var moreCustomAttributes = function(user) {
 
-      if(_.chain(user.custom_attributes).keys().size() === 0) {
+      if(_.chain(user.customAttributes).keys().size().value() === 0) {
         return(<span>-</span>);
       }
 
-      if(_.chain(user.custom_attributes).keys().size() > 2) {
+      if(_.chain(user.customAttributes).keys().size().value() > 2) {
         return(<span>...</span>);
       }
 
     };
 
-    var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().sortBy(function(user) { return -user.user_last_seen;}).map(function(user) {
+    var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().sortBy(function(user) { return -user.userLastSeen;}).map(function(user) {
 
       return(
-             <tr id={user.user_id} key={user.user_id}>
-             <td>{user.user_id}</td>
-             <td>{user.user_name}</td>
-             <td>{user.user_email}</td>
-             <td>{moment(user.user_signup_date).fromNow()}</td>
-             <td>{moment(user.user_last_seen).fromNow()}</td>
-             <td>{_.chain(user.custom_attributes).keys().first(2).map(function(key) {
+             <tr id={user.userId} key={user.userId}>
+             <td>{user.userId}</td>
+             <td>{user.userName}</td>
+             <td>{user.userEmail}</td>
+             <td>{moment(user.userSignupDate).fromNow()}</td>
+             <td>{moment(user.userLastSeen).fromNow()}</td>
+             <td>{_.chain(user.customAttributes).keys().first(2).map(function(key) {
               return (<span>{key}<br /></span>);
             })}
 
@@ -121,7 +121,7 @@ var UserProfile = React.createClass({
 
     var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().value();
 
-    var match = _.find(users, {"user_id" : parseInt(id)});
+    var match = _.find(users, {"userId" : parseInt(id)});
 
 
     // Redirect if id is non numeric
@@ -161,20 +161,20 @@ var UserProfile = React.createClass({
 
 
 
-        var rows = _.chain(self.state.user.events).sortBy(function(event) { return -event.created_at;}).map(function(event) {
+        var rows = _.chain(self.state.user.events).sortBy(function(event) { return -event.createdAt;}).map(function(event) {
 
-          var customAttrs = _.chain(event.custom_attributes).keys().first(2).map(function(key) {
+          var customAttrs = _.chain(event.customAttributes).keys().first(2).map(function(key) {
 
-            return (<span>{key} = {event.custom_attributes[key].value}<br /></span>);
+            return (<span>{key} = {event.customAttributes[key].value}<br /></span>);
           });
 
           var moreCustomAttributes = function() {
 
-            if(_.chain(event.custom_attributes).keys().size() == 0) {
+            if(_.chain(event.customAttributes).keys().size() === 0) {
               return(<span>-</span>);
             }
 
-            if(_.chain(event.custom_attributes).keys().size() > 2) {
+            if(_.chain(event.customAttributes).keys().size() > 2) {
               return(<span>...</span>);
             }
 
@@ -182,13 +182,13 @@ var UserProfile = React.createClass({
 
           return(
                  <tr id={event.id} key={event.id}>
-                 <td>{event.event_name}</td>
+                 <td>{event.eventName}</td>
                  <td>
                  {customAttrs}
                  {moreCustomAttributes()}
                  </td>
 
-                 <td>{moment(event.created_at).fromNow()}</td>
+                 <td>{moment(event.createdAt).fromNow()}</td>
                  </tr>
 
                  );
@@ -234,15 +234,15 @@ var UserProfile = React.createClass({
 
       return (
               <div>
-              <strong>User ID: </strong>{this.state.user.user_id}
+              <strong>User ID: </strong>{this.state.user.userId}
               <br />
-              <strong>User Name: </strong>{this.state.user.user_name}
+              <strong>User Name: </strong>{this.state.user.userName}
               <br />
-              <strong>User Email: </strong>{this.state.user.user_email}
+              <strong>User Email: </strong>{this.state.user.userEmail}
               <br />
-              <strong>Signed Up: </strong>{moment(this.state.user.user_signup_date).fromNow()}
+              <strong>Signed Up: </strong>{moment(this.state.user.userSignupDate).fromNow()}
               <br />
-              <strong>Last Seen: </strong>{moment(this.state.user.user_last_seen).fromNow()}
+              <strong>Last Seen: </strong>{moment(this.state.user.userLastSeen).fromNow()}
 
               <hr />
               {events()}
@@ -277,20 +277,20 @@ var EditUser = React.createClass({
 
     console.log("saving...");
 
-    var website_id = this.state.user.website_id;
-    var user_id = this.state.user.user_id;
-    var user_name = $('#userName').val();
-    var user_email = $('#userEmail').val();
-    var user_signup_date = $('#userSignupDate').val();
+    var websiteId = this.state.user.websiteId;
+    var userId = this.state.user.userId;
+    var userName = $('#userName').val();
+    var userEmail = $('#userEmail').val();
+    var userSignupDate = $('#userSignupDate').val();
 
-    var custom_attributes = {};
+    var customAttributes = {};
 
     var requiredFields = {
-      'website_id': website_id,
-      'user_id': user_id,
-      'user_name': user_name,
-      'user_email': user_email,
-      'user_signup_date': user_signup_date
+      'websiteId': websiteId,
+      'userId': userId,
+      'userName': userName,
+      'userEmail': userEmail,
+      'userSignupDate': userSignupDate
     };
 
     var customAttrKeys = [];
@@ -306,9 +306,9 @@ var EditUser = React.createClass({
 
     });
 
-    custom_attributes = _.zipObject(customAttrKeys, customAttrValues);
+    customAttributes = _.zipObject(customAttrKeys, customAttrValues);
 
-    console.log(custom_attributes);
+    console.log(customAttributes);
 
     var cookie = JSON.parse($.cookie("application"));
     var token = cookie.sessionId;
@@ -317,7 +317,7 @@ var EditUser = React.createClass({
     superagent
     .get(CONFIG.URLS.saveUser)
     .set('X-API-Key', token)
-    .query(custom_attributes)
+    .query(customAttributes)
     .query(requiredFields)
     .set('Accept', 'application/json')
     .end(function(error, res){
@@ -327,7 +327,7 @@ var EditUser = React.createClass({
       if(res.ok) {
 
         self.props.setPos("users", "Users");
-        self.props.setAlert(user_name + " has been updated!", "success");
+        self.props.setAlert(userName + " has been updated!", "success");
 
       } else {
 
@@ -336,7 +336,7 @@ var EditUser = React.createClass({
           var errors = JSON.parse(res.text).response.error;
 
           self.props.setPos("users", "Users");
-          self.props.setAlert("Unable to update " + user_name + ". The following errors occurred: " + JSON.stringify(errors), "alert");
+          self.props.setAlert("Unable to update " + userName + ". The following errors occurred: " + JSON.stringify(errors), "alert");
 
         }
 
@@ -356,7 +356,7 @@ var EditUser = React.createClass({
 
     var users = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('contacts').flatten().value();
 
-    var match = _.find(users, {"user_id" : parseInt(id)});
+    var match = _.find(users, {"userId" : parseInt(id)});
 
 
     // Redirect if id is non numeric
@@ -398,8 +398,8 @@ var EditUser = React.createClass({
     superagent
     .post(CONFIG.URLS.deleteUser)
     .set('X-API-Key', token)
-    .query({user_id: this.state.user.user_id})
-    .query({website_id: this.state.user.website_id})
+    .query({userId: this.state.user.userId})
+    .query({websiteId: this.state.user.websiteId})
     .set('Accept', 'application/json')
     .end(function(error, res){
 
@@ -422,9 +422,9 @@ var EditUser = React.createClass({
 
     if(!_.isUndefined(this.state.user)) {
 
-      var customAttributes = _.map(self.state.user.custom_attributes, function(attribute, key) {
+      var customAttributes = _.map(self.state.user.customAttributes, function(attribute, key) {
 
-        var index = _.chain(self.state.user.custom_attributes).keys().value().indexOf(key) + 1;
+        var index = _.chain(self.state.user.customAttributes).keys().value().indexOf(key) + 1;
 
         return (
                 <div id={"custom-attribute-" + index} key={index} className="row custom-attribute">
@@ -443,7 +443,7 @@ var EditUser = React.createClass({
 
       var additionalCustomAttributes = function() {
 
-        var index = _.size(self.state.user.custom_attributes);
+        var index = _.size(self.state.user.customAttributes);
 
         return (
                 <div>
@@ -490,10 +490,10 @@ return(
        <ul className="breadcrumbs">
        <li><a onClick={this.routeUsers}>Users</a></li>
        <li className="current">Edit User</li>
-       <li className="current">{this.state.user.user_name}</li>
+       <li className="current">{this.state.user.userName}</li>
        </ul>
 
-       <h2>Editing {this.state.user.user_name}</h2>
+       <h2>Editing {this.state.user.userName}</h2>
 
 
 
@@ -502,15 +502,15 @@ return(
        <fieldset>
        <legend>Required Fields</legend>
        <label>Name
-       <input id="userName" type="text" placeholder="Name" defaultValue={this.state.user.user_name} />
+       <input id="userName" type="text" placeholder="Name" defaultValue={this.state.user.userName} />
        </label>
 
        <label>Email Address
-       <input id="userEmail" type="text" placeholder="Email Address" defaultValue={this.state.user.user_email} />
+       <input id="userEmail" type="text" placeholder="Email Address" defaultValue={this.state.user.userEmail} />
        </label>
 
        <label>Signup Date
-       <input id="userSignupDate" type="text" placeholder="Signup Date" defaultValue={this.state.user.user_signup_date} />
+       <input id="userSignupDate" type="text" placeholder="Signup Date" defaultValue={this.state.user.userSignupDate} />
        </label>
 
        </fieldset>
@@ -531,14 +531,14 @@ return(
        <hr />
        <h3>Permenantly Delete User</h3>
 
-       <p>Click the button below to <strong>permenantly remove {this.state.user.user_name} and all of their data</strong> from the system.</p>
+       <p>Click the button below to <strong>permenantly remove {this.state.user.userName} and all of their data</strong> from the system.</p>
        <button onClick={this.deleteUser} className="button radius alert expand">Delete</button>
 
 
        </div>
 
        </div>
-       )
+       );
 
 } else {
   return (
@@ -546,7 +546,7 @@ return(
           No user
           </div>
 
-          )
+          );
 }
 
 }
