@@ -15,6 +15,7 @@ var EditWebsite = require('./website').EditWebsite;
 var Users = require('./users').Users;
 var EditUser = require('./users').EditUser;
 var UserProfile = require('./users').UserProfile;
+var EmailUser = require('./users').EmailUser;
 var Campaigns = require('./campaigns').Campaigns;
 /*jshint ignore:end */
 
@@ -308,9 +309,10 @@ var TopBar = React.createClass({
 var LeftMenu = React.createClass({
 
   route: function(event) {
+
     event.preventDefault();
-    var url = $(event.target).attr('data-nav');
-    var pos = $(event.target).text();
+    var url = $(event.target).closest('a').attr('data-nav');
+    var pos = $(event.target).closest('a').text();
 
     this.props.setPos(url, pos);
 
@@ -329,7 +331,7 @@ var LeftMenu = React.createClass({
       var icon = '/images/icon-' + link.name.toLowerCase() + '.png';
       if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = 'active';}
 
-      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}><img src={icon} />{link.name}</a></li>;
+      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}><img src={icon} /><span>{link.name}</span></a></li>;
     });
 
     return (

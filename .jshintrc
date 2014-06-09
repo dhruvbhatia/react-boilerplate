@@ -26,6 +26,7 @@
     "moment": false,
     "nv": false,
     "d3": false,
+    "CKEDITOR": false,
     "router": false
   },
   "expr": true,

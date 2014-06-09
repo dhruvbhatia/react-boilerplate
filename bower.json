@@ -11,7 +11,9 @@
     "superagent": "~0.17.0",
     "momentjs": "~2.6.0",
     "d3": "~3.4.8",
-    "nvd3": "~1.1.15-beta"
+    "nvd3": "~1.1.15-beta",
+    "ckeditor": "~4.4.1",
+    "jsplumb": "~1.6.2"
   },
   "devDependencies": {}
 }

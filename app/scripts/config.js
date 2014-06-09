@@ -11,12 +11,14 @@ module.exports = {
 
   ROUTES : [
     {name: 'Dashboard', url: '', showInMenu: true, allowParameters: false},
-    {name: 'Users', url: 'users', subroutes: 'Edit User, User Profile', showInMenu: true, allowParameters: false},
+    {name: 'Users', url: 'users', subroutes: 'Edit User, User Profile, Email User', showInMenu: true, allowParameters: false},
+    {name: 'Email User', url: 'users/email', showInMenu: false, allowParameters: true},
     {name: 'Edit User', url: 'users/edit', showInMenu: false, allowParameters: true},
     {name: 'User Profile', url: 'users/profile', showInMenu: false, allowParameters: true},
     {name: 'Websites', url: 'websites', subroutes: 'Add Website, Edit Website', showInMenu: true, allowParameters: false},
     {name: 'Add Website', url: 'websites/add', showInMenu: false, allowParameters: false},
     {name: 'Edit Website', url: 'websites/edit', showInMenu: false, allowParameters: true},
+    {name: 'Templates', url: 'templates', showInMenu: true, allowParameters: false},
     {name: 'Campaigns', url: 'campaigns', showInMenu: true, allowParameters: false},
     {name: 'Settings', url: 'settings', subroutes: 'Edit Account', showInMenu: true, allowParameters: false},
     {name: 'Edit Account', url: 'settings/edit', showInMenu: false, allowParameters: false},
@@ -33,7 +35,8 @@ module.exports = {
     'register' : 'http://192.168.178.20:9000/api/v1/account/add',
     'updateAccount' : 'http://192.168.178.20:9000/api/v1/account/update',
     'saveUser' : 'http://192.168.178.20:9000/api/v1/user',
-    'deleteUser' : 'http://192.168.178.20:9000/api/v1/user/delete'
+    'deleteUser' : 'http://192.168.178.20:9000/api/v1/user/delete',
+    'emailUser' : 'http://192.168.178.20:9000/api/v1/user/email'
 
   },
 

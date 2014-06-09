@@ -24,6 +24,8 @@ The goal is to use [leading technologies](#tech) to build a solid seed project f
 - Bower
 - Browserify
 - NVD3
+- CKEditor
+- jsPlumb
 
 
 ## Caveats
