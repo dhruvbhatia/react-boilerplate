@@ -465,11 +465,11 @@ var Content = React.createClass({
 
     return (
             <div id='content'>
-            <div  className='small-25 columns'>
+            <div  className='small-19 columns'>
 
 
             <div id='userInfo'>
-            Logged in as <span className='gotham'>{this.props.user.fullName}</span>
+            Logged in as {this.props.user.fullName}
             <button onClick={this.logout} className="button radius small">Logout</button>
             </div>
             {alerts()}

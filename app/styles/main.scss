@@ -5,7 +5,7 @@
 @import '../bower_components/foundation/scss/foundation.scss';
 
 body {
-  background-color: #F3F9FF;
+  background-color: #F5F4F4;
   //font-family: "Gotham Book", Helvetica, Arial, sans-serif;
   font-size: 18px;
 }
@@ -18,8 +18,8 @@ $form-label-small-transform: none;
 
 #leftMenu {
   position: fixed;
-  background-color: #404E64;
-  width: 200px;
+  background-color: #3B3B3B;
+  width: 250px;
   height: 100%;
   padding-left: 0px;
   padding-right: 0px;
@@ -33,7 +33,7 @@ $form-label-small-transform: none;
 #content {
   height: 100%;
   padding: 15px;
-  padding-left: 215px;
+  padding-left: 265px;
 }
 
 .side-nav {
@@ -83,7 +83,7 @@ $form-label-small-transform: none;
   left: 0px !important;
   top: 0px !important;
   border: 0px;
-  font-family: $gotham-book-font-family;
+  //font-family: $gotham-book-font-family;
   * {
     width: 200px;
     text-align: center;
@@ -102,16 +102,8 @@ $form-label-small-transform: none;
   display: none;
 }
 
-.gotham-book {
-  font-family: $gotham-book-font-family;
-}
-
-.gotham {
-  font-family: $gotham-font-family;
-}
-
 .active {
-  background-color: #2A3648;
+  background-color: #BF4333;
 }
 
 .browsehappy {

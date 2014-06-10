@@ -118,12 +118,12 @@ render: function() {
 
          <div className="row fullWidth">
 
-         <div id="chart1" className="panel chart columns small-24 large-12">
+         <div id="chart1" className="panel chart columns small-19 large-9">
          <h2>Email Opens</h2>
          <svg style={chartStyle}></svg>
          </div>
 
-         <div id="chart2" className="panel chart columns small-24 large-12">
+         <div id="chart2" className="panel chart columns small-19 large-9">
          <h2>Email Opens</h2>
          <svg style={chartStyle}></svg>
          </div>
