@@ -331,7 +331,7 @@ var LeftMenu = React.createClass({
       var icon = '/images/icon-' + link.name.toLowerCase() + '.png';
       if((self.props.path===link.name) || (_.contains(link.subroutes,self.props.path))){classString = 'active';}
 
-      return <li key={key}><a href={link.url} onClick={self.route} data-nav={link.url} className={classString}><img src={icon} /><div>{link.name}</div></a></li>;
+      return <li key={key}><a onClick={self.route} data-nav={link.url} className={classString}><img src={icon} /><div>{link.name}</div></a></li>;
     });
 
     return (
