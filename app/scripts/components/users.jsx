@@ -68,11 +68,7 @@ var Users = React.createClass({
 
              </td>
              <td>
-             <button onClick={self.routeUserProfile} className="button radius">Profile</button>
-             <br />
-             <button onClick={self.routeEmailUser} className="button radius">Email</button>
-             <br />
-             <button onClick={self.routeEditUser} className="button radius">Edit</button>
+             <a onClick={self.routeUserProfile}>Profile</a> | <a onClick={self.routeEmailUser}>Email</a> | <a onClick={self.routeEditUser}>Edit</a>
              </td>
              </tr>
 
@@ -81,9 +77,8 @@ var Users = React.createClass({
 
     });
 
-    console.log(users);
-
-
+    console.log(users.value());
+if(!_.isEmpty(users.value())) {
 
     return (
             <div>
@@ -111,6 +106,16 @@ var Users = React.createClass({
 
             </div>
             );
+
+  } else {
+
+    return (
+            <div>
+            Users are automatically added here when you have the tracking API installed.
+            </div>
+            );
+
+  }
 
   }
 

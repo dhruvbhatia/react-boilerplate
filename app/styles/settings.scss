@@ -170,8 +170,8 @@ $h2-font-size: rem-calc(18);
 // $code-font-weight: $font-weight-bold;
 
 // We use these to style anchors
-// $anchor-text-decoration: none;
-// $anchor-text-decoration-hover: none;
+$anchor-text-decoration: underline;
+$anchor-text-decoration-hover: underline;
 // $anchor-font-color: $primary-color;
 // $anchor-font-color-hover: scale-color($primary-color, $lightness: -14%);
 

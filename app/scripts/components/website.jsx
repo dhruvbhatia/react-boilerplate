@@ -34,7 +34,7 @@ var Websites = React.createClass({
              <td>{website.contacts.length}</td>
              <td>{website.senderName} ({website.senderEmail})</td>
              <td>{moment(website.createdAt).fromNow()}</td>
-             <td><button onClick={self.routeEditWebsite} className="button radius">Edit</button></td>
+             <td><a onClick={self.routeEditWebsite}>Edit</a></td>
              </tr>
 
              );
