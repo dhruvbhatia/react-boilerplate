@@ -58,8 +58,8 @@ $body-font-family: "Helvetica", Helvetica, Arial, sans-serif;
 // We use these as default colors throughout
 $primary-color: #26B1D9;
 // $secondary-color: #e7e7e7;
-// $alert-color: #f04124;
-// $success-color: #43AC6A;
+$alert-color: #FB5B46;
+$success-color: #33BA7F;
 // $warning-color: #f08a24;
 // $info-color: #a0d3e8;
 
@@ -126,9 +126,9 @@ $global-radius: 5px;
 
 // We use these to control header font styles
 // $header-font-family: $body-font-family;
-// $header-font-weight: $font-weight-normal;
+$header-font-weight: bold;
 // $header-font-style: normal;
-// $header-font-color: #222;
+$header-font-color: $body-font-color;
 // $header-line-height: 1.4;
 // $header-top-margin: .2rem;
 // $header-bottom-margin: .5rem;
@@ -136,7 +136,7 @@ $global-radius: 5px;
 
 // We use these to control header font sizes
 // $h1-font-size: rem-calc(44);
-// $h2-font-size: rem-calc(37);
+$h2-font-size: rem-calc(18);
 // $h3-font-size: rem-calc(27);
 // $h4-font-size: rem-calc(23);
 // $h5-font-size: rem-calc(18);
@@ -249,15 +249,15 @@ $global-radius: 5px;
 // $include-html-alert-classes: $include-html-classes;
 
 // We use this to control alert padding.
-// $alert-padding-top: rem-calc(14);
+$alert-padding-top: rem-calc(20);
 // $alert-padding-default-float: $alert-padding-top;
 // $alert-padding-opposite-direction: $alert-padding-top + rem-calc(10);
 // $alert-padding-bottom: $alert-padding-top;
 
 // We use these to control text style.
-// $alert-font-weight: $font-weight-normal;
-// $alert-font-size: rem-calc(13);
-// $alert-font-color: #fff;
+$alert-font-weight: bold;
+$alert-font-size: rem-calc(18);
+$alert-font-color: $body-bg;
 // $alert-font-color-alt: scale-color($secondary-color, $lightness: -66%);
 
 // We use this for close hover effect.
@@ -265,7 +265,7 @@ $global-radius: 5px;
 
 // We use these to control border styles.
 // $alert-border-style: solid;
-// $alert-border-width: 1px;
+$alert-border-width: 0px;
 // $alert-border-color: scale-color($primary-color, $lightness: $alert-function-factor);
 // $alert-bottom-margin: rem-calc(20);
 
@@ -338,7 +338,7 @@ $global-radius: 5px;
 // We use these to build padding for buttons.
 // $button-tny: rem-calc(10);
 // $button-sml: rem-calc(14);
-// $button-med: rem-calc(16);
+$button-med: rem-calc(18);
 // $button-lrg: rem-calc(18);
 
 // We use this to control the display property.
@@ -347,11 +347,11 @@ $global-radius: 5px;
 
 // We use these to control button text styles.
 // $button-font-family: $body-font-family;
-// $button-font-color: #fff;
+$button-font-color: $body-bg;
 // $button-font-color-alt: #333;
 // $button-font-tny: rem-calc(11);
 // $button-font-sml: rem-calc(13);
-// $button-font-med: rem-calc(16);
+$button-font-med: rem-calc(18);
 // $button-font-lrg: rem-calc(20);
 // $button-font-weight: $font-weight-normal;
 // $button-font-align: center;
@@ -509,28 +509,28 @@ $global-radius: 5px;
 // $include-html-form-classes: $include-html-classes;
 
 // We use this to set the base for lots of form spacing and positioning styles
-// $form-spacing: rem-calc(16);
+$form-spacing: rem-calc(20);
 
 // We use these to style the labels in different ways
 // $form-label-pointer: pointer;
-// $form-label-font-size: rem-calc(14);
+$form-label-font-size: rem-calc(18);
 // $form-label-font-weight: $font-weight-normal;
 // $form-label-line-height: 1.5;
-// $form-label-font-color: scale-color(#000, $lightness: 30%);
+$form-label-font-color: $body-font-color;
 // $form-label-small-transform: capitalize;
 // $form-label-bottom-margin: 0;
 // $input-font-family: inherit;
-// $input-font-color: rgba(0,0,0,0.75);
-// $input-font-size: rem-calc(14);
+$input-font-color: $body-font-color;
+$input-font-size: rem-calc(18);
 // $input-bg-color: #fff;
 // $input-focus-bg-color: scale-color(#fff, $lightness: -2%);
-// $input-border-color: scale-color(#fff, $lightness: -20%);
-// $input-focus-border-color: scale-color(#fff, $lightness: -40%);
+$input-border-color: #D0D0D0;
+$input-focus-border-color: scale-color($input-border-color, $lightness: -20%);
 // $input-border-style: solid;
-// $input-border-width: 1px;
+$input-border-width: 2px;
 // $input-border-radius: $global-radius;
 // $input-disabled-bg: #ddd;
-// $input-box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+$input-box-shadow: none;
 // $input-include-glowing-effect: true;
 
 // We use these to style the fieldset border and spacing.
@@ -557,18 +557,22 @@ $global-radius: 5px;
 // We use these to style the error states for inputs and labels
 // $input-error-message-padding: rem-calc(6 9 9);
 // $input-error-message-top: -1px;
-// $input-error-message-font-size: rem-calc(12);
+$input-error-message-font-size: rem-calc(16);
 // $input-error-message-font-weight: $font-weight-normal;
 // $input-error-message-font-style: italic;
 // $input-error-message-font-color: #fff;
 // $input-error-message-font-color-alt: #333;
+
+.error {
+  text-transform: none;
+}
 
 // We use this to style the glowing effect of inputs when focused
 // $glowing-effect-fade-time: 0.45s;
 // $glowing-effect-color: $input-focus-border-color;
 
 // Select variables
-// $select-bg-color: #fafafa;
+$select-bg-color: $body-bg;
 // $select-hover-bg-color: scale-color($select-bg-color, $lightness: -3%);
 
 // Inline Lists
@@ -828,7 +832,7 @@ $global-radius: 5px;
 // $panel-padding: rem-calc(20);
 
 // We use these to set default font colors
-// $panel-font-color: #333;
+$panel-font-color: $body-font-color;
 // $panel-font-color-alt: #fff;
 
 // $panel-header-adjust: true;
@@ -1092,24 +1096,33 @@ $side-nav-link-color-hover: $side-nav-link-color;
 // These control the table cell border style
 // $table-border-style: solid;
 // $table-border-size: 1px;
-// $table-border-color: #ddd;
+$table-border-color: #F5F4F4;
 
 // These control the table head styles
-// $table-head-bg: #f5f5f5  ;
-// $table-head-font-size: rem-calc(14);
-// $table-head-font-color: #222;
-// $table-head-font-weight: $font-weight-bold;
-// $table-head-padding: rem-calc(8 10 10);
+$table-head-bg: $success-color;
+$table-head-font-size: rem-calc(18);
+$table-head-font-color: #FFF;
+$table-head-font-weight: normal;
+$table-head-padding: rem-calc(15 15 13);
 
 // These control the row padding and font styles
-// $table-row-padding: rem-calc(9 10);
-// $table-row-font-size: rem-calc(14);
-// $table-row-font-color: #222;
+$table-row-padding: rem-calc(9 15);
+$table-row-font-size: rem-calc(18);
+$table-row-font-color: $body-font-color;
 // $table-line-height: rem-calc(18);
 
 // These are for controlling the display and margin of tables
 // $table-display: table-cell;
 // $table-margin-bottom: rem-calc(20);
+
+th {
+  border: 1px solid #E3E3E3;
+}
+
+td {
+  border: 1px solid #F5F4F4;
+}
+
 
 //
 // TABS

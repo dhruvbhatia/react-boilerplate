@@ -91,7 +91,7 @@ function getData() {
     area: true,
     values: rand,
     key: "Email Opens",
-    color: "#5AA8FF"
+    color: "#33BA7F"
   }
   ];
 }
