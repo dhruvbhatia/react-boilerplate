@@ -67,7 +67,7 @@ var Layout = React.createClass({
   componentWillReceiveProps: function() {
 
 // set the pushState to blank if the user arrives to the dashboard, either by going to the root or entering an invalid route
-    var pos = Backbone.history.fragment;
+var pos = Backbone.history.fragment;
 
         // Look up the current route against CONFIG.ROUTES so that we can populate Layout with the pretty path name.
     // If the current path isn't defined in CONFIG.ROUTES, send to the Dashboard
@@ -120,10 +120,10 @@ var Layout = React.createClass({
 
     // Onboarding screen if no websites exist
 
-      document.title = pos + ' | ' + CONFIG.WEBSITE_NAME;
-      this.setState({path: pos});
+    document.title = pos + ' | ' + CONFIG.WEBSITE_NAME;
+    this.setState({path: pos});
 
-      router.navigate(url);
+    router.navigate(url);
     
 
     this.setState({alert: {'message' : null, 'type' : null}});
@@ -336,6 +336,7 @@ var LeftMenu = React.createClass({
 
     return (
             <div id='leftMenu'>
+            <LeftMenuToggle />
             <WebsiteSelector activeWebsite={this.props.activeWebsite} setWebsite={this.props.setWebsite} setPos={this.props.setPos} websites={this.props.websites} setWebsites={this.props.setWebsites} alert={this.props.alert} setAlert={this.props.setAlert} />
             <ul className='side-nav'>{links}</ul>
             </div>
@@ -346,6 +347,36 @@ var LeftMenu = React.createClass({
 
 });
 
+var LeftMenuToggle = React.createClass({
+
+  toggleMenu: function(e) {
+
+    e.preventDefault();
+    var currentWidth = $('#leftMenu').width();
+
+    if(currentWidth === 250) {
+    $('#leftMenu').animate({width:"65px"}, 200);
+    $('#content').animate({paddingLeft:"80px"}, 200);
+  } else {
+    $('#leftMenu').animate({width:"250px"}, 200);
+    $('#content').animate({paddingLeft:"265px"}, 200);
+  }
+
+  },
+
+  render: function() {
+
+    return (
+            <div>
+            <button className="button small radius" onClick={this.toggleMenu}>Toggle</button>
+            <br />
+            </div>
+
+            );
+
+  }
+
+});
 
 var WebsiteSelector = React.createClass({
 
