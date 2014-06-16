@@ -87,6 +87,20 @@ $form-label-small-transform: none;
   box-shadow: 0 5px 3px -3px #E2E2E2;
 }
 
+.tall {
+  height: 100%;
+}
+
+.noBottomMargin {
+  margin-bottom: 0px;
+}
+
+.connector {
+  border-right: 1px solid $primary-color;
+  height: 50px;
+  width: 50%;
+}
+
 svg text {
   fill: $body-font-color;
 }
