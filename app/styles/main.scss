@@ -137,6 +137,10 @@ svg text {
   background-color: $active-color;
 }
 
+a.right, a.close-reveal-modal {
+  text-decoration: none !important;
+}
+
 .browsehappy {
   margin: 0.2em 0;
   background: #ccc;

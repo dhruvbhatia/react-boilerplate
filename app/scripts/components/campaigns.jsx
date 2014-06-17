@@ -9,6 +9,26 @@ var Campaigns = React.createClass({
 
     $(document).foundation('reveal', {animation: 'fade', animation_speed: 50});
 
+    $(document).on('click', '.reveal-modal button', function (e) {
+
+
+      if(e.target.id === 'addSendEmailButton') {
+
+
+        $('#sendEmailModal').foundation('reveal', 'close');
+
+        self.addLateralElement(e.target.id);
+
+      }
+
+    });
+
+  },
+
+  componentWillUnmount: function() {
+
+    $(document).off('click', '.reveal-modal button');
+
   },
 
   getInitialState: function() {
@@ -17,16 +37,16 @@ var Campaigns = React.createClass({
 
   },
 
-  addLateralElement: function(e) {
+  addLateralElement: function(message) {
 
-    e.preventDefault();
+    //e.preventDefault();
     var elementArray = this.state.elements;
     var counter = this.state.counter + 1;
     if(elementArray.length === 0) {
       counter = 1;
     }
 
-    elementArray.push(counter);
+    elementArray.push({id: counter, message: message});
 
     this.setState({elements : elementArray, counter: counter});
 
@@ -41,7 +61,7 @@ var Campaigns = React.createClass({
   removeLateralElement: function(e) {
     e.preventDefault();
 
-    var elementKey = parseInt($(e.target).closest('div').parent().attr('id'));
+    var elementKey = parseInt($(e.target).closest('div').parent().attr('id') - 1);
 
     var filtered = _.filter(this.state.elements, function(element, key) {
       return key !== elementKey;
@@ -58,9 +78,9 @@ var Campaigns = React.createClass({
     var elementChain = _.map(self.state.elements, function(element, key) {
 
       return(
-             <div key={key} id={key}>
+             <div key={key+1} id={key+1}>
              <div className="panel radius noBottomMargin">
-             {element}
+             {element.message}
              <a onClick={self.removeLateralElement} className="right">&times;</a>
              </div>
              <div className="connector"></div>
@@ -73,29 +93,41 @@ var Campaigns = React.createClass({
     return (
             <div>
             <p>{this.props.path}</p>
-            <a href="#" data-reveal-id="myModal">Click Me For A Modal</a>
+            <a href="#" data-reveal-id="designerModal">Click Me For A Modal</a>
             
 
             <div className="panel chart tall" id="ruleBuilder">
             <div className="panel radius noBottomMargin">Users</div>
             <div className="connector"></div>
             {elementChain}
-            <button className="button radius" onClick={self.addLateralElement}>+</button>
+            <button className="button radius" data-reveal-id="designerModal">+</button>
 
             </div>
 
-
-            <div key="4" id="myModal" className="reveal-modal tiny" data-reveal>
+            <div id="designerModal" className="reveal-modal tiny" data-reveal>
             <h2>Awesome. I have it.</h2>
             <p className="lead">Your couch.  It is mine.</p>
             <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-            <button className="button radius" onClick={self.blah}>+</button>
+            <button id="sendEmailButton" className="button radius" data-reveal-id="sendEmailModal">Send Email</button>
+            <button id="waitButton" className="button radius">Wait</button>
             <a className="close-reveal-modal">&#215;</a>
             </div>
 
+            <div id="sendEmailModal" className="reveal-modal tiny" data-reveal>
+            <h2>Send email.</h2>
+            <p>Which Email to send</p>
+            <label>Template
+            <input id="template" type="text" placeholder="Template" />
+            </label>
+
+            <button id="addSendEmailButton" className="button radius">Add</button>
+            <a className="close-reveal-modal">&#215;</a>
+            </div>
+
+
             </div>
             );
-  }
+}
 
 });
 
