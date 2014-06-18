@@ -18,6 +18,7 @@ var UserProfile = require('./users').UserProfile;
 var EmailUser = require('./users').EmailUser;
 var Campaigns = require('./campaigns').Campaigns;
 var Templates = require('./templates').Templates;
+var PreviewTemplate = require('./templates').PreviewTemplate;
 /*jshint ignore:end */
 
 

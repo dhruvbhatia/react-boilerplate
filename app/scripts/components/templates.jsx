@@ -5,7 +5,7 @@ var CONFIG = require('../config');
 
 var Templates = React.createClass({
 
-  routeTemplatePreview: function(e) {
+  routePreviewTemplate: function(e) {
 
     e.preventDefault();
     var id = $(e.target).closest("tr").attr("id");
@@ -26,7 +26,7 @@ var Templates = React.createClass({
              <td>{template.name}</td>
              <td>{moment(template.createdAt).fromNow()}</td>
              <td>
-             <a onClick={self.routeTemplatePreview}>Preview</a> | <a onClick={self.routeTemplateEdit}>Edit</a>
+             <a onClick={self.routePreviewTemplate}>Preview</a> | <a onClick={self.routeTemplateEdit}>Edit</a>
              </td>
              </tr>
 
@@ -75,4 +75,68 @@ var Templates = React.createClass({
 
 });
 
+var PreviewTemplate = React.createClass({
+
+  getInitialState: function() {
+
+    return {template: undefined};
+
+  },
+
+  componentDidMount: function() {
+
+
+    // Ensure current path references a website that the user owns
+    var id = Backbone.history.fragment.replace("templates/preview/", "");
+
+    var templates = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('templates').flatten().value();
+
+    var match = _.find(templates, {"id" : parseInt(id)});
+
+
+    // Redirect if id is non numeric
+    if (!/^\d+$/.test(id)) {
+
+      match = undefined;
+
+    }
+
+
+    if(_.isUndefined(match)) {
+
+      // Path id is an invalid user
+      this.props.setPos("templates", "Templates");
+
+    } else {
+      this.setState({template: match});
+    }
+
+  },
+
+  render: function() {
+
+    if(!_.isUndefined(this.state.template)) {
+
+      return (
+
+              <iframe width="100%" height="400px" srcDoc={this.state.template.htmlVersion} />
+
+              );
+
+    } else {
+
+
+      return (
+              <div>
+              An unexpected error occurred
+              </div>);
+
+    }
+
+
+  }
+
+});
+
 exports.Templates = Templates;
+exports.PreviewTemplate = PreviewTemplate;
