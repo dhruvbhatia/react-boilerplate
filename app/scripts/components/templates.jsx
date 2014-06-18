@@ -118,9 +118,9 @@ var PreviewTemplate = React.createClass({
     if(!_.isUndefined(this.state.template)) {
 
       return (
-
-              <iframe width="100%" height="400px" srcDoc={this.state.template.htmlVersion} />
-
+              <div id="resizable">
+                <iframe width="100%" height="400px" srcDoc={this.state.template.htmlVersion} />
+              </div>
               );
 
     } else {

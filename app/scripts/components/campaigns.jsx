@@ -92,6 +92,14 @@ addLateralElement: function(message) {
 
     var self = this;
 
+    var templates = _.chain(this.props.websites).where({'id' : this.props.activeWebsite}).pluck('templates').flatten().value();
+
+    var templateOptions = _.map(templates, function(template, key) {
+
+      return (<option key={template.id} value={template.name}>{template.name}</option>);
+
+    });
+
     var showModal = function() {
 
       var modalStyle = {
@@ -124,6 +132,23 @@ addLateralElement: function(message) {
                 );
       } else if ( self.state.modal === 'sendEmail') {
 
+        // if no templates
+        if(_.isEmpty(templates)) {
+          return (
+                  <div>
+
+                  <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+
+                  <div id="sendEmailModal" className="reveal-modal tiny" style={modalStyle}>
+                  <h2>Send email.</h2>
+                  <p>No templates found</p>
+                  <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
+                  </div>
+
+                  </div>
+                  );
+        }
+
         return (
                 <div>
 
@@ -133,7 +158,9 @@ addLateralElement: function(message) {
                 <h2>Send email.</h2>
                 <p>Which Email to send</p>
                 <label>Template
-                <input id="template" type="text" placeholder="Template" />
+                <select id="template">
+                {templateOptions}
+                </select>
                 </label>
 
                 <button id="addSendEmailButton" className="button radius" onClick={self.validateSendEmailElement}>Add</button>
