@@ -32,6 +32,7 @@ var Websites = React.createClass({
              <tr id={website.id} key={website.id}>
              <td>{website.name}</td>
              <td>{website.contacts.length}</td>
+             <td>{website.templates.length}</td>
              <td>{website.senderName} ({website.senderEmail})</td>
              <td>{moment(website.createdAt).fromNow()}</td>
              <td><a onClick={self.routeEditWebsite}>Edit</a></td>
@@ -52,6 +53,7 @@ var Websites = React.createClass({
             <tr>
             <th>Website Name</th>
             <th>Users</th>
+            <th>Templates</th>
             <th>Sender Details</th>
             <th>Created</th>
             <th>Actions</th>
