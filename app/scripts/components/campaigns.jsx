@@ -7,37 +7,50 @@ var Campaigns = React.createClass({
 
     var self = this;
 
-    $(document).foundation('reveal', {animation: 'fade', animation_speed: 50});
+    //$(document).foundation('reveal', {animation: 'fade', animation_speed: 50});
 
-    $(document).on('click', '.reveal-modal button', function (e) {
-
-
-      if(e.target.id === 'addSendEmailButton') {
+    // $(document).on('click', '.reveal-modal button', function (e) {
 
 
-        $('#sendEmailModal').foundation('reveal', 'close');
+    //   if(e.target.id === 'addSendEmailButton') {
 
-        self.addLateralElement(e.target.id);
 
-      }
+    //     $('#sendEmailModal').foundation('reveal', 'close');
 
-    });
+    //     self.addLateralElement(e.target.id);
 
-  },
+    //   }
 
-  componentWillUnmount: function() {
+    // });
 
-    $(document).off('click', '.reveal-modal button');
+},
 
-  },
+componentWillUnmount: function() {
 
-  getInitialState: function() {
+  $(document).off('click', '.reveal-modal button');
 
-    return {elements : [], counter : 0, modal: false};
+},
 
-  },
+getInitialState: function() {
 
-  addLateralElement: function(message) {
+  return {elements : [], counter : 0, modal: undefined};
+
+},
+
+openModal: function(modalName) {
+
+  console.log(modalName);
+  this.setState({modal: modalName});
+
+},
+
+closeModal: function() {
+
+  this.setState({modal: undefined});
+
+},
+
+addLateralElement: function(message) {
 
     //e.preventDefault();
     var elementArray = this.state.elements;
@@ -48,13 +61,17 @@ var Campaigns = React.createClass({
 
     elementArray.push({id: counter, message: message});
 
-    this.setState({elements : elementArray, counter: counter});
+    this.setState({elements : elementArray, counter: counter, modal: undefined});
 
   },
 
-  blah: function() {
+  validateSendEmailElement: function() {
 
-    console.log("asd");
+    var template = $('#template').val();
+
+    console.log(template);
+
+    this.addLateralElement(template);
 
   },
 
@@ -75,6 +92,68 @@ var Campaigns = React.createClass({
 
     var self = this;
 
+    var showModal = function() {
+
+      var modalStyle = {
+        display: 'block',
+        opacity: 1,
+        visibility: 'visible',
+        top: '100px'
+      };
+
+      var modalBackgroundStyle = {
+        display: 'block'
+      };
+
+      if(self.state.modal === 'widgets') {
+
+        return (
+                <div>
+
+                <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+
+                <div id="designerModal" className="reveal-modal tiny open" style={modalStyle}>
+                <h2>Awesome. I have it.</h2>
+                <p className="lead">Your couch.  It is mine.</p>
+                <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
+                <button id="sendEmailButton" className="button radius" onClick={self.openModal.bind(self, 'sendEmail')}>Send Email</button>
+                <button id="waitButton" className="button radius">Wait</button>
+                <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
+                </div>
+                </div>
+                );
+      } else if ( self.state.modal === 'sendEmail') {
+
+        return (
+                <div>
+
+                <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+
+                <div id="sendEmailModal" className="reveal-modal tiny" style={modalStyle}>
+                <h2>Send email.</h2>
+                <p>Which Email to send</p>
+                <label>Template
+                <input id="template" type="text" placeholder="Template" />
+                </label>
+
+                <button id="addSendEmailButton" className="button radius" onClick={self.validateSendEmailElement}>Add</button>
+                <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
+                </div>
+                </div>
+                );
+
+
+      }
+
+
+      else {
+
+        return (<div></div>);
+
+      }
+
+    };
+
     var elementChain = _.map(self.state.elements, function(element, key) {
 
       return(
@@ -93,41 +172,21 @@ var Campaigns = React.createClass({
     return (
             <div>
             <p>{this.props.path}</p>
-            <a href="#" data-reveal-id="designerModal">Click Me For A Modal</a>
-            
 
             <div className="panel chart tall" id="ruleBuilder">
             <div className="panel radius noBottomMargin">Users</div>
             <div className="connector"></div>
             {elementChain}
-            <button className="button radius" data-reveal-id="designerModal">+</button>
+            <button className="button radius" onClick={self.openModal.bind(self, 'widgets')}>+</button>
 
             </div>
 
-            <div id="designerModal" className="reveal-modal tiny" data-reveal>
-            <h2>Awesome. I have it.</h2>
-            <p className="lead">Your couch.  It is mine.</p>
-            <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-            <button id="sendEmailButton" className="button radius" data-reveal-id="sendEmailModal">Send Email</button>
-            <button id="waitButton" className="button radius">Wait</button>
-            <a className="close-reveal-modal">&#215;</a>
-            </div>
-
-            <div id="sendEmailModal" className="reveal-modal tiny" data-reveal>
-            <h2>Send email.</h2>
-            <p>Which Email to send</p>
-            <label>Template
-            <input id="template" type="text" placeholder="Template" />
-            </label>
-
-            <button id="addSendEmailButton" className="button radius">Add</button>
-            <a className="close-reveal-modal">&#215;</a>
-            </div>
+            {showModal()}
 
 
             </div>
             );
-}
+  }
 
 });
 
