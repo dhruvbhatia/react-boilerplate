@@ -232,8 +232,26 @@ addLateralElement: function(message) {
 
       var buildConnections = function(length) {
         // TODO
+
+        var connections = _.map(_.range(length), function(connection) {
+
+          var connectionStyle = {
+            float: 'left',
+            width: (100/length) + '%'
+          };
+
+          return (
+                  <div style={connectionStyle}>
+                  <div className="connector"></div>
+                  <span className="label radius">{root.children[connection].parentConnectionLabel}</span>
+                  <div className="connector"></div>
+                  ▼
+                  </div>
+                  );
+        });
+
         return (
-                <div>{length}</div>
+                <div>{connections}</div>
                 );
 
       };
@@ -241,7 +259,9 @@ addLateralElement: function(message) {
       var buildChildren = function(length) {
 
         if(_.isEmpty(root.children)) {
-          return (<div></div>);
+          return (
+                  <div className="connector"></div>
+                  );
         } else {
           var result = _.map(root.children, function(child) {
             return buildTreeNodes(child, length);
@@ -250,17 +270,17 @@ addLateralElement: function(message) {
         }
       };
 
-if(size > 0) {
-      var elementStyle = {
-        float: 'left',
-        width: (100/size) + '%'
-      };
-    }
+      if(size > 0) {
+        var elementStyle = {
+          float: 'left',
+          width: (100/size) + '%'
+        };
+      }
 
       return(
              <div style={elementStyle}>
              <div id="1" key="1" className="panel radius noBottomMargin">
-             {root.text} {size}
+             {root.text}
              </div>
              {buildConnections(root.children.length)}
              {buildChildren(root.children.length)}
