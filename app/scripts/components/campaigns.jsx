@@ -33,7 +33,44 @@ componentWillUnmount: function() {
 
 getInitialState: function() {
 
-  return {elements : [], counter : 0, modal: undefined};
+  var tree =
+  {
+    id: 1,
+    type: 'start',
+    text: 'All Users',
+    children:
+    [
+    {
+      id: 2,
+      parentConnectionLabel: 'Conditon',
+      type: 'condition',
+      text: 'Has Purchased?',
+      children:
+      [
+      {
+        id: 3,
+        parentConnectionLabel: 'Yes',
+        type: 'sendEmail',
+        text: 'Thanks for Purchasing',
+        children: []
+      },
+      {
+        id: 4,
+        parentConnectionLabel: 'No',
+        type: 'sendEmail',
+        text: '5% Discount Code',
+        children: []
+      }
+      ]
+    }
+    ]
+
+  };
+
+  console.log(tree);
+
+
+  return {elements : [], counter : 0, modal: undefined, tree: tree};
 
 },
 
@@ -71,7 +108,7 @@ addLateralElement: function(message) {
 
     console.log(template);
 
-    this.addLateralElement(template);
+    this.addLateralElement('Send Email: ' + template);
 
   },
 
@@ -85,6 +122,15 @@ addLateralElement: function(message) {
     });
 
     this.setState({'elements' : filtered});
+
+  },
+
+  addConditionalElement: function(e) {
+
+    e.preventDefault();
+
+
+
 
   },
 
@@ -126,6 +172,7 @@ addLateralElement: function(message) {
                 <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
                 <button id="sendEmailButton" className="button radius" onClick={self.openModal.bind(self, 'sendEmail')}>Send Email</button>
                 <button id="waitButton" className="button radius">Wait</button>
+                <button id="conditionalButton" className="button radius" onClick={self.addConditionalElement}>Conditional</button>
                 <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
                 </div>
                 </div>
@@ -181,6 +228,78 @@ addLateralElement: function(message) {
 
     };
 
+    var buildTreeNodes = function(root, size) {
+
+      var buildConnections = function(length) {
+        // TODO
+        return (
+                <div>{length}</div>
+                );
+
+      };
+
+      var buildChildren = function(length) {
+
+        if(_.isEmpty(root.children)) {
+          return (<div></div>);
+        } else {
+          var result = _.map(root.children, function(child) {
+            return buildTreeNodes(child, length);
+          } );
+          return(result);
+        }
+      };
+
+if(size > 0) {
+      var elementStyle = {
+        float: 'left',
+        width: (100/size) + '%'
+      };
+    }
+
+      return(
+             <div style={elementStyle}>
+             <div id="1" key="1" className="panel radius noBottomMargin">
+             {root.text} {size}
+             </div>
+             {buildConnections(root.children.length)}
+             {buildChildren(root.children.length)}
+             </div>
+             );
+
+    };
+
+
+    var renderTree = _.map(self.state.tree, function(element, key) {
+
+      var elementChildren = _.map(element.children, function(child, childKey) {
+
+        return(
+               <div key={childKey} className="panel radius noBottomMargin">
+               {child.text}
+               <a onClick={self.removeLateralElement} className="right">&times;</a>
+               </div>
+               );
+
+      });
+
+      return(
+             <div key={key} id={key}>
+             <div className="panel radius noBottomMargin">
+             {element.text}
+             </div>
+
+             
+             {elementChildren}
+
+
+             </div>
+
+             );
+
+    });
+
+
     var elementChain = _.map(self.state.elements, function(element, key) {
 
       return(
@@ -201,9 +320,7 @@ addLateralElement: function(message) {
             <p>{this.props.path}</p>
 
             <div className="panel chart tall" id="ruleBuilder">
-            <div className="panel radius noBottomMargin">Users</div>
-            <div className="connector"></div>
-            {elementChain}
+            {buildTreeNodes(self.state.tree)}
             <button className="button radius" onClick={self.openModal.bind(self, 'widgets')}>+</button>
 
             </div>
