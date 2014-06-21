@@ -7,9 +7,9 @@
  *
  */
 
-var CONFIG = require("./config");
+ var CONFIG = require("./config");
 
-_.mixin({
+ _.mixin({
 
   /**
    *
@@ -17,7 +17,7 @@ _.mixin({
    * otherwise kills the current session which shows the Login screen.
    *
    */
-  getSession: function() {
+   getSession: function() {
 
 
     var cookie = $.cookie("application");
@@ -28,21 +28,21 @@ _.mixin({
       var token = JSON.parse(cookie).sessionId;
 
       superagent
-        .get(CONFIG.URLS.validate + token)
-        .set('X-API-Key', token)
-        .set('Accept', 'application/json')
-        .end(function(error, res) {
+      .get(CONFIG.URLS.validate + token)
+      .set('X-API-Key', token)
+      .set('Accept', 'application/json')
+      .end(function(error, res) {
 
-          if (res.ok === true) {
+        if (res.ok === true) {
 
-            var sessionId = JSON.parse(res.text).sessionId
-            var user = JSON.parse(res.text).user
+          var sessionId = JSON.parse(res.text).sessionId
+          var user = JSON.parse(res.text).user
 
-            var user_websites = JSON.parse(res.text).websites
+          var user_websites = JSON.parse(res.text).websites
 
-            var activeWebsite = undefined;
+          var activeWebsite = undefined;
 
-            if (!_.isEmpty(user_websites)) {
+          if (!_.isEmpty(user_websites)) {
               // set active website to the last selected website in the cookie, else first website in the user's list
               activeWebsite = JSON.parse(cookie).activeWebsite;
 
@@ -93,7 +93,7 @@ _.mixin({
 
 
 
-    } else {
+} else {
 
       // No prev cookie - render login form
       self.setUser(undefined);
@@ -102,6 +102,43 @@ _.mixin({
       });
 
     }
+  },
+
+  findDeep: function(items, attrs) {
+
+    function match(value) {
+      for (var key in attrs) {
+        if (attrs[key] !== value[key]) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+
+    function traverse(value) {
+      var result;
+
+      _.forEach(value, function (val) {
+        if (match(val)) {
+          result = val;
+          return false;
+        }
+
+        if (_.isObject(val) || _.isArray(val)) {
+          result = traverse(val);
+        }
+
+        if (result) {
+          return false;
+        }
+      });
+
+      return result;
+    }
+
+    return traverse(items);
+
   }
 
 });

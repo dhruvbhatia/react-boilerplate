@@ -42,7 +42,6 @@ getInitialState: function() {
     [
     {
       id: 2,
-      parentConnectionLabel: 'Conditon',
       type: 'condition',
       text: 'Has Purchased?',
       children:
@@ -52,7 +51,15 @@ getInitialState: function() {
         parentConnectionLabel: 'Yes',
         type: 'sendEmail',
         text: 'Thanks for Purchasing',
-        children: []
+        children:
+        [
+        {
+          id: 5,
+          type: 'wait',
+          text: 'Wait 5 days',
+          children: []
+        }
+        ]
       },
       {
         id: 4,
@@ -70,45 +77,99 @@ getInitialState: function() {
   console.log(tree);
 
 
-  return {elements : [], counter : 0, modal: undefined, tree: tree};
+  return {elements : [], counter : 0, modal: undefined, modalStarterNode: undefined, treeCount: undefined, tree: tree};
 
 },
 
-openModal: function(modalName) {
+openModal: function(e) {
+
+  e.preventDefault();
+
+  var modalName = $(e.target).attr('data-modal');
+  var treeId = $(e.target).attr('data-modal-starter-id');
 
   console.log(modalName);
-  this.setState({modal: modalName});
+  console.log(treeId);
+  this.setState({modal: modalName, modalStarterNode: treeId});
 
 },
 
 closeModal: function() {
 
-  this.setState({modal: undefined});
+  this.setState({modal: undefined, modalStarterNode: undefined});
 
 },
 
-addLateralElement: function(message) {
+addLateralElement: function(element, parentId) {
 
     //e.preventDefault();
-    var elementArray = this.state.elements;
-    var counter = this.state.counter + 1;
-    if(elementArray.length === 0) {
-      counter = 1;
-    }
 
-    elementArray.push({id: counter, message: message});
+    var tree = this.state.tree;
+    var lastElementId = 0;
 
-    this.setState({elements : elementArray, counter: counter, modal: undefined});
+
+    $(".panel").each(function () {
+      var id = parseInt(this.id, 10);
+      if (id > lastElementId) {
+        lastElementId = id;
+      }
+    });
+
+    element.id = lastElementId + 1;
+
+    window.blah = tree;
+
+    // traverse tree and find the elemnt with id === parentId
+    var findParentElement = function(tree, depth, childIndex) {
+
+      var depth = depth;
+      var childIndex = childIndex;
+      console.log(depth);
+
+      if(tree.id === parentId) {
+        console.log("found at depth: " + depth + " and child length: " + childIndex);
+        tree.children.push(element);
+        return depth;
+      } else {
+
+        _.forEach(tree.children, function(child) {
+          childIndex = _.indexOf(tree.children, child);
+          console.log(child);
+          findParentElement(child, depth + 1, childIndex);
+        });
+
+        
+      }
+
+    };
+
+    var found = findParentElement(tree, 0);
+
+    this.setState({tree: tree});
+
+    this.closeModal();
+
 
   },
 
-  validateSendEmailElement: function() {
+  validateSendEmailElement: function(e) {
 
+    e.preventDefault();
+
+    var treeId = parseInt($(e.target).attr('data-modal-starter-id'));
     var template = $('#template').val();
 
     console.log(template);
 
-    this.addLateralElement('Send Email: ' + template);
+
+    var newElement = {
+      type: 'sendEmail',
+      text: 'Send email: ' + template,
+      children:
+      []
+    };
+
+    this.addLateralElement(newElement, treeId);
 
   },
 
@@ -170,7 +231,7 @@ addLateralElement: function(message) {
                 <h2>Awesome. I have it.</h2>
                 <p className="lead">Your couch.  It is mine.</p>
                 <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-                <button id="sendEmailButton" className="button radius" onClick={self.openModal.bind(self, 'sendEmail')}>Send Email</button>
+                <button id="sendEmailButton" className="button radius" data-modal="sendEmail" data-modal-starter-id={self.state.modalStarterNode} onClick={self.openModal}>Send Email</button>
                 <button id="waitButton" className="button radius">Wait</button>
                 <button id="conditionalButton" className="button radius" onClick={self.addConditionalElement}>Conditional</button>
                 <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
@@ -196,6 +257,8 @@ addLateralElement: function(message) {
                   );
         }
 
+        console.log(self.state);
+
         return (
                 <div>
 
@@ -210,7 +273,7 @@ addLateralElement: function(message) {
                 </select>
                 </label>
 
-                <button id="addSendEmailButton" className="button radius" onClick={self.validateSendEmailElement}>Add</button>
+                <button id="addSendEmailButton" className="button radius" data-modal-starter-id={self.state.modalStarterNode} onClick={self.validateSendEmailElement}>Add</button>
                 <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
                 </div>
                 </div>
@@ -240,14 +303,26 @@ addLateralElement: function(message) {
             width: (100/length) + '%'
           };
 
-          return (
-                  <div style={connectionStyle}>
-                  <div className="connector"></div>
-                  <span className="label radius">{root.children[connection].parentConnectionLabel}</span>
-                  <div className="connector"></div>
-                  ▼
-                  </div>
-                  );
+
+          if(root.children[connection].parentConnectionLabel) {
+            return (
+                    <div style={connectionStyle}>
+                    <div className="connector"></div>
+                    <span className="label radius">{root.children[connection].parentConnectionLabel}</span>
+                    <div className="connector"></div>
+                    ▼
+                    </div>
+                    );
+          } else {
+            return (
+                    <div style={connectionStyle}>
+                    <div className="connector"></div>
+                    <div className="connector"></div>
+                    ▼
+                    </div>
+                    );
+          }
+
         });
 
         return (
@@ -260,7 +335,10 @@ addLateralElement: function(message) {
 
         if(_.isEmpty(root.children)) {
           return (
+                  <div>
                   <div className="connector"></div>
+                  <button className="button radius" data-modal="widgets" data-modal-starter-id={root.id} onClick={self.openModal}>+</button>
+                  </div>
                   );
         } else {
           var result = _.map(root.children, function(child) {
@@ -279,7 +357,7 @@ addLateralElement: function(message) {
 
       return(
              <div style={elementStyle}>
-             <div id="1" key="1" className="panel radius noBottomMargin">
+             <div id={root.id} key={root.id} className="panel radius noBottomMargin">
              {root.text}
              </div>
              {buildConnections(root.children.length)}
@@ -289,59 +367,13 @@ addLateralElement: function(message) {
 
     };
 
-
-    var renderTree = _.map(self.state.tree, function(element, key) {
-
-      var elementChildren = _.map(element.children, function(child, childKey) {
-
-        return(
-               <div key={childKey} className="panel radius noBottomMargin">
-               {child.text}
-               <a onClick={self.removeLateralElement} className="right">&times;</a>
-               </div>
-               );
-
-      });
-
-      return(
-             <div key={key} id={key}>
-             <div className="panel radius noBottomMargin">
-             {element.text}
-             </div>
-
-             
-             {elementChildren}
-
-
-             </div>
-
-             );
-
-    });
-
-
-    var elementChain = _.map(self.state.elements, function(element, key) {
-
-      return(
-             <div key={key+1} id={key+1}>
-             <div className="panel radius noBottomMargin">
-             {element.message}
-             <a onClick={self.removeLateralElement} className="right">&times;</a>
-             </div>
-             <div className="connector"></div>
-             </div>
-
-             );
-
-    });
-
     return (
             <div>
             <p>{this.props.path}</p>
 
             <div className="panel chart tall" id="ruleBuilder">
             {buildTreeNodes(self.state.tree)}
-            <button className="button radius" onClick={self.openModal.bind(self, 'widgets')}>+</button>
+            <p>Tree Status: </p>
 
             </div>
 
