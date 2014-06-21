@@ -33,11 +33,13 @@ componentWillUnmount: function() {
 
 getInitialState: function() {
 
+  var activeWebsiteName = _.find(this.props.websites, { "id" : parseInt(this.props.activeWebsite)}).name;
+
   var tree =
   {
     id: 1,
     type: 'start',
-    text: 'All Users',
+    text: 'All Users within ' + activeWebsiteName,
     children:
     [
     {
@@ -77,7 +79,7 @@ getInitialState: function() {
   console.log(tree);
 
 
-  return {elements : [], counter : 0, modal: undefined, modalStarterNode: undefined, treeCount: undefined, tree: tree};
+  return {elements : [], counter : 0, modal: undefined, activeWidget: undefined, widgetEditMode: undefined, treeCount: undefined, tree: tree};
 
 },
 
@@ -85,18 +87,18 @@ openModal: function(e) {
 
   e.preventDefault();
 
-  var modalName = $(e.target).attr('data-modal');
-  var treeId = $(e.target).attr('data-modal-starter-id');
+  var modalType = $(e.target).attr('data-modal');
+  var widgetId = $(e.target).attr('data-widget-id');
 
-  console.log(modalName);
-  console.log(treeId);
-  this.setState({modal: modalName, modalStarterNode: treeId});
+  console.log(modalType);
+  console.log(widgetId);
+  this.setState({modal: modalType, activeWidget: widgetId});
 
 },
 
 closeModal: function() {
 
-  this.setState({modal: undefined, modalStarterNode: undefined});
+  this.setState({modal: undefined, activeWidget: undefined, editWidgetMode: undefined});
 
 },
 
@@ -116,8 +118,6 @@ addLateralElement: function(newElement, parentId) {
     });
 
     newElement.id = lastElementId + 1;
-
-    window.blah = tree;
 
     // traverse tree and find the element with id === parentId, then insert newElement as it's child
     var insertNewChild = function(tree, depth) {
@@ -152,7 +152,7 @@ addLateralElement: function(newElement, parentId) {
 
     e.preventDefault();
 
-    var treeId = parseInt($(e.target).attr('data-modal-starter-id'));
+    var widgetId = parseInt($(e.target).attr('data-widget-id'));
     var template = $('#template').val();
 
     console.log(template);
@@ -165,14 +165,27 @@ addLateralElement: function(newElement, parentId) {
       []
     };
 
-    this.addLateralElement(newElement, treeId);
+    this.addLateralElement(newElement, widgetId);
 
   },
+
+  editElement: function(e) {
+    e.preventDefault();
+
+    var modalType = $(e.target).attr('data-modal');
+    var widgetId = $(e.target).attr('data-widget-id');
+
+    console.log(modalType);
+
+    this.setState({modal: modalType, activeWidget: widgetId, editWidgetMode: true});
+
+  },
+
 
   removeLateralElement: function(e) {
     e.preventDefault();
 
-    var elementKey = parseInt($(e.target).closest('div').attr('id'));
+    var elementKey = parseInt($(e.target).closest('.widget').attr('id'));
     var currentTree = this.state.tree;
 
     console.log(elementKey);
@@ -180,6 +193,7 @@ addLateralElement: function(newElement, parentId) {
     var deleteChildren = function(tree) {
 
       if(tree.id === elementKey) {
+        tree.children = [];
         return;
       } else {
 
@@ -194,7 +208,6 @@ addLateralElement: function(newElement, parentId) {
 
           _.forEach(tree.children, function(child) {
 
-            console.log(child);
             deleteChildren(child);
           });
 
@@ -208,8 +221,6 @@ addLateralElement: function(newElement, parentId) {
     deleteChildren(currentTree);
 
     this.setState({tree: currentTree});
-
-    console.log(currentTree);
 
   },
 
@@ -258,7 +269,7 @@ addLateralElement: function(newElement, parentId) {
                 <h2>Awesome. I have it.</h2>
                 <p className="lead">Your couch.  It is mine.</p>
                 <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
-                <button id="sendEmailButton" className="button radius" data-modal="sendEmail" data-modal-starter-id={self.state.modalStarterNode} onClick={self.openModal}>Send Email</button>
+                <button id="sendEmailButton" className="button radius" data-modal="sendEmail" data-widget-id={self.state.activeWidget} onClick={self.openModal}>Send Email</button>
                 <button id="waitButton" className="button radius">Wait</button>
                 <button id="conditionalButton" className="button radius" onClick={self.addConditionalElement}>Conditional</button>
                 <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
@@ -284,7 +295,17 @@ addLateralElement: function(newElement, parentId) {
                   );
         }
 
-        console.log(self.state);
+
+var button = function() {
+
+if(self.state.editWidgetMode) {
+  return( <button id="editSendEmailButton" className="button radius" data-widget-id={self.state.activeWidget} onClick={self.validateSendEmailElement}>Edit</button>);
+} else {
+  return( <button id="addSendEmailButton" className="button radius" data-widget-id={self.state.activeWidget} onClick={self.validateSendEmailElement}>Add</button>);
+}
+
+
+};
 
         return (
                 <div>
@@ -300,7 +321,7 @@ addLateralElement: function(newElement, parentId) {
                 </select>
                 </label>
 
-                <button id="addSendEmailButton" className="button radius" data-modal-starter-id={self.state.modalStarterNode} onClick={self.validateSendEmailElement}>Add</button>
+                {button()}
                 <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
                 </div>
                 </div>
@@ -364,7 +385,7 @@ addLateralElement: function(newElement, parentId) {
           return (
                   <div>
                   <div className="connector" data-parent-id={root.id}></div>
-                  <button className="button radius" data-modal="widgets" data-modal-starter-id={root.id} onClick={self.openModal}>+</button>
+                  <button className="button radius" data-modal="widgets" data-widget-id={root.id} onClick={self.openModal}>+</button>
                   </div>
                   );
         } else {
@@ -382,11 +403,17 @@ addLateralElement: function(newElement, parentId) {
         };
       }
 
+      var classString = "panel radius noBottomMargin widget " + root.type;
+
       return(
              <div style={elementStyle}>
-             <div id={root.id} key={root.id} data-type={root.type} className="panel radius noBottomMargin">
-             {root.text}
-             <a className="close-reveal-modal right" onClick={self.removeLateralElement}>&#215;</a>
+             <div id={root.id} key={root.id} className={classString}>
+             <div className="right widgetControls">
+             <a className="right" onClick={self.removeLateralElement}>&#215;</a>
+             <span className="right separator"> | </span>
+             <a className="right" data-modal={root.type} data-widget-id={root.id} onClick={self.editElement}>Edit</a>
+             </div>
+             <div>{root.text}</div>
              </div>
              {buildConnections(root.children.length)}
              {buildChildren(root.children.length)}
