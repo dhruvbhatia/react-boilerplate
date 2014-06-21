@@ -100,7 +100,7 @@ closeModal: function() {
 
 },
 
-addLateralElement: function(element, parentId) {
+addLateralElement: function(newElement, parentId) {
 
     //e.preventDefault();
 
@@ -115,27 +115,23 @@ addLateralElement: function(element, parentId) {
       }
     });
 
-    element.id = lastElementId + 1;
+    newElement.id = lastElementId + 1;
 
     window.blah = tree;
 
-    // traverse tree and find the elemnt with id === parentId
-    var findParentElement = function(tree, depth, childIndex) {
+    // traverse tree and find the element with id === parentId, then insert newElement as it's child
+    var insertNewChild = function(tree, depth) {
 
-      var depth = depth;
-      var childIndex = childIndex;
-      console.log(depth);
+      var depth = depth || 0;
 
       if(tree.id === parentId) {
-        console.log("found at depth: " + depth + " and child length: " + childIndex);
-        tree.children.push(element);
+        tree.children.push(newElement);
         return depth;
       } else {
 
         _.forEach(tree.children, function(child) {
-          childIndex = _.indexOf(tree.children, child);
           console.log(child);
-          findParentElement(child, depth + 1, childIndex);
+          insertNewChild(child, depth + 1);
         });
 
         
@@ -143,7 +139,7 @@ addLateralElement: function(element, parentId) {
 
     };
 
-    var found = findParentElement(tree, 0);
+    insertNewChild(tree);
 
     this.setState({tree: tree});
 
@@ -176,13 +172,44 @@ addLateralElement: function(element, parentId) {
   removeLateralElement: function(e) {
     e.preventDefault();
 
-    var elementKey = parseInt($(e.target).closest('div').parent().attr('id') - 1);
+    var elementKey = parseInt($(e.target).closest('div').attr('id'));
+    var currentTree = this.state.tree;
 
-    var filtered = _.filter(this.state.elements, function(element, key) {
-      return key !== elementKey;
-    });
+    console.log(elementKey);
 
-    this.setState({'elements' : filtered});
+    var deleteChildren = function(tree) {
+
+      if(tree.id === elementKey) {
+        return;
+      } else {
+
+        if(_.find(tree.children, {'id': elementKey})) {
+
+          var index = _.chain(tree.children).indexOf(_.find(tree.children, {'id': elementKey}));
+
+          tree.children.splice(index, 1);
+
+        } else {
+
+
+          _.forEach(tree.children, function(child) {
+
+            console.log(child);
+            deleteChildren(child);
+          });
+
+        }
+
+        
+      }
+
+    };
+
+    deleteChildren(currentTree);
+
+    this.setState({tree: currentTree});
+
+    console.log(currentTree);
 
   },
 
@@ -307,17 +334,17 @@ addLateralElement: function(element, parentId) {
           if(root.children[connection].parentConnectionLabel) {
             return (
                     <div style={connectionStyle}>
-                    <div className="connector"></div>
+                    <div className="connector" data-parent-id={root.id}></div>
                     <span className="label radius">{root.children[connection].parentConnectionLabel}</span>
-                    <div className="connector"></div>
+                    <div className="connector" data-parent-id={root.id}></div>
                     ▼
                     </div>
                     );
           } else {
             return (
                     <div style={connectionStyle}>
-                    <div className="connector"></div>
-                    <div className="connector"></div>
+                    <div className="connector" data-parent-id={root.id}></div>
+                    <div className="connector" data-parent-id={root.id}></div>
                     ▼
                     </div>
                     );
@@ -336,7 +363,7 @@ addLateralElement: function(element, parentId) {
         if(_.isEmpty(root.children)) {
           return (
                   <div>
-                  <div className="connector"></div>
+                  <div className="connector" data-parent-id={root.id}></div>
                   <button className="button radius" data-modal="widgets" data-modal-starter-id={root.id} onClick={self.openModal}>+</button>
                   </div>
                   );
@@ -357,8 +384,9 @@ addLateralElement: function(element, parentId) {
 
       return(
              <div style={elementStyle}>
-             <div id={root.id} key={root.id} className="panel radius noBottomMargin">
+             <div id={root.id} key={root.id} data-type={root.type} className="panel radius noBottomMargin">
              {root.text}
+             <a className="close-reveal-modal right" onClick={self.removeLateralElement}>&#215;</a>
              </div>
              {buildConnections(root.children.length)}
              {buildChildren(root.children.length)}
