@@ -153,6 +153,10 @@ svg text {
   background-color: $active-color;
 }
 
+.reveal-modal {
+  position: fixed;
+}
+
 a.right, a.close-reveal-modal {
   text-decoration: none !important;
 }
