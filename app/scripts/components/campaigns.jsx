@@ -50,26 +50,43 @@ getInitialState: function() {
       [
       {
         'id' : 3,
-        parentConnectionLabel: 'Yes',
-        type: 'sendEmail',
-        templateId: 1,
+        type: 'conditionBranch',
+        text: 'Yes',
         children:
         [
+
         {
           'id' : 5,
-          type: 'delay',
-          delay: {'amount' : 7, 'unit' : 'days' },
-          children: []
+          type: 'sendEmail',
+          templateId: 1,
+          children:
+          [
+          {
+            'id' : 6,
+            type: 'delay',
+            delay: {'amount' : 7, 'unit' : 'days' },
+            children: []
+          }
+          ]
         }
+
         ]
       },
       {
         'id' : 4,
-        parentConnectionLabel: 'No',
-        type: 'sendEmail',
-        templateId: 2,
-        children: []
+        type: 'conditionBranch',
+        text: 'No',
+        children:
+        [
+        {
+          'id' : 7,
+          type: 'sendEmail',
+          templateId: 2,
+          children: []
+        }
+        ]
       }
+
       ]
     }
     ]
@@ -196,6 +213,33 @@ addLateralElement: function(newElement, parentId) {
       var newElement = {
         type: 'sendEmail',
         templateId: templateId,
+        children:
+        []
+      };
+
+      if(editingExistingWidget) {
+
+        console.log("update existing");
+        newElement.id = widgetId;
+        this.updateExistingWidget(newElement, widgetId);
+
+      } else {
+        this.addLateralElement(newElement, widgetId);
+      }
+
+    },
+
+    validateConditionBranchElement: function(e) {
+
+      e.preventDefault();
+
+      var widgetId = this.state.activeWidget.id;
+      var editingExistingWidget = this.state.activeWidget.editing;
+      var name = $('#conditionBranchName').val();
+
+      var newElement = {
+        type: 'conditionBranch',
+        text: name,
         children:
         []
       };
@@ -352,23 +396,35 @@ addLateralElement: function(newElement, parentId) {
     }
   };
 
-  var branchRows = function() {
+  var branchTable = function() {
 
     var tree = _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id});
 
     console.log(tree);
 
-    var rows = _.map(tree.children, function(condition) {
+    var rows = _.chain(tree.children).filter({'type' : 'conditionBranch'}).map( function(condition) {
       console.log(condition);
       return(
              <tr id={condition.id} key={condition.id}>
-             <td>{condition.parentConnectionLabel}</td>
-             <td><a data-modal="condition" onClick={self.openModal}>Edit</a> | <a data-widget-id={condition.id} onClick={self.removeLateralElement}>&#215;</a></td>
+             <td>{condition.text}</td>
+             <td><a data-modal="conditionBranch" data-widget-id={condition.id} onClick={self.editElement}>Edit</a> | <a data-widget-id={condition.id} onClick={self.removeLateralElement}>&#215;</a></td>
              </tr>
              );
     });
 
-    return(<div>{rows}</div>);
+    return(
+          <table width="100%">
+          <thead>
+          <tr>
+          <th>Name</th>
+          <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          {rows}
+          </tbody>
+          </table>
+           );
 
   };
 
@@ -381,19 +437,53 @@ addLateralElement: function(newElement, parentId) {
           <h2>Conditions</h2>
           <p>Add logic to this stream.</p>
 
-          <table width="100%">
-          <thead>
-          <tr>
-          <th>Name</th>
-          <th>Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-          {branchRows()}
-          </tbody>
-          </table>
+
+          {branchTable()}
 
 
+
+          {button()}
+
+          <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
+          </div>
+          </div>
+          );
+
+
+} else if ( self.state.modal === 'conditionBranch') {
+
+  var button = function() {
+
+    if(self.state.activeWidget.editing) {
+      return( <button id="delayButton" className="button radius" onClick={self.validateConditionBranchElement}>Edit</button>);
+    } else {
+      return( <button id="delayButton" className="button radius" onClick={self.validateConditionBranchElement}>Add</button>);
+    }
+  };
+
+
+  var currentConditionBranchName = function() {
+    if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
+      return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).text;
+    } else {
+      return '2';
+    }
+
+
+  };
+
+  return (
+          <div>
+
+          <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+
+          <div id="conditionBranchModal" className="reveal-modal tiny" style={modalStyle}>
+          <h2>Condition Branch</h2>
+          <p>Define a conditional branch.</p>
+
+          <label>Condition Name
+          <input id="conditionBranchName" type="text" defaultValue={currentConditionBranchName()} />
+          </label>
 
           {button()}
 
@@ -548,11 +638,11 @@ addLateralElement: function(newElement, parentId) {
           };
 
 
-          if(root.children[connection].parentConnectionLabel) {
+          if(root.children[connection].type === "conditionBranch") {
             return (
                     <div key={connection} style={connectionStyle}>
                     <div className="connector" data-parent-id={root.id}></div>
-                    <span className="label radius">{root.children[connection].parentConnectionLabel}</span>
+                    <span className="label radius">{root.children[connection].text}</span>
                     <div className="connector" data-parent-id={root.id}></div>
                     ▼
                     </div>
@@ -569,99 +659,99 @@ addLateralElement: function(newElement, parentId) {
 
         });
 
-return (
-        <div>{connections}</div>
-        );
+        return (
+                <div>{connections}</div>
+                );
 
-};
+      };
 
-var buildChildren = function(length) {
+      var buildChildren = function(length) {
 
-  if(_.isEmpty(root.children)) {
+        if(_.isEmpty(root.children)) {
+          return (
+                  <div>
+                  <div className="connector" data-parent-id={root.id}></div>
+                  <button className="button radius" data-modal="widgets" data-widget-id={root.id} onClick={self.openModal}>+</button>
+                  </div>
+                  );
+        } else {
+          var result = _.map(root.children, function(child) {
+            var nodes = buildTreeNodes(child, length);
+            return (<div key={child.id}>{nodes}</div>);
+          } );
+          return(result);
+        }
+      };
+
+      if(size > 0) {
+        var elementStyle = {
+          float: 'left',
+          width: (100/size) + '%'
+        };
+      }
+
+      var classString = "panel radius noBottomMargin widget " + root.type;
+
+      var widgetText = function(widget) {
+
+        if(widget.type === "sendEmail") {
+
+          var templates = _.chain(self.props.websites).where({'id' : self.props.activeWebsite}).pluck('templates').flatten().value();
+          var template = _.find(templates, {'id' : widget.templateId});
+
+          return(<div>Send Email: {template.name}</div>);
+        }
+
+        else if (widget.type === "condition") {
+
+          return(<div>Condition: {widget.text}</div>);
+
+        } 
+
+
+        else if (widget.type === "delay") {
+
+          return(<div>Delay: {widget.delay.amount} {widget.delay.unit}</div>);
+
+        } else {
+          return(<div>Other: {widget.text}</div>);
+        }
+
+      };
+
+      return(
+             <div style={elementStyle}>
+             <div id={root.id} key={root.id} className={classString}>
+             <div className="right widgetControls">
+             <a className="right" data-widget-id={root.id} onClick={self.removeLateralElement}>&#215;</a>
+             <span className="right separator"> | </span>
+             <a className="right" data-modal={root.type} data-widget-id={root.id} onClick={self.editElement}>Edit</a>
+             </div>
+             {widgetText(root)}
+             </div>
+             {buildConnections(root.children.length)}
+             {buildChildren(root.children.length)}
+             </div>
+             );
+
+    };
+
     return (
             <div>
-            <div className="connector" data-parent-id={root.id}></div>
-            <button className="button radius" data-modal="widgets" data-widget-id={root.id} onClick={self.openModal}>+</button>
+            <p>{this.props.path}</p>
+
+            <div className="panel chart tall" id="ruleBuilder">
+            {buildTreeNodes(self.state.tree)}
+            <p>Tree Status: </p>
+
+            </div>
+
+            {showModal()}
+
+
             </div>
             );
-  } else {
-    var result = _.map(root.children, function(child) {
-      var nodes = buildTreeNodes(child, length);
-      return (<div key={child.id}>{nodes}</div>);
-    } );
-    return(result);
   }
-};
-
-if(size > 0) {
-  var elementStyle = {
-    float: 'left',
-    width: (100/size) + '%'
-  };
-}
-
-var classString = "panel radius noBottomMargin widget " + root.type;
-
-var widgetText = function(widget) {
-
-  if(widget.type === "sendEmail") {
-
-    var templates = _.chain(self.props.websites).where({'id' : self.props.activeWebsite}).pluck('templates').flatten().value();
-    var template = _.find(templates, {'id' : widget.templateId});
-
-    return(<div>Send Email: {template.name}</div>);
-  }
-
-  else if (widget.type === "condition") {
-
-    return(<div>Condition: {widget.text}</div>);
-
-  } 
-
-
-  else if (widget.type === "delay") {
-
-    return(<div>Delay: {widget.delay.amount} {widget.delay.unit}</div>);
-
-  } else {
-    return(<div>Other: {widget.text}</div>);
-  }
-
-};
-
-return(
-       <div style={elementStyle}>
-       <div id={root.id} key={root.id} className={classString}>
-       <div className="right widgetControls">
-       <a className="right" data-widget-id={root.id} onClick={self.removeLateralElement}>&#215;</a>
-       <span className="right separator"> | </span>
-       <a className="right" data-modal={root.type} data-widget-id={root.id} onClick={self.editElement}>Edit</a>
-       </div>
-       {widgetText(root)}
-       </div>
-       {buildConnections(root.children.length)}
-       {buildChildren(root.children.length)}
-       </div>
-       );
-
-};
-
-return (
-        <div>
-        <p>{this.props.path}</p>
-
-        <div className="panel chart tall" id="ruleBuilder">
-        {buildTreeNodes(self.state.tree)}
-        <p>Tree Status: </p>
-
-        </div>
-
-        {showModal()}
-
-
-        </div>
-        );
-}
 
 });
 
