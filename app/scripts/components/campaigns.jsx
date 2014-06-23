@@ -57,8 +57,8 @@ getInitialState: function() {
         [
         {
           'id' : 5,
-          type: 'wait',
-          text: 'Wait 5 days',
+          type: 'delay',
+          delay: {'amount' : 7, 'unit' : 'days' },
           children: []
         }
         ]
@@ -160,7 +160,9 @@ addLateralElement: function(newElement, parentId) {
         var depth = depth || 0;
 
         if(tree.id === newElement.id) {
-          tree.templateId = newElement.templateId;
+          if(newElement.templateId) { tree.templateId = newElement.templateId; }
+          if(newElement.delay) { tree.delay = newElement.delay; }
+          if(newElement.text) { tree.text = newElement.text; }
           return depth;
         } else {
 
@@ -210,17 +212,18 @@ addLateralElement: function(newElement, parentId) {
 
     },
 
-    validateWaitElement: function(e) {
+    validateDelayElement: function(e) {
 
       e.preventDefault();
 
       var widgetId = this.state.activeWidget.id;
       var editingExistingWidget = this.state.activeWidget.editing;
-      var waitInput = $('#waitInput').val();
+      var delayAmount = $('#delayAmount').val();
+      var delayUnit = $('#delayUnit option:selected').val();
 
       var newElement = {
-        type: 'wait',
-        text: waitInput,
+        type: 'delay',
+        delay: { amount: delayAmount, unit: delayUnit },
         children:
         []
       };
@@ -254,7 +257,7 @@ addLateralElement: function(newElement, parentId) {
     removeLateralElement: function(e) {
       e.preventDefault();
 
-      var elementKey = parseInt($(e.target).closest('.widget').attr('id'));
+      var elementKey = parseInt($(e.target).attr('data-widget-id'));
       var currentTree = this.state.tree;
 
       console.log(elementKey);
@@ -290,6 +293,8 @@ addLateralElement: function(newElement, parentId) {
       deleteChildren(currentTree);
 
       this.setState({tree: currentTree});
+
+      this.closeModal();
 
     },
 
@@ -330,21 +335,41 @@ addLateralElement: function(newElement, parentId) {
                   <p className="lead">Your couch.  It is mine.</p>
                   <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
                   <button id="sendEmailButton" className="button radius" data-modal="sendEmail" data-widget-id={self.state.activeWidget.id} onClick={self.openModal}>Send Email</button>
-                  <button id="waitButton" className="button radius" data-modal="wait" data-widget-id={self.state.activeWidget.id} onClick={self.openModal}>Wait</button>
+                  <button id="delayButton" className="button radius" data-modal="delay" data-widget-id={self.state.activeWidget.id} onClick={self.openModal}>Delay</button>
                   <button id="conditionalButton" className="button radius" data-modal="condition" data-widget-id={self.state.activeWidget.id} onClick={self.openModal}>Conditional</button>
                   <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
                   </div>
                   </div>
                   );
-} else if ( self.state.modal === 'wait') {
+} else if ( self.state.modal === 'condition') {
 
   var button = function() {
 
     if(self.state.activeWidget.editing) {
-      return( <button id="waitButton" className="button radius" onClick={self.validateWaitElement}>Edit</button>);
+      return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Edit</button>);
     } else {
-      return( <button id="waitButton" className="button radius" onClick={self.validateWaitElement}>Add</button>);
+      return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Add</button>);
     }
+  };
+
+  var branchRows = function() {
+
+    var tree = _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id});
+
+    console.log(tree);
+
+    var rows = _.map(tree.children, function(condition) {
+      console.log(condition);
+      return(
+             <tr id={condition.id} key={condition.id}>
+             <td>{condition.parentConnectionLabel}</td>
+             <td><a data-modal="condition" onClick={self.openModal}>Edit</a> | <a data-widget-id={condition.id} onClick={self.removeLateralElement}>&#215;</a></td>
+             </tr>
+             );
+    });
+
+    return(<div>{rows}</div>);
+
   };
 
   return (
@@ -352,11 +377,82 @@ addLateralElement: function(newElement, parentId) {
 
           <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-          <div id="waitModal" className="reveal-modal tiny" style={modalStyle}>
+          <div id="delayModal" className="reveal-modal tiny" style={modalStyle}>
+          <h2>Conditions</h2>
+          <p>Add logic to this stream.</p>
+
+          <table width="100%">
+          <thead>
+          <tr>
+          <th>Name</th>
+          <th>Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          {branchRows()}
+          </tbody>
+          </table>
+
+
+
+          {button()}
+
+          <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
+          </div>
+          </div>
+          );
+
+
+} else if ( self.state.modal === 'delay') {
+
+  var button = function() {
+
+    if(self.state.activeWidget.editing) {
+      return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Edit</button>);
+    } else {
+      return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Add</button>);
+    }
+  };
+
+  var currentDelayAmount = function() {
+    if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
+      return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).delay.amount;
+    } else {
+      return '2';
+    }
+
+
+  };
+
+
+  var currentDelayUnit = function() {
+    if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
+      return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).delay.unit;
+    } else {
+      return 'days';
+    }
+
+
+  };
+
+  return (
+          <div>
+
+          <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+
+          <div id="delayModal" className="reveal-modal tiny" style={modalStyle}>
           <h2>Add a Delay</h2>
           <p>Add a delay to this stream.</p>
 
-          <input type="text" id="waitInput" />
+          <input type="text" id="delayAmount" defaultValue={currentDelayAmount()} />
+
+          <select id="delayUnit" defaultValue={currentDelayUnit()}>
+          <option value="minutes">Minute(s)</option>
+          <option value="hours">Hour(s)</option>
+          <option value="days">Day(s)</option>
+          <option value="weeks">Week(s)</option>
+          <option value="months">Month(s)</option>
+          </select>
 
           {button()}
 
@@ -523,9 +619,9 @@ var widgetText = function(widget) {
   } 
 
 
-  else if (widget.type === "wait") {
+  else if (widget.type === "delay") {
 
-    return(<div>Delay: {widget.text}</div>);
+    return(<div>Delay: {widget.delay.amount} {widget.delay.unit}</div>);
 
   } else {
     return(<div>Other: {widget.text}</div>);
@@ -537,7 +633,7 @@ return(
        <div style={elementStyle}>
        <div id={root.id} key={root.id} className={classString}>
        <div className="right widgetControls">
-       <a className="right" onClick={self.removeLateralElement}>&#215;</a>
+       <a className="right" data-widget-id={root.id} onClick={self.removeLateralElement}>&#215;</a>
        <span className="right separator"> | </span>
        <a className="right" data-modal={root.type} data-widget-id={root.id} onClick={self.editElement}>Edit</a>
        </div>
