@@ -101,6 +101,12 @@ $form-label-small-transform: none;
   width: 50%;
 }
 
+.connectorHorizontal {
+  border-top: 1px solid $primary-color;
+  border-right: 1px solid $primary-color;
+  width: 50%;
+}
+
 .widget {
   position: relative;
   margin-left: 10px;

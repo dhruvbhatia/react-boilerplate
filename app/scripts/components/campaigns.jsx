@@ -47,9 +47,34 @@ getInitialState: function() {
     {
       'id' : 2,
       type: 'condition',
-      text: 'Has Purchased?',
+      text: 'User Location',
       children:
       [
+      //       {
+      //   'id' : 7,
+      //   type: 'conditionBranch',
+      //   logic: { type: 'user', key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
+      //   text: 'From Melbourne',
+      //   children:
+      //   [
+
+      //   {
+      //     'id' : 8,
+      //     type: 'sendEmail',
+      //     templateId: 1,
+      //     children:
+      //     [
+      //     {
+      //       'id' : 9,
+      //       type: 'delay',
+      //       delay: {'amount' : 7, 'unit' : 'days' },
+      //       children: []
+      //     }
+      //     ]
+      //   }
+
+      //   ]
+      // },
       {
         'id' : 3,
         type: 'conditionBranch',
@@ -548,21 +573,21 @@ addLateralElement: function(newElement, parentId) {
           <label>Condition Operator
           <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()}>
           <optgroup label="Basic">
-          <option value="equals">Equals (&#61;)</option>
-          <option value="notEquals">Not Equals (!&#61;)</option>
-          <option value="notSet">Not Set (null)</option>
+          <option value="=">Equals (&#61;)</option>
+          <option value="!=">Not Equals (!&#61;)</option>
+          <option value="is not set">Not Set (null)</option>
           </optgroup>
           <optgroup label="Numeric">
-          <option value="lt">Less Than (&lt;)</option>
-          <option value="lte">Less Than or Equal To (&lt;=)</option>
-          <option value="gt">Greater Than (&gt;)</option>
-          <option value="gte">Greater Than or Equal To (&#61;&gt;)</option>
+          <option value="<">Less Than (&lt;)</option>
+          <option value="<=">Less Than or Equal To (&lt;=)</option>
+          <option value=">">Greater Than (&gt;)</option>
+          <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
           </optgroup>
           <optgroup label="Fuzzy">
-          <option value="starts">Starts With (*_)</option>
+          <option value="starts with">Starts With (*_)</option>
           <option value="contains">Contains (*)</option>
-          <option value="notContains">Does Not Contain (!*)</option>
-          <option value="ends">Ends With (_*)</option>
+          <option value="does not contain">Does Not Contain (!*)</option>
+          <option value="ends with">Ends With (_*)</option>
           </optgroup>
           </select>
           </label>
@@ -790,10 +815,19 @@ addLateralElement: function(newElement, parentId) {
 
         else if (widget.type === "condition") {
 
-          return(<div>Condition: {widget.text}<br /><button className="button tiny radius noBottomMargin">Add Condition</button></div>);
+          return(<div>
+                 Condition: {widget.text}
+                 <br />
+                 <button className="button tiny radius noBottomMargin">Add Condition</button>
+                 </div>);
 
         } 
 
+        else if (widget.type === "conditionBranch") {
+
+          return(<div>Rule: {widget.logic.key} {widget.logic.operator} {widget.logic.value}</div>);
+
+        }
 
         else if (widget.type === "delay") {
 
@@ -801,6 +835,20 @@ addLateralElement: function(newElement, parentId) {
 
         } else {
           return(<div>Other: {widget.text}</div>);
+        }
+
+      };
+
+      var fork = function(widget) {
+
+        if(widget.type === "condition") {
+          return(
+                 <div>
+                 <div className="connector" data-parent-id={root.id}></div>
+                 <div className="row connectorHorizontal" data-parent-id={root.id}></div>
+                 </div>
+                 );
+
         }
 
       };
@@ -815,6 +863,7 @@ addLateralElement: function(newElement, parentId) {
              </div>
              {widgetText(root)}
              </div>
+             {fork(root)}
              {buildConnections(root.children.length)}
              {buildChildren(root.children.length)}
              </div>
