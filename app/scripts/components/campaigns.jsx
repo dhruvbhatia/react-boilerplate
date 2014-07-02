@@ -248,10 +248,13 @@ addLateralElement: function(newElement, parentId) {
       var editingExistingWidget = this.state.activeWidget.editing;
       var name = $('#conditionBranchName').val();
       var logicType = $('#conditionBranchLogicType option:selected').val();
+      var logicKey = $('#conditionBranchLogicKey').val();
+      var logicOperator = $('#conditionBranchLogicOperator option:selected').val();
+      var logicValue = $('#conditionBranchLogicValue').val();
 
       var newElement = {
         type: 'conditionBranch',
-        logic: { type: logicType,  key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
+        logic: { type: logicType,  key: logicKey, operator: logicOperator, value: logicValue, match: 'fuzzy' },
         text: name,
         children:
         []
@@ -543,7 +546,25 @@ addLateralElement: function(newElement, parentId) {
           </label>
 
           <label>Condition Operator
-          <input id="conditionBranchLogicOperator" type="text" defaultValue={conditionBranchLogicOperator()} />
+          <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()}>
+          <optgroup label="Basic">
+          <option value="equals">Equals (&#61;)</option>
+          <option value="notEquals">Not Equals (!&#61;)</option>
+          <option value="notSet">Not Set (null)</option>
+          </optgroup>
+          <optgroup label="Numeric">
+          <option value="lt">Less Than (&lt;)</option>
+          <option value="lte">Less Than or Equal To (&lt;=)</option>
+          <option value="gt">Greater Than (&gt;)</option>
+          <option value="gte">Greater Than or Equal To (&#61;&gt;)</option>
+          </optgroup>
+          <optgroup label="Fuzzy">
+          <option value="starts">Starts With (*_)</option>
+          <option value="contains">Contains (*)</option>
+          <option value="notContains">Does Not Contain (!*)</option>
+          <option value="ends">Ends With (_*)</option>
+          </optgroup>
+          </select>
           </label>
 
           <label>Condition Value
