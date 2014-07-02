@@ -33,13 +33,15 @@ componentWillUnmount: function() {
 
 getInitialState: function() {
 
-  var activeWebsiteName = _.find(this.props.websites, { "id" : parseInt(this.props.activeWebsite)}).name;
+  var activeWebsite = _.find(this.props.websites, { "id" : parseInt(this.props.activeWebsite)});
+
+  var contactAttributes = _.sortBy(_.uniq(_.flatten(_.map(_.filter(_.pluck(_.flatten(_.pluck(this.props.websites, "contacts")), "customAttributes"), function(a) { return !_.isEmpty(a); }), function(element) { return _.keys(element); } ))));
 
   var tree =
   {
     'id' : 1,
     type: 'start',
-    text: 'All Users within ' + activeWebsiteName,
+    text: 'All Users within ' + activeWebsite.name,
     children:
     [
     {
@@ -51,7 +53,8 @@ getInitialState: function() {
       {
         'id' : 3,
         type: 'conditionBranch',
-        text: 'Yes',
+        logic: { type: 'user', key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
+        text: 'From Melbourne',
         children:
         [
 
@@ -75,7 +78,8 @@ getInitialState: function() {
       {
         'id' : 4,
         type: 'conditionBranch',
-        text: 'No',
+        logic: { type: 'user', key: 'user_location', operator: '=', value: 'Sydney', match: 'fuzzy' },
+        text: 'From Sydney',
         children:
         [
         {
@@ -94,9 +98,10 @@ getInitialState: function() {
   };
 
   console.log(tree);
+  console.log(contactAttributes);
 
 
-  return {modal: undefined, activeWidget: {}, tree: tree};
+  return {modal: undefined, activeWidget: {}, tree: tree, contactAttributes: contactAttributes};
 
 },
 
@@ -108,8 +113,13 @@ openModal: function(e) {
   var widgetId = parseInt($(e.target).attr('data-widget-id'));
 
   console.log(modalType);
-  console.log(widgetId);
-  this.setState({modal: modalType, activeWidget: {'id' : widgetId} });
+
+  var activeWidget = _.findDeep([this.state.tree], {'id' : widgetId});
+
+  activeWidget.editing = false;
+
+
+  this.setState({modal: modalType, activeWidget: activeWidget });
 
 },
 
@@ -179,6 +189,7 @@ addLateralElement: function(newElement, parentId) {
         if(tree.id === newElement.id) {
           if(newElement.templateId) { tree.templateId = newElement.templateId; }
           if(newElement.delay) { tree.delay = newElement.delay; }
+          if(newElement.logic) { tree.logic = newElement.logic; }
           if(newElement.text) { tree.text = newElement.text; }
           return depth;
         } else {
@@ -236,9 +247,11 @@ addLateralElement: function(newElement, parentId) {
       var widgetId = this.state.activeWidget.id;
       var editingExistingWidget = this.state.activeWidget.editing;
       var name = $('#conditionBranchName').val();
+      var logicType = $('#conditionBranchLogicType option:selected').val();
 
       var newElement = {
         type: 'conditionBranch',
+        logic: { type: logicType,  key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
         text: name,
         children:
         []
@@ -293,7 +306,11 @@ addLateralElement: function(newElement, parentId) {
 
       console.log(modalType);
 
-      this.setState({modal: modalType, activeWidget: {'id' : widgetId, 'editing' : true }});
+      var activeWidget = _.findDeep(this.state.tree, {'id' : widgetId});
+
+      activeWidget.editing = true;
+
+      this.setState({modal: modalType, activeWidget: activeWidget});
 
     },
 
@@ -360,7 +377,7 @@ addLateralElement: function(newElement, parentId) {
           display: 'block',
           opacity: 1,
           visibility: 'visible',
-          top: '20%'
+          top: '5%'
         };
 
         var modalBackgroundStyle = {
@@ -374,7 +391,7 @@ addLateralElement: function(newElement, parentId) {
 
                   <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-                  <div id="designerModal" className="reveal-modal tiny open" style={modalStyle}>
+                  <div id="designerModal" className="reveal-modal small open" style={modalStyle}>
                   <h2>Awesome. I have it.</h2>
                   <p className="lead">Your couch.  It is mine.</p>
                   <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
@@ -390,6 +407,7 @@ addLateralElement: function(newElement, parentId) {
   var button = function() {
 
     if(self.state.activeWidget.editing) {
+      // TODO
       return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Edit</button>);
     } else {
       return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Add</button>);
@@ -398,11 +416,7 @@ addLateralElement: function(newElement, parentId) {
 
   var branchTable = function() {
 
-    var tree = _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id});
-
-    console.log(tree);
-
-    var rows = _.chain(tree.children).filter({'type' : 'conditionBranch'}).map( function(condition) {
+    var rows = _.chain(self.state.activeWidget.children).filter({'type' : 'conditionBranch'}).map( function(condition) {
       console.log(condition);
       return(
              <tr id={condition.id} key={condition.id}>
@@ -413,17 +427,17 @@ addLateralElement: function(newElement, parentId) {
     });
 
     return(
-          <table width="100%">
-          <thead>
-          <tr>
-          <th>Name</th>
-          <th>Actions</th>
-          </tr>
-          </thead>
-          <tbody>
-          {rows}
-          </tbody>
-          </table>
+           <table width="100%">
+           <thead>
+           <tr>
+           <th>Name</th>
+           <th>Actions</th>
+           </tr>
+           </thead>
+           <tbody>
+           {rows}
+           </tbody>
+           </table>
            );
 
   };
@@ -433,7 +447,7 @@ addLateralElement: function(newElement, parentId) {
 
           <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-          <div id="delayModal" className="reveal-modal tiny" style={modalStyle}>
+          <div id="delayModal" className="reveal-modal small" style={modalStyle}>
           <h2>Conditions</h2>
           <p>Add logic to this stream.</p>
 
@@ -463,13 +477,44 @@ addLateralElement: function(newElement, parentId) {
 
 
   var currentConditionBranchName = function() {
-    if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
-      return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).text;
+    if(self.state.activeWidget.type === "conditionBranch") {
+      return self.state.activeWidget.text;
     } else {
-      return '2';
+      return '';
     }
+  };
 
+  var currentConditionBranchLogicType = function() {
+    if(self.state.activeWidget.type === "conditionBranch") {
+      return self.state.activeWidget.logic.type;
+    } else {
+      return 'user';
+    }
+  };
 
+  var conditionBranchLogicKey = function() {
+    if(self.state.contactAttributes) {
+      return self.state.activeWidget.logic.key;
+      // return _.first(self.state.contactAttributes);
+    } else {
+      return '';
+    }
+  };
+
+  var conditionBranchLogicOperator = function() {
+    if(self.state.activeWidget.type === "conditionBranch") {
+      return self.state.activeWidget.logic.operator;
+    } else {
+      return '=';
+    }
+  };
+
+  var conditionBranchLogicValue = function() {
+    if(self.state.activeWidget.type === "conditionBranch") {
+      return self.state.activeWidget.logic.value;
+    } else {
+      return '';
+    }
   };
 
   return (
@@ -477,12 +522,32 @@ addLateralElement: function(newElement, parentId) {
 
           <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-          <div id="conditionBranchModal" className="reveal-modal tiny" style={modalStyle}>
+          <div id="conditionBranchModal" className="reveal-modal small" style={modalStyle}>
           <h2>Condition Branch</h2>
           <p>Define a conditional branch.</p>
 
           <label>Condition Name
           <input id="conditionBranchName" type="text" defaultValue={currentConditionBranchName()} />
+          </label>
+
+          <label>Condition Type
+          <select id="conditionBranchLogicType" defaultValue={currentConditionBranchLogicType()}>
+          <option value="user">User Attribute</option>
+          <option value="event">Event</option>
+          <option value="email">Email</option>
+          </select>
+          </label>
+
+          <label>Condition Key
+          <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
+          </label>
+
+          <label>Condition Operator
+          <input id="conditionBranchLogicOperator" type="text" defaultValue={conditionBranchLogicOperator()} />
+          </label>
+
+          <label>Condition Value
+          <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
           </label>
 
           {button()}
@@ -505,8 +570,8 @@ addLateralElement: function(newElement, parentId) {
   };
 
   var currentDelayAmount = function() {
-    if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
-      return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).delay.amount;
+    if(self.state.activeWidget.type === "delay") {
+      return self.state.activeWidget.delay.amount;
     } else {
       return '2';
     }
@@ -516,8 +581,8 @@ addLateralElement: function(newElement, parentId) {
 
 
   var currentDelayUnit = function() {
-    if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
-      return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).delay.unit;
+    if(self.state.activeWidget.type === "delay") {
+      return self.state.activeWidget.delay.unit;
     } else {
       return 'days';
     }
@@ -530,7 +595,7 @@ addLateralElement: function(newElement, parentId) {
 
           <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-          <div id="delayModal" className="reveal-modal tiny" style={modalStyle}>
+          <div id="delayModal" className="reveal-modal small" style={modalStyle}>
           <h2>Add a Delay</h2>
           <p>Add a delay to this stream.</p>
 
@@ -561,7 +626,7 @@ addLateralElement: function(newElement, parentId) {
 
                   <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-                  <div id="sendEmailModal" className="reveal-modal tiny" style={modalStyle}>
+                  <div id="sendEmailModal" className="reveal-modal small" style={modalStyle}>
                   <h2>Send email.</h2>
                   <p>No templates found</p>
                   <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
@@ -584,8 +649,8 @@ addLateralElement: function(newElement, parentId) {
         };
 
         var currentTemplateId = function() {
-          if(self.state.activeWidget.editing && _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id})) {
-            return _.findDeep(self.state.tree, {'id' : self.state.activeWidget.id}).templateId;
+          if(self.state.activeWidget.type === 'sendEmail') {
+            return self.state.activeWidget.templateId;
           } else {
             return 1;
           }
@@ -598,7 +663,7 @@ addLateralElement: function(newElement, parentId) {
 
                 <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-                <div id="sendEmailModal" className="reveal-modal tiny" style={modalStyle}>
+                <div id="sendEmailModal" className="reveal-modal small" style={modalStyle}>
                 <h2>Send email.</h2>
                 <p>Which Email to send</p>
                 <label>Template
@@ -704,7 +769,7 @@ addLateralElement: function(newElement, parentId) {
 
         else if (widget.type === "condition") {
 
-          return(<div>Condition: {widget.text}</div>);
+          return(<div>Condition: {widget.text}<br /><button className="button tiny radius noBottomMargin">Add Condition</button></div>);
 
         } 
 
