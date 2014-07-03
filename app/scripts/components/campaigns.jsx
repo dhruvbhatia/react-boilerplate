@@ -50,7 +50,7 @@ getInitialState: function() {
       text: 'User Location',
       children:
       [
-      //       {
+      // {
       //   'id' : 7,
       //   type: 'conditionBranch',
       //   logic: { type: 'user', key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
@@ -749,10 +749,46 @@ addLateralElement: function(newElement, parentId) {
           };
 
 
+          var connectorHorizontalStyle = {
+            float: 'left'
+          };
+
+
+          if(connection < length - 1) {
+            connectorHorizontalStyle = {
+              float: 'left',
+              width: '100%'
+            };
+          }
+
+          if(connection === 0) {
+            connectorHorizontalStyle = {
+              float: 'right'
+            };
+          }
+
+          if(length === 1) {
+            connectorHorizontalStyle = {
+              display: 'none'
+            };
+          }
+
+          var connectorStyle = {
+            display: 'visible'
+          };
+
+          if(length === 1) {
+            connectorStyle = {
+              display: 'none'
+            };
+          }      
+
+
           if(root.children[connection].type === "conditionBranch") {
             return (
                     <div key={connection} style={connectionStyle}>
-                    <div className="connector" data-parent-id={root.id}></div>
+                    <div className="connectorHorizontal" data-parent-id={root.id} style={connectorHorizontalStyle}></div>
+                    <div className="connector" data-parent-id={root.id} style={connectorStyle}></div>
                     <span className="label radius">{root.children[connection].text}</span>
                     <div className="connector" data-parent-id={root.id}></div>
                     ▼
@@ -770,123 +806,122 @@ addLateralElement: function(newElement, parentId) {
 
         });
 
-        return (
-                <div>{connections}</div>
-                );
+return (
+        <div>{connections}</div>
+        );
 
-      };
+};
 
-      var buildChildren = function(length) {
+var buildChildren = function(length) {
 
-        if(_.isEmpty(root.children)) {
-          return (
-                  <div>
-                  <div className="connector" data-parent-id={root.id}></div>
-                  <button className="button radius" data-modal="widgets" data-widget-id={root.id} onClick={self.openModal}>+</button>
-                  </div>
-                  );
-        } else {
-          var result = _.map(root.children, function(child) {
-            var nodes = buildTreeNodes(child, length);
-            return (<div key={child.id}>{nodes}</div>);
-          } );
-          return(result);
-        }
-      };
-
-      if(size > 0) {
-        var elementStyle = {
-          float: 'left',
-          width: (100/size) + '%'
-        };
-      }
-
-      var classString = "panel radius noBottomMargin widget " + root.type;
-
-      var widgetText = function(widget) {
-
-        if(widget.type === "sendEmail") {
-
-          var templates = _.chain(self.props.websites).where({'id' : self.props.activeWebsite}).pluck('templates').flatten().value();
-          var template = _.find(templates, {'id' : widget.templateId});
-
-          return(<div>Send Email: {template.name}</div>);
-        }
-
-        else if (widget.type === "condition") {
-
-          return(<div>
-                 Condition: {widget.text}
-                 <br />
-                 <button className="button tiny radius noBottomMargin">Add Condition</button>
-                 </div>);
-
-        } 
-
-        else if (widget.type === "conditionBranch") {
-
-          return(<div>Rule: {widget.logic.key} {widget.logic.operator} {widget.logic.value}</div>);
-
-        }
-
-        else if (widget.type === "delay") {
-
-          return(<div>Delay: {widget.delay.amount} {widget.delay.unit}</div>);
-
-        } else {
-          return(<div>Other: {widget.text}</div>);
-        }
-
-      };
-
-      var fork = function(widget) {
-
-        if(widget.type === "condition") {
-          return(
-                 <div>
-                 <div className="connector" data-parent-id={root.id}></div>
-                 <div className="row connectorHorizontal" data-parent-id={root.id}></div>
-                 </div>
-                 );
-
-        }
-
-      };
-
-      return(
-             <div style={elementStyle}>
-             <div id={root.id} key={root.id} className={classString}>
-             <div className="right widgetControls">
-             <a className="right" data-widget-id={root.id} onClick={self.removeLateralElement}>&#215;</a>
-             <span className="right separator"> | </span>
-             <a className="right" data-modal={root.type} data-widget-id={root.id} onClick={self.editElement}>Edit</a>
-             </div>
-             {widgetText(root)}
-             </div>
-             {fork(root)}
-             {buildConnections(root.children.length)}
-             {buildChildren(root.children.length)}
-             </div>
-             );
-
-    };
-
+  if(_.isEmpty(root.children)) {
     return (
             <div>
-            <p>{this.props.path}</p>
-
-            <div className="panel chart tall" id="ruleBuilder">
-            {buildTreeNodes(self.state.tree)}
-            <p>Tree Status: </p>
-
-            </div>
-
-            {showModal()}
-
-
+            <div className="connector" data-parent-id={root.id}></div>
+            <button className="button radius" data-modal="widgets" data-widget-id={root.id} onClick={self.openModal}>+</button>
             </div>
             );
+  } else {
+    var result = _.map(root.children, function(child) {
+      var nodes = buildTreeNodes(child, length);
+      return (<div key={child.id}>{nodes}</div>);
+    } );
+    return(result);
   }
+};
+
+if(size > 0) {
+  var elementStyle = {
+    float: 'left',
+    width: (100/size) + '%'
+  };
+}
+
+var classString = "panel radius noBottomMargin widget " + root.type;
+
+var widgetText = function(widget) {
+
+  if(widget.type === "sendEmail") {
+
+    var templates = _.chain(self.props.websites).where({'id' : self.props.activeWebsite}).pluck('templates').flatten().value();
+    var template = _.find(templates, {'id' : widget.templateId});
+
+    return(<div>Send Email: {template.name}</div>);
+  }
+
+  else if (widget.type === "condition") {
+
+    return(<div>
+           Condition: {widget.text}
+           <br />
+           <button className="button tiny radius noBottomMargin">Add Condition</button>
+           </div>);
+
+  } 
+
+  else if (widget.type === "conditionBranch") {
+
+    return(<div>Rule: {widget.logic.key} {widget.logic.operator} {widget.logic.value}</div>);
+
+  }
+
+  else if (widget.type === "delay") {
+
+    return(<div>Delay: {widget.delay.amount} {widget.delay.unit}</div>);
+
+  } else {
+    return(<div>Other: {widget.text}</div>);
+  }
+
+};
+
+var fork = function(widget) {
+
+  if(widget.type === "condition") {
+    return(
+           <div>
+           <div className="connector" data-parent-id={root.id}></div>
+           </div>
+           );
+
+  }
+
+};
+
+return(
+       <div style={elementStyle}>
+       <div id={root.id} key={root.id} className={classString}>
+       <div className="right widgetControls">
+       <a className="right" data-widget-id={root.id} onClick={self.removeLateralElement}>&#215;</a>
+       <span className="right separator"> | </span>
+       <a className="right" data-modal={root.type} data-widget-id={root.id} onClick={self.editElement}>Edit</a>
+       </div>
+       {widgetText(root)}
+       </div>
+       {fork(root)}
+       {buildConnections(root.children.length)}
+       {buildChildren(root.children.length)}
+       </div>
+       );
+
+};
+
+return (
+        <div>
+        <p>{this.props.path}</p>
+
+        <div className="panel chart tall" id="ruleBuilder">
+        {buildTreeNodes(self.state.tree)}
+        <p>Tree Status: </p>
+
+        </div>
+
+        {showModal()}
+
+
+        </div>
+        );
+}
 
 });
 
