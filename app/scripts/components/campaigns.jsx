@@ -78,7 +78,7 @@ getInitialState: function() {
       {
         'id' : 3,
         type: 'conditionBranch',
-        logic: { type: 'user', key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
+        logic: { type: 'user', key: 'user_location', operator: 'is not set', value: 'Melbourne', match: 'fuzzy' },
         text: 'From Melbourne',
         children:
         [
@@ -126,7 +126,7 @@ getInitialState: function() {
   console.log(contactAttributes);
 
 
-  return {modal: undefined, activeWidget: {}, tree: tree, contactAttributes: contactAttributes};
+  return {modal: undefined, activeWidget: undefined, tree: tree, contactAttributes: contactAttributes};
 
 },
 
@@ -150,7 +150,7 @@ openModal: function(e) {
 
 closeModal: function() {
 
-  this.setState({modal: undefined, activeWidget: {}});
+  this.setState({modal: undefined, activeWidget: undefined});
 
 },
 
@@ -545,6 +545,65 @@ addLateralElement: function(newElement, parentId) {
     }
   };
 
+  var conditionValue = function() {
+
+    var returnJSX = '';
+
+    var hiddenStyle = {
+      'display' : 'none'
+    };
+
+    if(!_.isUndefined(self.state.activeWidget.temp)) {
+
+      if(self.state.activeWidget.temp.hideValue === false) {
+        returnJSX = (
+                     <label>Condition Value
+                     <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
+                     </label>
+                     );
+      } else {
+        returnJSX = (<label style={hiddenStyle}>Condition Value
+                     <input id="conditionBranchLogicValue" type="text" value="" />
+                     </label>);
+      }
+
+    } else {
+
+      if(self.state.activeWidget.logic.operator === 'is not set') {
+        returnJSX = (<label style={hiddenStyle}>Condition Value
+                     <input id="conditionBranchLogicValue" type="text" value="" />
+                     </label>);
+      } else {
+        returnJSX = (
+                     <label>Condition Value
+                     <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
+                     </label>
+                     );
+      }
+
+
+    }
+
+    return returnJSX;
+
+
+  };
+
+  var operatorChange = function(e) {
+    var activeWidget = self.state.activeWidget;
+
+    var operator = $(e.target).val();
+
+    if(operator === "is not set") {
+      activeWidget.temp = { hideValue: true };
+    } else {
+      activeWidget.temp = { hideValue: false };
+    }
+
+    self.setState({activeWidget: activeWidget});
+
+  };
+
   return (
           <div>
 
@@ -571,7 +630,7 @@ addLateralElement: function(newElement, parentId) {
           </label>
 
           <label>Condition Operator
-          <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()}>
+          <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
           <optgroup label="Basic">
           <option value="=">Equals (&#61;)</option>
           <option value="!=">Not Equals (!&#61;)</option>
@@ -592,9 +651,7 @@ addLateralElement: function(newElement, parentId) {
           </select>
           </label>
 
-          <label>Condition Value
-          <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
-          </label>
+          {conditionValue()}
 
           {button()}
 
