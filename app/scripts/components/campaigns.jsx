@@ -139,7 +139,7 @@ openModal: function(e) {
 
   console.log(modalType);
 
-  var activeWidget = _.findDeep([this.state.tree], {'id' : widgetId});
+  var activeWidget = _.cloneDeep(_.findDeep([this.state.tree], {'id' : widgetId}));
 
   activeWidget.editing = false;
 
@@ -334,7 +334,7 @@ addLateralElement: function(newElement, parentId) {
 
       console.log(modalType);
 
-      var activeWidget = _.findDeep(this.state.tree, {'id' : widgetId});
+      var activeWidget = _.cloneDeep(_.findDeep(this.state.tree, {'id' : widgetId}));
 
       activeWidget.editing = true;
 
@@ -574,6 +574,7 @@ addLateralElement: function(newElement, parentId) {
                      <input id="conditionBranchLogicValue" type="text" value="" />
                      </label>);
       } else {
+
         returnJSX = (
                      <label>Condition Value
                      <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
