@@ -78,7 +78,7 @@ getInitialState: function() {
       {
         'id' : 3,
         type: 'conditionBranch',
-        logic: { type: 'user', key: 'user_location', operator: 'is not set', value: 'Melbourne', match: 'fuzzy' },
+        logic: { type: 'user', key: 'user_location', operator: '=', value: 'Melbourne', match: 'fuzzy' },
         text: 'From Melbourne',
         children:
         [
@@ -277,6 +277,10 @@ addLateralElement: function(newElement, parentId) {
       var logicOperator = $('#conditionBranchLogicOperator option:selected').val();
       var logicValue = $('#conditionBranchLogicValue').val();
 
+      if(logicOperator === 'is not set') {
+        logicValue = undefined;
+      }
+
       var newElement = {
         type: 'conditionBranch',
         logic: { type: logicType,  key: logicKey, operator: logicOperator, value: logicValue, match: 'fuzzy' },
@@ -329,12 +333,14 @@ addLateralElement: function(newElement, parentId) {
     editElement: function(e) {
       e.preventDefault();
 
+      var self = this;
+
       var modalType = $(e.target).attr('data-modal');
       var widgetId = parseInt($(e.target).attr('data-widget-id'));
 
       console.log(modalType);
 
-      var activeWidget = _.cloneDeep(_.findDeep(this.state.tree, {'id' : widgetId}));
+      var activeWidget = _.cloneDeep(_.findDeep(self.state.tree, {'id' : widgetId}));
 
       activeWidget.editing = true;
 
@@ -482,7 +488,7 @@ addLateralElement: function(newElement, parentId) {
 
           {branchTable()}
 
-
+          <button className="button radius" data-modal="conditionBranch" data-widget-id={self.state.activeWidget.id} onClick={self.openModal}>Add Condition</button>
 
           {button()}
 
@@ -495,6 +501,8 @@ addLateralElement: function(newElement, parentId) {
 } else if ( self.state.modal === 'conditionBranch') {
 
   var button = function() {
+
+
 
     if(self.state.activeWidget.editing) {
       return( <button id="delayButton" className="button radius" onClick={self.validateConditionBranchElement}>Edit</button>);
@@ -521,7 +529,7 @@ addLateralElement: function(newElement, parentId) {
   };
 
   var conditionBranchLogicKey = function() {
-    if(self.state.contactAttributes) {
+    if(self.state.activeWidget.type === "conditionBranch" && self.state.contactAttributes) {
       return self.state.activeWidget.logic.key;
       // return _.first(self.state.contactAttributes);
     } else {
@@ -569,11 +577,12 @@ addLateralElement: function(newElement, parentId) {
 
     } else {
 
-      if(self.state.activeWidget.logic.operator === 'is not set') {
+      if(self.state.activeWidget.logic) {
+        if(self.state.activeWidget.logic.operator === 'is not set') {
         returnJSX = (<label style={hiddenStyle}>Condition Value
                      <input id="conditionBranchLogicValue" type="text" value="" />
                      </label>);
-      } else {
+      } } else {
 
         returnJSX = (
                      <label>Condition Value

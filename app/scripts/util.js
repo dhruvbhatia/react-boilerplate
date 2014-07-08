@@ -108,8 +108,10 @@
 
     function match(value) {
       for (var key in attrs) {
-        if (attrs[key] !== value[key]) {
-          return false;
+        if(!_.isUndefined(value)) {
+          if (attrs[key] !== value[key]) {
+            return false;
+          }
         }
       }
 
