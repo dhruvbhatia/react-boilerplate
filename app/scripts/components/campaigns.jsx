@@ -301,6 +301,34 @@ addLateralElement: function(newElement, parentId) {
 
     },
 
+
+    validateConditionSetElement: function(e) {
+
+      e.preventDefault();
+
+      var widgetId = this.state.activeWidget.id;
+      var editingExistingWidget = this.state.activeWidget.editing;
+      var conditionSetName = $('#conditionSetName').val();
+
+      var newElement = {
+        type: 'condition',
+        text: conditionSetName,
+        children:
+        []
+      };
+
+      if(editingExistingWidget) {
+
+        console.log("update existing");
+        newElement.id = widgetId;
+        this.updateExistingWidget(newElement, widgetId);
+
+      } else {
+        this.addLateralElement(newElement, widgetId);
+      }
+
+    },
+
     validateDelayElement: function(e) {
 
       e.preventDefault();
@@ -425,7 +453,7 @@ addLateralElement: function(newElement, parentId) {
 
                   <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-                  <div id="designerModal" className="reveal-modal small open" style={modalStyle}>
+                  <div id="designerModal" className="reveal-modal small radius open" style={modalStyle}>
                   <h2>Awesome. I have it.</h2>
                   <p className="lead">Your couch.  It is mine.</p>
                   <p>Im a cool paragraph that lives inside of an even cooler modal. Wins</p>
@@ -442,9 +470,9 @@ addLateralElement: function(newElement, parentId) {
 
     if(self.state.activeWidget.editing) {
       // TODO
-      return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Edit</button>);
+      return( <button id="delayButton" className="button radius" onClick={self.validateConditionSetElement}>Edit</button>);
     } else {
-      return( <button id="delayButton" className="button radius" onClick={self.validateDelayElement}>Add</button>);
+      return( <button id="delayButton" className="button radius" onClick={self.validateConditionSetElement}>Add</button>);
     }
   };
 
@@ -481,9 +509,14 @@ addLateralElement: function(newElement, parentId) {
 
           <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-          <div id="delayModal" className="reveal-modal small" style={modalStyle}>
+          <div id="delayModal" className="reveal-modal small radius" style={modalStyle}>
           <h2>Conditions</h2>
           <p>Add logic to this stream.</p>
+
+
+          <label>Condition Set Name
+          <input id="conditionSetName" type="text" defaultValue={self.state.activeWidget.text} />
+          </label>
 
 
           {branchTable()}
@@ -511,12 +544,16 @@ addLateralElement: function(newElement, parentId) {
     }
   };
 
-
   var currentConditionBranchName = function() {
-    if(self.state.activeWidget.type === "conditionBranch") {
-      return self.state.activeWidget.text;
-    } else {
-      return '';
+
+    console.log(self.state.activeWidget.text);
+
+    if(self.state.activeWidget.editing) {
+      if(self.state.activeWidget.type === "conditionBranch") {
+        return self.state.activeWidget.text;
+      } else {
+        return '';
+      }
     }
   };
 
@@ -544,6 +581,14 @@ addLateralElement: function(newElement, parentId) {
       return '=';
     }
   };
+
+var conditionBranchLogicUserFilter = function() {
+    if(self.state.activeWidget.logic && self.state.activeWidget.logic.userFilter) {
+      return self.state.activeWidget.logic.userFilter;
+    } else {
+      return '';
+    }
+};
 
   var conditionBranchLogicValue = function() {
     if(self.state.activeWidget.type === "conditionBranch") {
@@ -573,102 +618,176 @@ addLateralElement: function(newElement, parentId) {
         returnJSX = (<label style={hiddenStyle}>Condition Value
                      <input id="conditionBranchLogicValue" type="text" value="" />
                      </label>);
-      }
-
-    } else {
-
-      if(self.state.activeWidget.logic) {
-        if(self.state.activeWidget.logic.operator === 'is not set') {
-        returnJSX = (<label style={hiddenStyle}>Condition Value
-                     <input id="conditionBranchLogicValue" type="text" value="" />
-                     </label>);
       } } else {
 
-        returnJSX = (
-                     <label>Condition Value
-                     <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
-                     </label>
-                     );
+        if(self.state.activeWidget.logic && self.state.activeWidget.logic.operator) {
+          if(self.state.activeWidget.logic.operator === 'is not set') {
+            returnJSX = (<label style={hiddenStyle}>Condition Value
+                         <input id="conditionBranchLogicValue" type="text" value="" />
+                         </label>);
+          } else {
+            returnJSX = (
+                         <label>Condition Value
+                         <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
+                         </label>
+                         );
+          }
+        } else {
+          returnJSX = (
+                       <label>Condition Value
+                       <input id="conditionBranchLogicValue" type="text" defaultValue={conditionBranchLogicValue()} />
+                       </label>
+                       );
+        }
+
       }
 
 
-    }
 
-    return returnJSX;
+      return returnJSX;
 
 
-  };
+    };
 
-  var operatorChange = function(e) {
-    var activeWidget = self.state.activeWidget;
+    var typeChange = function(e) {
+      var activeWidget = self.state.activeWidget;
 
-    var operator = $(e.target).val();
+      var type = $(e.target).val();
 
-    if(operator === "is not set") {
-      activeWidget.temp = { hideValue: true };
-    } else {
-      activeWidget.temp = { hideValue: false };
-    }
+      activeWidget.logic.type = type;
 
-    self.setState({activeWidget: activeWidget});
+      self.setState({activeWidget: activeWidget});
 
-  };
+    };
 
-  return (
-          <div>
+    var operatorChange = function(e) {
+      var activeWidget = self.state.activeWidget;
 
-          <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+      var operator = $(e.target).val();
 
-          <div id="conditionBranchModal" className="reveal-modal small" style={modalStyle}>
-          <h2>Condition Branch</h2>
-          <p>Define a conditional branch.</p>
+      if(operator === "is not set") {
+        activeWidget.temp = { hideValue: true };
+      } else {
+        activeWidget.temp = { hideValue: false };
+      }
 
-          <label>Condition Name
-          <input id="conditionBranchName" type="text" defaultValue={currentConditionBranchName()} />
-          </label>
+      self.setState({activeWidget: activeWidget});
 
-          <label>Condition Type
-          <select id="conditionBranchLogicType" defaultValue={currentConditionBranchLogicType()}>
-          <option value="user">User Attribute</option>
-          <option value="event">Event</option>
-          <option value="email">Email</option>
-          </select>
-          </label>
+    };
 
-          <label>Condition Key
-          <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
-          </label>
 
-          <label>Condition Operator
-          <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
-          <optgroup label="Basic">
-          <option value="=">Equals (&#61;)</option>
-          <option value="!=">Not Equals (!&#61;)</option>
-          <option value="is not set">Not Set (null)</option>
-          </optgroup>
-          <optgroup label="Numeric">
-          <option value="<">Less Than (&lt;)</option>
-          <option value="<=">Less Than or Equal To (&lt;=)</option>
-          <option value=">">Greater Than (&gt;)</option>
-          <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
-          </optgroup>
-          <optgroup label="Fuzzy">
-          <option value="starts with">Starts With (*_)</option>
-          <option value="contains">Contains (*)</option>
-          <option value="does not contain">Does Not Contain (!*)</option>
-          <option value="ends with">Ends With (_*)</option>
-          </optgroup>
-          </select>
-          </label>
+    var conditionOptions = function() {
+      switch(self.state.activeWidget.logic.type) {
 
-          {conditionValue()}
+        case 'event':
+        return(
+               <div>
 
-          {button()}
+               <label>User Filter
+               <select id="conditionBranchLogicUserFilter" defaultValue={conditionBranchLogicUserFilter()}>
+               <option value="=">Equals (&#61;)</option>
+               <option value="!=">Not Equals (!&#61;)</option>
+               <option value="is not set">Not Set (null)</option>
+               </select>
+               </label>
 
-          <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
-          </div>
-          </div>
-          );
+               <label>Event Name
+               <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
+               </label>
+
+               <label>Condition Operator
+               <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
+               <optgroup label="Basic">
+               <option value="=">Equals (&#61;)</option>
+               <option value="!=">Not Equals (!&#61;)</option>
+               <option value="is not set">Not Set (null)</option>
+               </optgroup>
+               <optgroup label="Numeric">
+               <option value="<">Less Than (&lt;)</option>
+               <option value="<=">Less Than or Equal To (&lt;=)</option>
+               <option value=">">Greater Than (&gt;)</option>
+               <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
+               </optgroup>
+               <optgroup label="Fuzzy">
+               <option value="starts with">Starts With (*_)</option>
+               <option value="contains">Contains (*)</option>
+               <option value="does not contain">Does Not Contain (!*)</option>
+               <option value="ends with">Ends With (_*)</option>
+               </optgroup>
+               </select>
+               </label>
+
+               {conditionValue()}
+               </div>
+               );
+
+
+
+default:
+return(
+       <div>
+       <label>Condition Key
+       <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
+       </label>
+
+       <label>Condition Operator
+       <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
+       <optgroup label="Basic">
+       <option value="=">Equals (&#61;)</option>
+       <option value="!=">Not Equals (!&#61;)</option>
+       <option value="is not set">Not Set (null)</option>
+       </optgroup>
+       <optgroup label="Numeric">
+       <option value="<">Less Than (&lt;)</option>
+       <option value="<=">Less Than or Equal To (&lt;=)</option>
+       <option value=">">Greater Than (&gt;)</option>
+       <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
+       </optgroup>
+       <optgroup label="Fuzzy">
+       <option value="starts with">Starts With (*_)</option>
+       <option value="contains">Contains (*)</option>
+       <option value="does not contain">Does Not Contain (!*)</option>
+       <option value="ends with">Ends With (_*)</option>
+       </optgroup>
+       </select>
+       </label>
+
+       {conditionValue()}
+       </div>
+       );
+
+}
+};
+
+return (
+        <div key={self.state.activeWidget.id}>
+
+        <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
+
+        <div id="conditionBranchModal" className="reveal-modal small radius" style={modalStyle}>
+        <h2>Condition Branch</h2>
+        <p>Define a conditional branch.</p>
+
+        <label>Condition Name
+        <input id="conditionBranchName" type="text" defaultValue={currentConditionBranchName()} />
+        </label>
+
+        <label>Condition Type
+        <select id="conditionBranchLogicType" defaultValue={currentConditionBranchLogicType()} onChange={typeChange}>
+        <option value="user">User Attribute</option>
+        <option value="event">Event</option>
+        <option value="email">Email</option>
+        </select>
+        </label>
+
+        {conditionOptions()}
+
+        {button()}
+
+        <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
+        </div>
+        </div>
+        );
 
 
 } else if ( self.state.modal === 'delay') {
@@ -708,7 +827,7 @@ addLateralElement: function(newElement, parentId) {
 
           <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-          <div id="delayModal" className="reveal-modal small" style={modalStyle}>
+          <div id="delayModal" className="reveal-modal small radius" style={modalStyle}>
           <h2>Add a Delay</h2>
           <p>Add a delay to this stream.</p>
 
@@ -739,7 +858,7 @@ addLateralElement: function(newElement, parentId) {
 
                   <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-                  <div id="sendEmailModal" className="reveal-modal small" style={modalStyle}>
+                  <div id="sendEmailModal" className="reveal-modal small radius" style={modalStyle}>
                   <h2>Send email.</h2>
                   <p>No templates found</p>
                   <a className="close-reveal-modal" onClick={self.closeModal}>&#215;</a>
@@ -776,7 +895,7 @@ addLateralElement: function(newElement, parentId) {
 
                 <div className="reveal-modal-bg" style={modalBackgroundStyle} onClick={self.closeModal}></div>
 
-                <div id="sendEmailModal" className="reveal-modal small" style={modalStyle}>
+                <div id="sendEmailModal" className="reveal-modal small radius" style={modalStyle}>
                 <h2>Send email.</h2>
                 <p>Which Email to send</p>
                 <label>Template
@@ -846,7 +965,7 @@ addLateralElement: function(newElement, parentId) {
 
           if(length === 1) {
             connectorStyle = {
-              display: 'none'
+              display: 'visible'
             };
           }      
 
