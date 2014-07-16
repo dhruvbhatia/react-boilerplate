@@ -148,8 +148,8 @@ gulp.task('watch', ['connect', 'serve'], function () {
         server.changed(file.path);
     });
 
-    gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/scripts/**/{*.js,*.jsx}', ['scripts']);
+    gulp.watch('app/styles/**/*.scss', ['styles']);
     gulp.watch('app/images/**/*', ['images']);
     gulp.watch('bower.json', ['wiredep']);
 });

@@ -1,6 +1,8 @@
 /** @jsx React.DOM */
 'use strict';
 
+var Modal = require('./modal').Modal;
+
 var Dashboard = React.createClass({
 
   buildChart: function() {
@@ -115,6 +117,7 @@ render: function() {
  return (
          <div>
          <h1>{this.props.path}</h1>
+         <Modal show="true" />
 
          <div className="row fullWidth">
 

@@ -7,49 +7,33 @@ var Campaigns = React.createClass({
 
     var self = this;
 
-    //$(document).foundation('reveal', {animation: 'fade', animation_speed: 50});
+  },
 
-    // $(document).on('click', '.reveal-modal button', function (e) {
+  componentWillUnmount: function() {
 
+    $(document).off('click', '.reveal-modal button');
 
-    //   if(e.target.id === 'addSendEmailButton') {
+  },
 
+  getInitialState: function() {
 
-    //     $('#sendEmailModal').foundation('reveal', 'close');
+    var activeWebsite = _.find(this.props.websites, { "id" : parseInt(this.props.activeWebsite)});
 
-    //     self.addLateralElement(e.target.id);
+    var contactAttributes = _.sortBy(_.uniq(_.flatten(_.map(_.filter(_.pluck(_.flatten(_.pluck(this.props.websites, "contacts")), "customAttributes"), function(a) { return !_.isEmpty(a); }), function(element) { return _.keys(element); } ))));
 
-    //   }
-
-    // });
-
-},
-
-componentWillUnmount: function() {
-
-  $(document).off('click', '.reveal-modal button');
-
-},
-
-getInitialState: function() {
-
-  var activeWebsite = _.find(this.props.websites, { "id" : parseInt(this.props.activeWebsite)});
-
-  var contactAttributes = _.sortBy(_.uniq(_.flatten(_.map(_.filter(_.pluck(_.flatten(_.pluck(this.props.websites, "contacts")), "customAttributes"), function(a) { return !_.isEmpty(a); }), function(element) { return _.keys(element); } ))));
-
-  var tree =
-  {
-    'id' : 1,
-    type: 'start',
-    text: 'All Users within ' + activeWebsite.name,
-    children:
-    [
+    var tree =
     {
-      'id' : 2,
-      type: 'condition',
-      text: 'User Location',
+      'id' : 1,
+      type: 'start',
+      text: 'All Users within ' + activeWebsite.name,
       children:
       [
+      {
+        'id' : 2,
+        type: 'condition',
+        text: 'User Location',
+        children:
+        [
       // {
       //   'id' : 7,
       //   type: 'conditionBranch',
@@ -182,7 +166,6 @@ addLateralElement: function(newElement, parentId) {
       } else {
 
         _.forEach(tree.children, function(child) {
-          console.log(child);
           insertNewChild(child, depth + 1);
         });
 
@@ -220,7 +203,6 @@ addLateralElement: function(newElement, parentId) {
         } else {
 
           _.forEach(tree.children, function(child) {
-            console.log(child);
             findAndUpdate(child, depth + 1);
           });
 
@@ -277,21 +259,47 @@ addLateralElement: function(newElement, parentId) {
       var logicOperator = $('#conditionBranchLogicOperator option:selected').val();
       var logicValue = $('#conditionBranchLogicValue').val();
 
+      // event DOM nodes
+      var userOperator = $('#userOperator').val();
+      var eventName = $('#eventName').val();
+
       if(logicOperator === 'is not set') {
         logicValue = undefined;
       }
 
+      // build properties based on condition type
+      var properties = {};
+
+      switch(logicType) {
+
+        case 'user':
+        properties = { key: logicKey, operator: logicOperator, value: logicValue, match: 'fuzzy' };
+        break;
+
+        case 'event':
+        properties = { key: 'user', operator: userOperator, value: eventName, match: 'fuzzy' };
+        break;
+
+        default:
+        properties = { key: logicKey, operator: logicOperator, value: logicValue, match: 'fuzzy' };
+
+      }
+
+
+
       var newElement = {
         type: 'conditionBranch',
-        logic: { type: logicType,  key: logicKey, operator: logicOperator, value: logicValue, match: 'fuzzy' },
+        logic: _.assign({type: logicType}, properties),
         text: name,
         children:
         []
       };
 
+
       if(editingExistingWidget) {
 
         console.log("update existing");
+              console.log(newElement)
         newElement.id = widgetId;
         this.updateExistingWidget(newElement, widgetId);
 
@@ -574,6 +582,20 @@ addLateralElement: function(newElement, parentId) {
     }
   };
 
+  var eventName = function() {
+    
+    if(self.state.activeWidget.type === "conditionBranch" && self.state.activeWidget.logic.value) {
+
+      return self.state.activeWidget.logic.value;
+
+    } else {
+
+      return '';
+
+    }
+
+  };
+
   var conditionBranchLogicOperator = function() {
     if(self.state.activeWidget.type === "conditionBranch") {
       return self.state.activeWidget.logic.operator;
@@ -582,13 +604,13 @@ addLateralElement: function(newElement, parentId) {
     }
   };
 
-var conditionBranchLogicUserFilter = function() {
-    if(self.state.activeWidget.logic && self.state.activeWidget.logic.userFilter) {
-      return self.state.activeWidget.logic.userFilter;
+  var userOperator = function() {
+    if(self.state.activeWidget.logic && self.state.activeWidget.logic.userOperator) {
+      return self.state.activeWidget.logic.userOperator;
     } else {
       return '';
     }
-};
+  };
 
   var conditionBranchLogicValue = function() {
     if(self.state.activeWidget.type === "conditionBranch") {
@@ -677,85 +699,96 @@ var conditionBranchLogicUserFilter = function() {
 
 
     var conditionOptions = function() {
-      switch(self.state.activeWidget.logic.type) {
+      if(self.state.activeWidget.logic) {
+        switch(self.state.activeWidget.logic.type) {
 
-        case 'event':
-        return(
-               <div>
+          case 'event':
+          return(
+                 <div>
 
-               <label>User Filter
-               <select id="conditionBranchLogicUserFilter" defaultValue={conditionBranchLogicUserFilter()}>
-               <option value="=">Equals (&#61;)</option>
-               <option value="!=">Not Equals (!&#61;)</option>
-               <option value="is not set">Not Set (null)</option>
-               </select>
-               </label>
+                 <label>Where User
+                 <select id="userOperator" defaultValue={userOperator()}>
+                 <option value="has triggered">Has Triggered</option>
+                 <option value="has not triggered">Has Not Triggered</option>
+                 </select>
+                 </label>
 
-               <label>Event Name
-               <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
-               </label>
+                 <label>Event Name
+                 <input id="eventName" type="text" defaultValue={eventName()} />
+                 </label>
 
-               <label>Condition Operator
-               <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
-               <optgroup label="Basic">
-               <option value="=">Equals (&#61;)</option>
-               <option value="!=">Not Equals (!&#61;)</option>
-               <option value="is not set">Not Set (null)</option>
-               </optgroup>
-               <optgroup label="Numeric">
-               <option value="<">Less Than (&lt;)</option>
-               <option value="<=">Less Than or Equal To (&lt;=)</option>
-               <option value=">">Greater Than (&gt;)</option>
-               <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
-               </optgroup>
-               <optgroup label="Fuzzy">
-               <option value="starts with">Starts With (*_)</option>
-               <option value="contains">Contains (*)</option>
-               <option value="does not contain">Does Not Contain (!*)</option>
-               <option value="ends with">Ends With (_*)</option>
-               </optgroup>
-               </select>
-               </label>
-
-               {conditionValue()}
-               </div>
-               );
+                 </div>
+                 );
+          break;
 
 
 
-default:
-return(
-       <div>
-       <label>Condition Key
-       <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
-       </label>
+          default:
+          return(
+                 <div>
+                 <label>Condition Key
+                 <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
+                 </label>
 
-       <label>Condition Operator
-       <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
-       <optgroup label="Basic">
-       <option value="=">Equals (&#61;)</option>
-       <option value="!=">Not Equals (!&#61;)</option>
-       <option value="is not set">Not Set (null)</option>
-       </optgroup>
-       <optgroup label="Numeric">
-       <option value="<">Less Than (&lt;)</option>
-       <option value="<=">Less Than or Equal To (&lt;=)</option>
-       <option value=">">Greater Than (&gt;)</option>
-       <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
-       </optgroup>
-       <optgroup label="Fuzzy">
-       <option value="starts with">Starts With (*_)</option>
-       <option value="contains">Contains (*)</option>
-       <option value="does not contain">Does Not Contain (!*)</option>
-       <option value="ends with">Ends With (_*)</option>
-       </optgroup>
-       </select>
-       </label>
+                 <label>Condition Operator
+                 <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
+                 <optgroup label="Basic">
+                 <option value="=">Equals (&#61;)</option>
+                 <option value="!=">Not Equals (!&#61;)</option>
+                 <option value="is not set">Not Set (null)</option>
+                 </optgroup>
+                 <optgroup label="Numeric">
+                 <option value="<">Less Than (&lt;)</option>
+                 <option value="<=">Less Than or Equal To (&lt;=)</option>
+                 <option value=">">Greater Than (&gt;)</option>
+                 <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
+                 </optgroup>
+                 <optgroup label="Fuzzy">
+                 <option value="starts with">Starts With (*_)</option>
+                 <option value="contains">Contains (*)</option>
+                 <option value="does not contain">Does Not Contain (!*)</option>
+                 <option value="ends with">Ends With (_*)</option>
+                 </optgroup>
+                 </select>
+                 </label>
 
-       {conditionValue()}
-       </div>
-       );
+                 {conditionValue()}
+                 </div>
+                 );
 
+}
+} else {
+  return(
+         <div>
+         <label>Condition Key
+         <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
+         </label>
+
+         <label>Condition Operator
+         <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
+         <optgroup label="Basic">
+         <option value="=">Equals (&#61;)</option>
+         <option value="!=">Not Equals (!&#61;)</option>
+         <option value="is not set">Not Set (null)</option>
+         </optgroup>
+         <optgroup label="Numeric">
+         <option value="<">Less Than (&lt;)</option>
+         <option value="<=">Less Than or Equal To (&lt;=)</option>
+         <option value=">">Greater Than (&gt;)</option>
+         <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
+         </optgroup>
+         <optgroup label="Fuzzy">
+         <option value="starts with">Starts With (*_)</option>
+         <option value="contains">Contains (*)</option>
+         <option value="does not contain">Does Not Contain (!*)</option>
+         <option value="ends with">Ends With (_*)</option>
+         </optgroup>
+         </select>
+         </label>
+
+         {conditionValue()}
+         </div>
+         );
 }
 };
 

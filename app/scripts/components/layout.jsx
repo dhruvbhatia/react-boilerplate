@@ -19,6 +19,7 @@ var EmailUser = require('./users').EmailUser;
 var Campaigns = require('./campaigns').Campaigns;
 var Templates = require('./templates').Templates;
 var PreviewTemplate = require('./templates').PreviewTemplate;
+var Modal = require('./modal').Modal;
 /*jshint ignore:end */
 
 
