@@ -124,12 +124,8 @@ var PreviewTemplate = React.createClass({
               );
 
     } else {
-
-
-      return (
-              <div>
-              An unexpected error occurred
-              </div>);
+      
+      return null;
 
     }
 

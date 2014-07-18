@@ -98,6 +98,14 @@ var Campaigns = React.createClass({
           children: []
         }
         ]
+      },
+      {
+        'id' : 8,
+        type: 'conditionBranch',
+        logic: { type: 'event', key: 'user', operator: 'has triggered', value: 'sale', match: 'fuzzy' },
+        text: 'Has bought',
+        children:
+        []
       }
 
       ]
@@ -134,7 +142,7 @@ openModal: function(e) {
 
 closeModal: function() {
 
-  this.setState({modal: undefined, activeWidget: undefined});
+  this.setState({modal: undefined, activeWidget: undefined, hideOptions: undefined});
 
 },
 
@@ -260,7 +268,8 @@ addLateralElement: function(newElement, parentId) {
       var logicValue = $('#conditionBranchLogicValue').val();
 
       // event DOM nodes
-      var userOperator = $('#userOperator').val();
+      var userOperator = $('#userOperator option:selected').val();
+      console.log(userOperator);
       var eventName = $('#eventName').val();
 
       if(logicOperator === 'is not set') {
@@ -299,7 +308,7 @@ addLateralElement: function(newElement, parentId) {
       if(editingExistingWidget) {
 
         console.log("update existing");
-              console.log(newElement)
+        console.log(newElement)
         newElement.id = widgetId;
         this.updateExistingWidget(newElement, widgetId);
 
@@ -443,6 +452,9 @@ addLateralElement: function(newElement, parentId) {
 
       var showModal = function() {
 
+        // scroll to top
+        //$(window).scrollTop(0);
+
         var modalStyle = {
           display: 'block',
           opacity: 1,
@@ -583,7 +595,7 @@ addLateralElement: function(newElement, parentId) {
   };
 
   var eventName = function() {
-    
+
     if(self.state.activeWidget.type === "conditionBranch" && self.state.activeWidget.logic.value) {
 
       return self.state.activeWidget.logic.value;
@@ -605,8 +617,8 @@ addLateralElement: function(newElement, parentId) {
   };
 
   var userOperator = function() {
-    if(self.state.activeWidget.logic && self.state.activeWidget.logic.userOperator) {
-      return self.state.activeWidget.logic.userOperator;
+    if(self.state.activeWidget.logic && self.state.activeWidget.logic.operator) {
+      return self.state.activeWidget.logic.operator;
     } else {
       return '';
     }
@@ -697,28 +709,212 @@ addLateralElement: function(newElement, parentId) {
 
     };
 
+    var eventCondition = function() {
+      if(self.state.activeWidget.type === "conditionBranch") {
+        return self.state.activeWidget.logic.operator;
+      } else {
+        return '=';
+      }
+    };
+
+
+    var eventConditionChange = function(e) {
+
+      var activeWidget = self.state.activeWidget;
+      var opeartor = $('#userOperator option:selected').val();
+
+      switch(opeartor) {
+
+        case 'has not triggered':
+
+        activeWidget.temp = { hideOptions: true };
+        self.setState({activeWidget: activeWidget});
+        console.log('has not triggered');
+        break;
+
+        default:
+        // show the options
+        activeWidget.temp = { hideOptions: undefined };
+        self.setState({activeWidget: activeWidget});
+        console.log('has triggered');
+
+
+
+      }
+
+    }
+
+
+    var conditionsJSX = function() {
+      return (
+              <div>
+              <optgroup label="Basic">
+              <option value="=">Equals (&#61;)</option>
+              <option value="!=">Not Equals (!&#61;)</option>
+              <option value="is not set">Not Set (null)</option>
+              </optgroup>
+              <optgroup label="Numeric">
+              <option value="<">Less Than (&lt;)</option>
+              <option value="<=">Less Than or Equal To (&lt;=)</option>
+              <option value=">">Greater Than (&gt;)</option>
+              <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
+              </optgroup>
+              <optgroup label="Fuzzy">
+              <option value="starts with">Starts With (*_)</option>
+              <option value="contains">Contains (*)</option>
+              <option value="does not contain">Does Not Contain (!*)</option>
+              <option value="ends with">Ends With (_*)</option>
+              </optgroup>
+              </div>
+              );
+    };
+
+    var eventValuesJSX = function() {
+      return(
+             <div>
+
+             <label>Event Key
+             <input id="eventKey" type="text" />
+             </label>
+
+             <label>Event Condition
+             <select id="eventCondition" defaultValue={eventCondition()} onChange={operatorChange}>
+             {conditionsJSX()}
+             </select>
+             </label>
+
+             <label>Event Value
+             <input id="eventValue" type="text" />
+             </label>
+
+             </div>
+             );
+    }
 
     var conditionOptions = function() {
+
       if(self.state.activeWidget.logic) {
         switch(self.state.activeWidget.logic.type) {
 
           case 'event':
-          return(
-                 <div>
 
-                 <label>Where User
-                 <select id="userOperator" defaultValue={userOperator()}>
-                 <option value="has triggered">Has Triggered</option>
-                 <option value="has not triggered">Has Not Triggered</option>
-                 </select>
-                 </label>
+          if(!_.isUndefined(self.state.activeWidget.temp)) {
 
-                 <label>Event Name
-                 <input id="eventName" type="text" defaultValue={eventName()} />
-                 </label>
+            if(self.state.activeWidget.temp.hideOptions) {
+              return(
+                     <div>
 
-                 </div>
-                 );
+                     <label>Where User
+                     <select id="userOperator" defaultValue={userOperator()} onChange={eventConditionChange}>
+                     <option value="has triggered">Has Triggered</option>
+                     <option value="has not triggered">Has Not Triggered</option>
+                     </select>
+                     </label>
+
+                     <label>Event Name
+                     <input id="eventName" type="text" defaultValue={eventName()} />
+                     </label>
+
+                     </div>
+                     );
+            } else {
+              return(
+                     <div>
+
+                     <label>Where User
+                     <select id="userOperator" defaultValue={userOperator()} onChange={eventConditionChange}>
+                     <option value="has triggered">Has Triggered</option>
+                     <option value="has not triggered">Has Not Triggered</option>
+                     </select>
+                     </label>
+
+                     <label>Event Name
+                     <input id="eventName" type="text" defaultValue={eventName()} />
+                     </label>
+
+                     <div className="alert-box radius">Filters</div>
+                     <h3>Event Values</h3>
+                     {eventValuesJSX()}
+
+
+                     </div>
+                     );
+            }
+
+          } else {
+
+            if(self.state.activeWidget.logic && self.state.activeWidget.logic.operator) {
+              if(self.state.activeWidget.logic.operator === 'has not triggered') {
+
+              return(
+                     <div>
+
+                     <label>Where User
+                     <select id="userOperator" defaultValue={userOperator()} onChange={eventConditionChange}>
+                     <option value="has triggered">Has Triggered</option>
+                     <option value="has not triggered">Has Not Triggered</option>
+                     </select>
+                     </label>
+
+                     <label>Event Name
+                     <input id="eventName" type="text" defaultValue={eventName()} />
+                     </label>
+
+                     </div>
+                     );
+
+              } else {
+
+              return(
+                     <div>
+
+                     <label>Where User
+                     <select id="userOperator" defaultValue={userOperator()} onChange={eventConditionChange}>
+                     <option value="has triggered">Has Triggered</option>
+                     <option value="has not triggered">Has Not Triggered</option>
+                     </select>
+                     </label>
+
+                     <label>Event Name
+                     <input id="eventName" type="text" defaultValue={eventName()} />
+                     </label>
+
+                     <div className="alert-box radius">Filters</div>
+                     <h3>Event Values</h3>
+                     {eventValuesJSX()}
+
+
+                     </div>
+                     );
+                
+              }
+
+
+            } else {
+
+              return(
+                     <div>
+
+                     <label>Where User
+                     <select id="userOperator" defaultValue={userOperator()} onChange={eventConditionChange}>
+                     <option value="has triggered">Has Triggered</option>
+                     <option value="has not triggered">Has Not Triggered</option>
+                     </select>
+                     </label>
+
+                     <label>Event Name
+                     <input id="eventName" type="text" defaultValue={eventName()} />
+                     </label>
+
+                     </div>
+                     );
+
+            }
+
+          }
+
+
+
           break;
 
 
@@ -732,23 +928,7 @@ addLateralElement: function(newElement, parentId) {
 
                  <label>Condition Operator
                  <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
-                 <optgroup label="Basic">
-                 <option value="=">Equals (&#61;)</option>
-                 <option value="!=">Not Equals (!&#61;)</option>
-                 <option value="is not set">Not Set (null)</option>
-                 </optgroup>
-                 <optgroup label="Numeric">
-                 <option value="<">Less Than (&lt;)</option>
-                 <option value="<=">Less Than or Equal To (&lt;=)</option>
-                 <option value=">">Greater Than (&gt;)</option>
-                 <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
-                 </optgroup>
-                 <optgroup label="Fuzzy">
-                 <option value="starts with">Starts With (*_)</option>
-                 <option value="contains">Contains (*)</option>
-                 <option value="does not contain">Does Not Contain (!*)</option>
-                 <option value="ends with">Ends With (_*)</option>
-                 </optgroup>
+                 {conditionsJSX()}
                  </select>
                  </label>
 
@@ -756,39 +936,39 @@ addLateralElement: function(newElement, parentId) {
                  </div>
                  );
 
-}
-} else {
-  return(
-         <div>
-         <label>Condition Key
-         <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
-         </label>
+        }
+      } else {
+        return(
+               <div>
+               <label>Condition Key
+               <input id="conditionBranchLogicKey" type="text" defaultValue={conditionBranchLogicKey()} />
+               </label>
 
-         <label>Condition Operator
-         <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
-         <optgroup label="Basic">
-         <option value="=">Equals (&#61;)</option>
-         <option value="!=">Not Equals (!&#61;)</option>
-         <option value="is not set">Not Set (null)</option>
-         </optgroup>
-         <optgroup label="Numeric">
-         <option value="<">Less Than (&lt;)</option>
-         <option value="<=">Less Than or Equal To (&lt;=)</option>
-         <option value=">">Greater Than (&gt;)</option>
-         <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
-         </optgroup>
-         <optgroup label="Fuzzy">
-         <option value="starts with">Starts With (*_)</option>
-         <option value="contains">Contains (*)</option>
-         <option value="does not contain">Does Not Contain (!*)</option>
-         <option value="ends with">Ends With (_*)</option>
-         </optgroup>
-         </select>
-         </label>
+               <label>Condition Operator
+               <select id="conditionBranchLogicOperator" defaultValue={conditionBranchLogicOperator()} onChange={operatorChange}>
+               <optgroup label="Basic">
+               <option value="=">Equals (&#61;)</option>
+               <option value="!=">Not Equals (!&#61;)</option>
+               <option value="is not set">Not Set (null)</option>
+               </optgroup>
+               <optgroup label="Numeric">
+               <option value="<">Less Than (&lt;)</option>
+               <option value="<=">Less Than or Equal To (&lt;=)</option>
+               <option value=">">Greater Than (&gt;)</option>
+               <option value=">=">Greater Than or Equal To (&gt;&#61;)</option>
+               </optgroup>
+               <optgroup label="Fuzzy">
+               <option value="starts with">Starts With (*_)</option>
+               <option value="contains">Contains (*)</option>
+               <option value="does not contain">Does Not Contain (!*)</option>
+               <option value="ends with">Ends With (_*)</option>
+               </optgroup>
+               </select>
+               </label>
 
-         {conditionValue()}
-         </div>
-         );
+               {conditionValue()}
+               </div>
+               );
 }
 };
 

@@ -613,16 +613,10 @@ render: function() {
               </div>
               );
 } else {
-  return (
-          <div>
-          An unexpected error occurred
-          </div>);
+  return null;
 } 
 } else {
-  return (
-          <div>
-          An unexpected error occurred
-          </div>);
+  return null;
 }
 }
 
